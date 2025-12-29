@@ -1,136 +1,446 @@
-# tamagotchi
+<div align="center">
 
-Una aplicación en Flutter (Android) que simule un Tamagotchi debe incluir mecánicas básicas de cuidado de una mascota virtual, como alimentación, juego y monitoreo de salud, para mantenerla viva y evolucionando. Aunque los detalles exactos pueden variar según el diseño, la evidencia sugiere que las implementaciones exitosas priorizan la persistencia de estado y actualizaciones en tiempo real para simular vida continua.
+# 🐾 Tamagotchi Virtual
 
-Características esenciales: Incluye interacciones como alimentar, jugar y limpiar, con estados de humor que cambian con el tiempo; personalización de la mascota; y notificaciones para recordatorios de cuidado.
-Implementación en background: Usa plugins como WorkManager para tareas periódicas en Android (por ejemplo, aumentar el hambre cada pocos minutos), pero en iOS hay limitaciones y se recurre a alternativas como background_fetch; los isolates ayudan en cálculos intensivos sin bloquear la UI.
-Funciones clave a implementar: Maneja eventos como carga de estado, actualizaciones de temporizadores y persistencia de datos para asegurar que la mascota "viva" incluso cuando la app no está abierta.
+### Una mascota virtual completa desarrollada en Flutter
 
-## Características Principales
+[![Flutter](https://img.shields.io/badge/Flutter-3.10.4+-02569B?logo=flutter&logoColor=white)](https://flutter.dev)
+[![Dart](https://img.shields.io/badge/Dart-3.0+-0175C2?logo=dart&logoColor=white)](https://dart.dev)
+[![Platform](https://img.shields.io/badge/Platform-Android%20%7C%20iOS-green)](https://flutter.dev)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-Una app de este tipo debe replicar la esencia de un Tamagotchi: una mascota digital que requiere atención constante para evitar que "muera" o se deteriore. Basado en ejemplos prácticos, incluye mecánicas de cuidado (alimentar, jugar), seguimiento de métricas como hambre o felicidad, y elementos visuales como animaciones. Agrega notificaciones push para alertas en background, y opcionalmente IA para comportamientos adaptativos. La personalización, como cambiar apariencias, aumenta el engagement.
+[Características](#-características) • [Instalación](#-instalación) • [Uso](#-uso) • [Documentación](#-documentación) • [Créditos](#-créditos)
 
-### Implementación por Plataforma:
+</div>
 
-Android: Usa workmanager para tareas OS-level que sobreviven al cierre de la app. Por ejemplo, registra una tarea periódica para aumentar hambre cada 15 minutos. Código ejemplo:
+---
 
-## Lista de Funciones a Implementar
+## 📖 Descripción
 
-Aquí una lista sugerida basada en implementaciones reales:
+**Tamagotchi Virtual** es una aplicación móvil desarrollada en Flutter que recrea la experiencia clásica de cuidar una mascota virtual. Con un sistema completo de evolución, personalización y procesamiento en background, tu mascota vive 24/7 incluso cuando la app está cerrada.
 
-* initApp(): Inicializa el estado, temporizadores y servicios de background.
-* loadPetState(): Carga datos persistentes como nombre, últimos timestamps de interacciones.
-* updateMood(): Calcula humor basado en tiempo transcurrido (por ejemplo, hambriento si >40 segundos sin alimentar).
-* feedPet(): Actualiza estado de hambre, establece humor feliz y guarda cambios.
-* playWithPet(): Mejora felicidad, actualiza timestamps y activa animaciones.
-* saveState(): Persiste datos en almacenamiento local.
-* startBackgroundTimer(): Configura tareas periódicas para actualizaciones en fondo.
-* handleNotifications(): Envía alertas push cuando el estado crítico (por ejemplo, mascota triste).
-* disposeResources(): Cancela temporizadores y servicios al cerrar.
+Este proyecto implementa mecánicas modernas de gamificación incluyendo:
+- Sistema de evolución con 5 etapas de vida
+- Experiencia y niveles
+- Procesamiento en background real con WorkManager
+- Notificaciones inteligentes
+- Persistencia completa de estado
 
-## Características Básicas (Must-Have):
+## 📋 Tabla de Contenidos
 
-* Cuidado Rutinario de la Mascota: Alimentación, limpieza, juego y descanso. Por ejemplo, botones para "alimentar" que reduzcan el nivel de hambre, o "jugar" que aumenten la felicidad. Si se ignora, la mascota puede "enfermar" o "morir", reiniciando el progreso.
-* Monitoreo de Estados y Métricas: Seguimiento de variables como hambre, felicidad, energía y salud. Estas cambian con el tiempo real, usando temporizadores para simular decadencia natural (e.g., hambre aumenta cada 5 minutos).
-* Personalización: Permitir renombrar la mascota, cambiar apariencias (colores, accesorios) o entornos. Esto fomenta apego emocional.
-* Interacciones Visuales y Animaciones: Animaciones simples para acciones, como un rebote al jugar o expresiones faciales para humores (feliz, hambriento, triste). Usa paquetes como flutter_bloc para manejar estados reactivos.
-* Notificaciones y Recordatorios: Alertas push para eventos como "Tu mascota tiene hambre" o "Es hora de jugar", integradas con Firebase Cloud Messaging o similares.
-* Persistencia de Estado: Guardado local de progreso para que la mascota "sobreviva" al cerrar la app, usando shared_preferences o Hive.
+- [Características](#-características)
+- [Demo](#-demo)
+- [Instalación](#-instalación)
+- [Uso](#-uso)
+- [Arquitectura](#-arquitectura)
+- [Tecnologías](#-tecnologías)
+- [Estado del Proyecto](#-estado-del-proyecto)
+- [Documentación](#-documentación)
+- [Roadmap](#-roadmap)
+- [Contribuir](#-contribuir)
+- [Créditos](#-créditos)
+- [Licencia](#-licencia)
+- [Contacto](#-contacto)
 
-## Características Avanzadas (Opcionales para Escalabilidad):
+## ✨ Características
 
-Comportamientos Adaptativos con IA: La mascota aprende de interacciones, recordando preferencias (e.g., prefiere ciertos juegos). Integra modelos como TensorFlow Lite para respuestas conversacionales.
-Mini-Juegos Integrados: Actividades como puzzles o carreras para ganar recompensas, implementadas con paquetes como Flame para juegos en Flutter.
-Realidad Aumentada (AR): Proyectar la mascota en el mundo real usando ARCore/ARKit, para interacciones inmersivas.
-Elementos Sociales: Compartir progreso en redes o multijugador para "visitar" mascotas de amigos.
-Evolución y Ciclos de Vida: La mascota crece o evoluciona basado en cuidado, con etapas como bebé, adulto o formas especiales.
+### 🎮 Cuidado Virtual Completo
 
-## Mecánica General:
+- **4 Acciones de Cuidado**: Alimentar 🍔, Jugar 🎮, Limpiar 🧼, Descansar 😴
+- **Métricas en Tiempo Real**: Hambre, Felicidad, Energía y Salud que decaen continuamente
+- **Estados de Ánimo Dinámicos**: 6 estados diferentes (Feliz, Triste, Hambriento, Cansado, Normal, Crítico)
+- **Animaciones Fluidas**: Botones animados y avatar con efecto de "respiración"
 
-Tareas Periódicas: Un temporizador (e.g., Timer.periodic) actualiza métricas como hambre o felicidad cada pocos segundos/minutos. Cuando la app está en foreground, esto es directo; en background, se delega a servicios del SO.
-Persistencia: Al actualizar, guarda el estado en almacenamiento local. Al reabrir, carga y calcula cambios basados en timestamps (e.g., tiempo desde última interacción).
-Notificaciones: Integra con firebase_messaging o flutter_local_notifications para alertas cuando un estado es crítico, incluso en background.
+### 🐣 Sistema de Evolución
 
-### Cómo Funcionaría la Implementación en Background
-La clave de un Tamagotchi es que la mascota "vive" continuamente, incluso sin la app abierta. En Flutter, esto se logra con procesos en background que actualizan estados periódicamente, pero con limitaciones por plataforma debido a restricciones de batería y seguridad en móviles.
+- **5 Etapas de Vida**: Huevo 🥚 → Bebé 🐣 → Niño 🐥 → Adolescente 🐤 → Adulto 🐦
+- **Sistema de Experiencia**: Gana XP por cada acción de cuidado
+- **Niveles Progresivos**: Sistema de nivelación exponencial con barra de progreso
+- **3 Variantes de Adulto**: Evoluciona en Descuidado 💀, Normal 🐦 o Excelente 🦅 según tu cuidado
+- **Celebración de Evolución**: Diálogo especial cada vez que tu mascota evoluciona
+- **Evolución Dual**: Basada en experiencia O tiempo (lo que ocurra primero)
 
-## Estado del Proyecto
+### 💾 Persistencia y Background
 
-### Fases Completadas
+- **Persistencia Total**: SharedPreferences guarda todo el estado entre sesiones
+- **Background 24/7**: WorkManager ejecuta tareas cada 15 minutos incluso con la app cerrada
+- **Cálculo Retroactivo**: Al reabrir, calcula métricas basadas en tiempo transcurrido
+- **Lifecycle Management**: Manejo correcto de estados de app (pausa, resume, cierre)
 
-- ✅ **Fase 1**: Estructura base y UI - Modelos, widgets, pantallas, tema
-- ✅ **Fase 2**: Interacciones básicas - Alimentar, jugar, limpiar, descansar
-- ✅ **Fase 3**: Persistencia de estado - SharedPreferences, guardado/carga
-- ✅ **Fase 4**: Temporizadores en tiempo real - Decaimiento continuo de métricas
-- ✅ **Fase 5**: Background processing - WorkManager para actualizaciones 24/7
-- ✅ **Fase 6**: Sistema de notificaciones - Alertas críticas cuando necesita atención
-- ✅ **Fase 7**: Personalización - Colores, accesorios, renombrar mascota
-- ✅ **Fase 8**: Pulido y UX - Animaciones, haptic feedback, onboarding
-- ✅ **Fase 9**: Evolución y Ciclos de Vida - 5 etapas, experiencia, variantes
+### 🔔 Notificaciones Inteligentes
+
+- **Alertas Críticas**: Notificaciones cuando tu mascota necesita atención urgente
+- **Permisos Dinámicos**: Solicitud de permisos en tiempo de ejecución
+- **Contextuales**: Mensajes específicos según el estado (hambre, cansancio, salud baja)
+
+### 🎨 Personalización
+
+- **8 Colores Disponibles**: Púrpura, Rosa, Azul, Verde, Naranja, Rojo, Teal, Ámbar
+- **5 Accesorios**: Sombrero 🎩, Corona 👑, Gafas 🕶️, Lazo 🎀, Sin accesorio
+- **Renombrar Mascota**: Dale un nombre único a tu compañero virtual
+- **Configuración de Sonido**: Habilitar/deshabilitar haptic feedback
+
+### ✨ UX y Pulido
+
+- **Haptic Feedback**: Vibración táctil diferenciada para cada acción
+- **Onboarding Interactivo**: Tutorial de 5 pasos para nuevos usuarios
+- **3 Pantallas**: Cuidado, Configuración y Acerca de
+- **Material Design 3**: Interfaz moderna siguiendo las guías de diseño de Google
+- **Animaciones Contextuales**: Feedback visual inmediato en cada interacción
+
+## 🎥 Demo
+
+> 🚧 Sección en desarrollo - Se agregarán capturas de pantalla y video demo
+
+<!--
+Incluir aquí:
+- Capturas de diferentes etapas de evolución
+- Video de interacciones
+- GIFs de animaciones
+-->
+
+## 📥 Instalación
+
+### Requisitos Previos
+
+- **Flutter SDK**: 3.10.4 o superior
+- **Dart SDK**: 3.0 o superior
+- **Android Studio** o **VS Code** con extensiones de Flutter
+- **Dispositivo Android** (físico o emulador) con Android 5.0+ (API 21+)
+- **iOS** (opcional): Xcode 14+ y dispositivo iOS 12+
+
+### Pasos de Instalación
+
+1. **Clonar el repositorio**
+   ```bash
+   git clone https://github.com/tu-usuario/tamagotchi.git
+   cd tamagotchi
+   ```
+
+2. **Instalar dependencias**
+   ```bash
+   flutter pub get
+   ```
+
+3. **Verificar configuración de Flutter**
+   ```bash
+   flutter doctor
+   ```
+
+4. **Ejecutar en modo debug**
+   ```bash
+   # Android
+   flutter run
+
+   # iOS (solo en macOS)
+   flutter run -d ios
+   ```
+
+5. **Compilar release (Android)**
+   ```bash
+   flutter build apk --release
+   # El APK se genera en: build/app/outputs/flutter-apk/app-release.apk
+   ```
+
+### Dependencias Principales
+
+```yaml
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Persistencia
+  shared_preferences: ^2.2.2
+
+  # Background Processing
+  workmanager: ^0.5.1
+
+  # Notificaciones
+  flutter_local_notifications: ^16.3.0
+  permission_handler: ^11.1.0
+
+  # UX
+  vibration: ^2.0.0
+  introduction_screen: ^3.1.14
+
+  # Navegación
+  cupertino_icons: ^1.0.6
+```
+
+## 🚀 Uso
+
+### Primera Ejecución
+
+1. Al abrir la app por primera vez, verás un **onboarding interactivo** de 5 pasos
+2. Se te solicitarán **permisos de notificación** (recomendado aceptar)
+3. Tu mascota comenzará como un **Huevo 🥚** (Etapa 1)
+4. Realiza acciones de cuidado para ganar experiencia y ayudarla a evolucionar
+
+### Acciones de Cuidado
+
+| Acción | Efecto | XP |
+|--------|--------|-----|
+| 🍔 **Alimentar** | Reduce hambre -30 | +10 XP |
+| 🎮 **Jugar** | Aumenta felicidad +25, reduce energía -15 | +15 XP |
+| 🧼 **Limpiar** | Aumenta salud +20 | +10 XP |
+| 😴 **Descansar** | Aumenta energía +40 | +5 XP |
+
+### Sistema de Evolución
+
+#### Por Experiencia (Rápido)
+- **Bebé** (🐣): 100 XP (~10 acciones de jugar)
+- **Niño** (🐥): 500 XP (~33 acciones adicionales)
+- **Adolescente** (🐤): 1500 XP (~67 acciones adicionales)
+- **Adulto** (🐦): 3000 XP (~100 acciones adicionales)
+
+#### Por Tiempo (Automático)
+- **Bebé**: 5 minutos desde nacimiento
+- **Niño**: 30 minutos de vida
+- **Adolescente**: 2 horas de vida
+- **Adulto**: 6 horas de vida
+
+### Variantes de Adulto
+
+Tu mascota evolucionará en diferentes formas según tu cuidado:
+
+- **Excelente** 🦅: Promedio de métricas > 70 (requiere atención constante)
+- **Normal** 🐦: Promedio de métricas 40-70 (cuidado regular)
+- **Descuidado** 💀: Promedio de métricas < 40 (advertencia visual)
+
+### Personalización
+
+1. Ve a la pestaña **⚙️ Configuración**
+2. Selecciona un **color** (8 opciones disponibles)
+3. Elige un **accesorio** (5 opciones)
+4. **Renombra** tu mascota tocando el botón de edición
+5. Activa/desactiva **sonido** y **notificaciones**
+
+## 🏗️ Arquitectura
+
+### Estructura del Proyecto
+
+```
+lib/
+├── config/
+│   └── theme.dart              # Tema y colores de la app
+├── models/
+│   ├── pet.dart                # Modelo principal de la mascota
+│   ├── life_stage.dart         # Etapas de vida y evolución
+│   ├── pet_preferences.dart    # Preferencias de personalización
+│   └── credit_model.dart       # Modelo para créditos
+├── screens/
+│   ├── home_screen.dart        # Pantalla principal de cuidado
+│   ├── settings_screen.dart    # Configuración y personalización
+│   ├── about_screen.dart       # Información de la app
+│   ├── credits_screen.dart     # Créditos del proyecto
+│   ├── onboarding_screen.dart  # Tutorial inicial
+│   └── main_navigation.dart    # Navegación por pestañas
+├── services/
+│   ├── storage_service.dart       # Persistencia con SharedPreferences
+│   ├── background_service.dart    # WorkManager para background
+│   ├── notification_service.dart  # Sistema de notificaciones
+│   ├── preferences_service.dart   # Gestión de preferencias
+│   ├── feedback_service.dart      # Haptic feedback
+│   └── local_service.dart         # Servicios locales
+├── widgets/
+│   ├── pet_display.dart           # Widget de visualización de mascota
+│   ├── metric_bar.dart            # Barras de métricas
+│   └── animated_action_button.dart # Botones animados
+├── utils/
+│   └── constants.dart          # Constantes de la app
+└── main.dart                   # Punto de entrada
+```
+
+### Flujo de Datos
+
+```mermaid
+graph TD
+    A[Usuario] -->|Interacción| B[Home Screen]
+    B -->|Actualiza| C[Pet Model]
+    C -->|Guarda| D[Storage Service]
+    D -->|Persiste| E[SharedPreferences]
+
+    F[Timer] -->|Cada 1s| B
+    G[WorkManager] -->|Cada 15min| H[Background Service]
+    H -->|Actualiza| D
+
+    C -->|Estado crítico| I[Notification Service]
+    I -->|Alerta| A
+```
+
+### Patrones de Diseño
+
+- **State Management**: StatefulWidget con setState
+- **Service Layer**: Capa de servicios para lógica de negocio
+- **Model Layer**: Modelos inmutables con copyWith
+- **Singleton Pattern**: Servicios como singletons
+- **Observer Pattern**: Temporizadores y listeners de lifecycle
+
+## 🛠️ Tecnologías
+
+### Frontend
+- **Flutter 3.10.4+**: Framework principal de UI
+- **Dart 3.0+**: Lenguaje de programación
+- **Material Design 3**: Sistema de diseño
+
+### Backend & Persistencia
+- **SharedPreferences**: Almacenamiento local clave-valor
+- **WorkManager**: Procesamiento en background (Android)
+
+### Notificaciones
+- **flutter_local_notifications**: Notificaciones locales
+- **permission_handler**: Gestión de permisos
+
+### UX & Feedback
+- **vibration**: Feedback háptico
+- **introduction_screen**: Onboarding
+
+### Herramientas de Desarrollo
+- **flutter_launcher_icons**: Generación de iconos
+- **flutter_native_splash**: Splash screen nativo
+
+## 📊 Estado del Proyecto
+
+### Fases Completadas ✅
+
+| Fase | Descripción | Estado |
+|------|-------------|--------|
+| **Fase 1** | Estructura base y UI | ✅ Completada |
+| **Fase 2** | Interacciones básicas | ✅ Completada |
+| **Fase 3** | Persistencia de estado | ✅ Completada |
+| **Fase 4** | Temporizadores en tiempo real | ✅ Completada |
+| **Fase 5** | Background processing | ✅ Completada |
+| **Fase 6** | Sistema de notificaciones | ✅ Completada |
+| **Fase 7** | Personalización | ✅ Completada |
+| **Fase 8** | Pulido y UX | ✅ Completada |
+| **Fase 9** | Evolución y Ciclos de Vida | ✅ Completada |
+
+**Total: 42 tareas completadas** 🎉
+
+### Próximas Mejoras (Opcionales)
+
+- [ ] **Fase 10**: Mini-Juegos (puzzles, carreras)
+- [ ] **Fase 11**: Elementos Sociales (compartir, multijugador)
+- [ ] **Fase 12**: Más Variantes de Evolución
+- [ ] **Fase 13**: IA Adaptativa con TensorFlow Lite
+- [ ] **Fase 14**: Realidad Aumentada (ARCore/ARKit)
+
+## 📚 Documentación
+
+Cada fase implementada incluye documentación técnica detallada:
 
 ### Documentación por Fase
 
-Cada fase implementada incluye documentación detallada:
-- `FASE_4_TEMPORIZADORES.md` - Sistema de actualización en tiempo real
-- `FASE_5_BACKGROUND.md` - Procesamiento en segundo plano
-- `FASE_6_NOTIFICACIONES.md` - Sistema de notificaciones
-- `FASE_7_PERSONALIZACION.md` - Sistema de personalización
-- `FASE_8_PULIDO_UX.md` - Animaciones, haptic feedback y onboarding
-- `FASE_9_EVOLUCION.md` - Sistema de evolución y ciclos de vida
-- `COMO_PROBAR_PERSISTENCIA.md` - Guía de pruebas
+- 📄 [**FASE_3_PERSISTENCIA.md**](FASE_3_PERSISTENCIA.md) - Sistema de guardado y carga
+- 📄 [**FASE_4_TEMPORIZADORES.md**](FASE_4_TEMPORIZADORES.md) - Actualización en tiempo real
+- 📄 [**FASE_5_BACKGROUND.md**](FASE_5_BACKGROUND.md) - Procesamiento en segundo plano
+- 📄 [**FASE_6_NOTIFICACIONES.md**](FASE_6_NOTIFICACIONES.md) - Sistema de notificaciones
+- 📄 [**FASE_7_PERSONALIZACION.md**](FASE_7_PERSONALIZACION.md) - Personalización completa
+- 📄 [**FASE_8_PULIDO_UX.md**](FASE_8_PULIDO_UX.md) - Animaciones y feedback
+- 📄 [**FASE_9_EVOLUCION.md**](FASE_9_EVOLUCION.md) - Sistema de evolución
 
-Consulta `ROADMAP.md` para ver las siguientes fases opcionales (Mini-juegos, Social).
+### Guías Adicionales
 
-## Características Implementadas
+- 📄 [**ROADMAP.md**](ROADMAP.md) - Hoja de ruta completa del proyecto
+- 📄 [**COMO_PROBAR_PERSISTENCIA.md**](COMO_PROBAR_PERSISTENCIA.md) - Guía de pruebas
+- 📄 [**ESTRUCTURA_INICIAL.md**](ESTRUCTURA_INICIAL.md) - Estructura del proyecto
 
-Tu Tamagotchi incluye:
+## 🗺️ Roadmap
 
-1. 🐾 **Mascota Virtual Completa** - Con estados de ánimo dinámicos
-2. 🎮 **4 Acciones de Cuidado** - Alimentar, jugar, limpiar, descansar (con animaciones)
-3. 💾 **Persistencia Total** - El estado se guarda entre sesiones
-4. ⏱️ **Tiempo Real** - Métricas que decaen continuamente
-5. 🔔 **Notificaciones** - Alertas cuando necesita atención
-6. 🌙 **Background 24/7** - Vive incluso con la app cerrada
-7. 🎨 **Personalización** - 8 colores y 5 accesorios
-8. ✏️ **Renombrar** - Dale un nombre único a tu mascota
-9. 📱 **3 Pantallas** - Cuidado, Configuración, Acerca de
-10. ✨ **Animaciones Fluidas** - Botones animados y avatar que "respira"
-11. 📳 **Haptic Feedback** - Vibración táctil en todas las interacciones
-12. 🎓 **Onboarding** - Tutorial interactivo para nuevos usuarios
-13. 🐣 **5 Etapas de Vida** - Huevo → Bebé → Niño → Adolescente → Adulto
-14. ⭐ **Sistema de Experiencia** - Gana XP por cuidar, sube de nivel
-15. 🦅 **3 Variantes** - Evoluciona diferente según tu cuidado
-16. 🎉 **Celebración de Evolución** - Notificación especial al evolucionar
+```
+✅ Q4 2024 - Fases 1-6: MVP Funcional
+✅ Q4 2024 - Fases 7-9: Personalización y Evolución
+🚧 Q1 2025 - Fase 10: Mini-Juegos
+📅 Q2 2025 - Fase 11: Social Features
+📅 Q3 2025 - Fase 12-14: IA y AR
+```
 
-## Key Citations
+## 🤝 Contribuir
 
-* Is it possible to make a tamagotchi-like game w flutter as a no brainer
-* Build Your First Flutter Game with Flame | Apps From Scratch
-* How to Build an AI Virtual Pet App: A Step-by-Step Guide
-* Background processes
-* How I Built a Virtual Pet App in Flutter
-* [A Hatsune Miku's Tamagotchi project made with Flutter - GitHub (https://github.com/wesleydevsouza/)]
-* MikuDatchi?referrer=grok.com
-* Running Background Tasks in Flutter - GeeksforGeeks
-* Background Processing Using WorkManager and Isolates in Flutter
+Las contribuciones son bienvenidas. Por favor:
 
-👥 Créditos
-Desarrollado por
-Facultad de Estudios Superiores Iztacala
-Universidad Nacional Autónoma de México (UNAM)
-Tecnologías principales
-Flutter & Dart
+1. Fork el proyecto
+2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
+3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abre un Pull Request
 
-Agradecimientos
-Comunidad de FES Iztacala
-Equipo de desarrollo de Flutter
-Contribuidores del proyecto
-Para más información sobre los créditos, consulta la sección "Acerca de" dentro de la aplicación.
+### Guías de Contribución
 
-📞 Contacto
-FES Iztacala
-🌐 Sitio Web Oficial
-📱 Portal de Noticias
-📧 Contacto: apps@iztacala.unam.mx
-Hecho con ❤️ en Flutter | FES Iztacala, UNAM
-Made with Flutter
+- Seguir las convenciones de código de Dart/Flutter
+- Documentar funciones públicas
+- Agregar tests cuando sea aplicable
+- Actualizar documentación relevante
+
+## 👥 Créditos
+
+### Desarrollado por
+
+**Facultad de Estudios Superiores Iztacala**
+**Universidad Nacional Autónoma de México (UNAM)**
+
+### Equipo de Desarrollo
+
+Este proyecto fue desarrollado como parte de las actividades académicas de FES Iztacala.
+
+### Tecnologías Principales
+
+- [Flutter](https://flutter.dev) - Framework de desarrollo
+- [Dart](https://dart.dev) - Lenguaje de programación
+
+### Agradecimientos
+
+- Comunidad de FES Iztacala
+- Equipo de desarrollo de Flutter
+- Contribuidores del proyecto
+- Comunidad open source de Flutter
+
+Para más información sobre los créditos, consulta la sección **"Acerca de"** dentro de la aplicación.
+
+## 📄 Licencia
+
+Este proyecto está bajo la Licencia MIT. Ver el archivo [LICENSE](LICENSE) para más detalles.
+
+```
+MIT License
+
+Copyright (c) 2024 FES Iztacala, UNAM
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software")...
+```
+
+## 📞 Contacto
+
+**FES Iztacala - UNAM**
+
+- 🌐 [Sitio Web Oficial](https://www.iztacala.unam.mx/)
+- 📱 [Portal de Noticias](https://noticias.iztacala.unam.mx/)
+- 📧 Email: apps@iztacala.unam.mx
+
+## 🔗 Referencias
+
+### Inspiración y Recursos
+
+- [Flutter Documentation](https://docs.flutter.dev/)
+- [Background Processing in Flutter](https://pub.dev/packages/workmanager)
+- [Flutter Local Notifications](https://pub.dev/packages/flutter_local_notifications)
+- [Building Virtual Pet Apps](https://medium.com/@flutter-guides)
+
+### Proyectos Relacionados
+
+- [MikuDatchi](https://github.com/wesleydevsouza/) - Tamagotchi de Hatsune Miku en Flutter
+- [Flutter Games](https://flutter.dev/games) - Recursos oficiales de Flutter para juegos
+
+---
+
+<div align="center">
+
+**Hecho con ❤️ en Flutter**
+
+[![Flutter](https://img.shields.io/badge/Made%20with-Flutter-02569B?logo=flutter&logoColor=white)](https://flutter.dev)
+[![UNAM](https://img.shields.io/badge/FES-Iztacala-gold)](https://www.iztacala.unam.mx/)
+
+[⬆ Volver arriba](#-tamagotchi-virtual)
+
+</div>
