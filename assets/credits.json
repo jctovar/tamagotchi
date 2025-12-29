@@ -1,0 +1,39 @@
+{
+  "RECORDS": [
+    {
+      "credit_id": 1,
+      "credit_name": "Directora de la FES Iztacala",
+      "credit_members": "Dra. María del Coro Arizmendi Arriaga"
+    },
+    {
+      "credit_id": 2,
+      "credit_name": "Secretaria General Académica",
+      "credit_members": "Dra. Claudia Tzasna Hernández Delgado"
+    },
+    {
+      "credit_id": 3,
+      "credit_name": "Secretario de Desarrollo y Relaciones Institucionales",
+      "credit_members": "Esp. Noé Francisco Santana Domínguez"
+    },
+    {
+        "credit_id": 4,
+        "credit_name": "Secretario de Planeación y Cuerpos Colegiados",
+        "credit_members": "Dr. Rodrigo Erick Escartín Pérez"
+    },
+    {
+        "credit_id": 5,
+        "credit_name": "Secretaria Administrativa",
+        "credit_members": "C.P. Reyna Isabel Ferrer Trujillo"
+    },
+    {
+        "credit_id": 6,
+        "credit_name": "Jefe del Departamento de Comunicación Social",
+        "credit_members": "Mtro. Eduardo Méndez Sandoval"
+    },
+    {
+      "credit_id": 7,
+      "credit_name": "Jefe del Departamento de Plataformas Educativas",
+      "credit_members": "Ing. Juan Carlos Tovar Gómez"
+    }
+  ]
+}
