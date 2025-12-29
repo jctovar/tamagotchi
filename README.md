@@ -109,6 +109,6 @@ Build Your First Flutter Game with Flame | Apps From Scratch
 How to Build an AI Virtual Pet App: A Step-by-Step Guide
 Background processes
 How I Built a Virtual Pet App in Flutter
-A Hatsune Miku's Tamagotchi project made with Flutter - GitHub
+[A Hatsune Miku's Tamagotchi project made with Flutter - GitHub] (https://github.com/wesleydevsouza/)MikuDatchi?referrer=grok.com
 Running Background Tasks in Flutter - GeeksforGeeks
 Background Processing Using WorkManager and Isolates in Flutter
