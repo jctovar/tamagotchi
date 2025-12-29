@@ -104,11 +104,33 @@ Tu Tamagotchi incluye:
 
 ## Key Citations
 
-Is it possible to make a tamagotchi-like game w flutter as a no brainer
-Build Your First Flutter Game with Flame | Apps From Scratch
-How to Build an AI Virtual Pet App: A Step-by-Step Guide
-Background processes
-How I Built a Virtual Pet App in Flutter
-[A Hatsune Miku's Tamagotchi project made with Flutter - GitHub] (https://github.com/wesleydevsouza/)MikuDatchi?referrer=grok.com
-Running Background Tasks in Flutter - GeeksforGeeks
-Background Processing Using WorkManager and Isolates in Flutter
+* Is it possible to make a tamagotchi-like game w flutter as a no brainer
+* Build Your First Flutter Game with Flame | Apps From Scratch
+* How to Build an AI Virtual Pet App: A Step-by-Step Guide
+* Background processes
+* How I Built a Virtual Pet App in Flutter
+* [A Hatsune Miku's Tamagotchi project made with Flutter - GitHub (https://github.com/wesleydevsouza/)]
+* MikuDatchi?referrer=grok.com
+* Running Background Tasks in Flutter - GeeksforGeeks
+* Background Processing Using WorkManager and Isolates in Flutter
+
+👥 Créditos
+Desarrollado por
+Facultad de Estudios Superiores Iztacala
+Universidad Nacional Autónoma de México (UNAM)
+Tecnologías principales
+Flutter & Dart
+
+Agradecimientos
+Comunidad de FES Iztacala
+Equipo de desarrollo de Flutter
+Contribuidores del proyecto
+Para más información sobre los créditos, consulta la sección "Acerca de" dentro de la aplicación.
+
+📞 Contacto
+FES Iztacala
+🌐 Sitio Web Oficial
+📱 Portal de Noticias
+📧 Contacto: apps@iztacala.unam.mx
+Hecho con ❤️ en Flutter | FES Iztacala, UNAM
+Made with Flutter
