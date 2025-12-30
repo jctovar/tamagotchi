@@ -3,6 +3,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tamagotchi/services/storage_service.dart';
 import 'package:tamagotchi/models/pet.dart';
 import 'package:tamagotchi/models/life_stage.dart';
+import 'package:tamagotchi/models/minigame_stats.dart';
+import 'package:tamagotchi/models/interaction_history.dart';
+import 'package:tamagotchi/models/pet_personality.dart';
 import 'package:tamagotchi/utils/constants.dart';
 
 void main() {
@@ -580,6 +583,387 @@ void main() {
 
       // Verify clean slate
       expect(await service.loadPetState(), isNull);
+    });
+  });
+
+  group('StorageService - MiniGameStats', () {
+    test('loadMiniGameStats returns empty stats when no data exists', () async {
+      final service = StorageService();
+
+      final stats = await service.loadMiniGameStats();
+
+      expect(stats, isNotNull);
+      expect(stats.totalGamesPlayed, 0);
+      expect(stats.totalWins, 0);
+      expect(stats.totalXpEarned, 0);
+      expect(stats.totalCoinsEarned, 0);
+    });
+
+    test('saveMiniGameStats stores data correctly', () async {
+      final service = StorageService();
+      final stats = MiniGameStats();
+
+      await service.saveMiniGameStats(stats);
+
+      final prefs = await SharedPreferences.getInstance();
+      final savedData = prefs.getString('minigame_stats');
+      expect(savedData, isNotNull);
+    });
+
+    test('saveMiniGameStats and loadMiniGameStats preserve data', () async {
+      final service = StorageService();
+      final originalStats = MiniGameStats();
+      final memoryStats = GameStats(
+        gameType: MiniGameType.memory,
+        timesPlayed: 10,
+        timesWon: 7,
+        bestScore: 1500,
+        totalXpEarned: 350,
+        totalCoinsEarned: 70,
+      );
+      final updatedStats = originalStats.updateGameStats(MiniGameType.memory, memoryStats);
+
+      await service.saveMiniGameStats(updatedStats);
+      final loadedStats = await service.loadMiniGameStats();
+
+      final loadedMemoryStats = loadedStats.getStats(MiniGameType.memory);
+      expect(loadedMemoryStats.timesPlayed, 10);
+      expect(loadedMemoryStats.timesWon, 7);
+      expect(loadedMemoryStats.bestScore, 1500);
+      expect(loadedMemoryStats.totalXpEarned, 350);
+      expect(loadedMemoryStats.totalCoinsEarned, 70);
+    });
+
+    test('updateGameStats increments counters correctly', () async {
+      final service = StorageService();
+      final result = GameResult(
+        gameType: MiniGameType.slidingPuzzle,
+        won: true,
+        score: 2000,
+        xpEarned: 50,
+        coinsEarned: 10,
+        duration: const Duration(seconds: 45),
+      );
+
+      await service.updateGameStats(result);
+
+      final stats = await service.loadMiniGameStats();
+      final puzzleStats = stats.getStats(MiniGameType.slidingPuzzle);
+      expect(puzzleStats.timesPlayed, 1);
+      expect(puzzleStats.timesWon, 1);
+      expect(puzzleStats.bestScore, 2000);
+      expect(puzzleStats.totalXpEarned, 50);
+      expect(puzzleStats.totalCoinsEarned, 10);
+    });
+
+    test('updateGameStats updates best score correctly', () async {
+      final service = StorageService();
+
+      // First game
+      await service.updateGameStats(GameResult(
+        gameType: MiniGameType.reactionRace,
+        won: true,
+        score: 1000,
+        xpEarned: 30,
+        coinsEarned: 5,
+        duration: const Duration(seconds: 30),
+      ));
+
+      // Second game with higher score
+      await service.updateGameStats(GameResult(
+        gameType: MiniGameType.reactionRace,
+        won: true,
+        score: 1500,
+        xpEarned: 40,
+        coinsEarned: 8,
+        duration: const Duration(seconds: 25),
+      ));
+
+      final stats = await service.loadMiniGameStats();
+      final raceStats = stats.getStats(MiniGameType.reactionRace);
+      expect(raceStats.timesPlayed, 2);
+      expect(raceStats.timesWon, 2);
+      expect(raceStats.bestScore, 1500); // Higher score
+      expect(raceStats.totalXpEarned, 70); // 30 + 40
+      expect(raceStats.totalCoinsEarned, 13); // 5 + 8
+    });
+
+    test('updateGameStats handles loss correctly', () async {
+      final service = StorageService();
+      final result = GameResult(
+        gameType: MiniGameType.memory,
+        won: false,
+        score: 500,
+        xpEarned: 10,
+        coinsEarned: 2,
+        duration: const Duration(seconds: 60),
+      );
+
+      await service.updateGameStats(result);
+
+      final stats = await service.loadMiniGameStats();
+      final memoryStats = stats.getStats(MiniGameType.memory);
+      expect(memoryStats.timesPlayed, 1);
+      expect(memoryStats.timesWon, 0); // Not incremented for loss
+      expect(memoryStats.bestScore, 500);
+    });
+
+    test('loadMiniGameStats handles corrupted data gracefully', () async {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('minigame_stats', 'invalid json');
+
+      final service = StorageService();
+      final stats = await service.loadMiniGameStats();
+
+      // Should return empty stats
+      expect(stats, isNotNull);
+      expect(stats.totalGamesPlayed, 0);
+    });
+  });
+
+  group('StorageService - InteractionHistory', () {
+    test('loadInteractionHistory returns empty history when no data exists', () async {
+      final service = StorageService();
+
+      final history = await service.loadInteractionHistory();
+
+      expect(history, isNotNull);
+      expect(history.totalInteractions, 0);
+    });
+
+    test('saveInteractionHistory stores data correctly', () async {
+      final service = StorageService();
+      final history = InteractionHistory();
+
+      await service.saveInteractionHistory(history);
+
+      final prefs = await SharedPreferences.getInstance();
+      final savedData = prefs.getString('interaction_history');
+      expect(savedData, isNotNull);
+    });
+
+    test('saveInteractionHistory and loadInteractionHistory preserve data', () async {
+      final service = StorageService();
+      final interaction = Interaction.now(
+        type: InteractionType.feed,
+        hungerBefore: 50,
+        happinessBefore: 70,
+        energyBefore: 60,
+        healthBefore: 80,
+      );
+      final history = InteractionHistory().addInteraction(interaction);
+
+      await service.saveInteractionHistory(history);
+      final loadedHistory = await service.loadInteractionHistory();
+
+      expect(loadedHistory.totalInteractions, 1);
+    });
+
+    test('addInteraction saves and returns updated history', () async {
+      final service = StorageService();
+      final interaction = Interaction.now(
+        type: InteractionType.play,
+        hungerBefore: 40,
+        happinessBefore: 60,
+        energyBefore: 70,
+        healthBefore: 85,
+      );
+
+      final updatedHistory = await service.addInteraction(interaction);
+
+      expect(updatedHistory.totalInteractions, 1);
+
+      // Verify it was saved
+      final loadedHistory = await service.loadInteractionHistory();
+      expect(loadedHistory.totalInteractions, 1);
+    });
+
+    test('multiple addInteraction calls accumulate interactions', () async {
+      final service = StorageService();
+
+      await service.addInteraction(Interaction.now(
+        type: InteractionType.feed,
+        hungerBefore: 50,
+        happinessBefore: 70,
+        energyBefore: 60,
+        healthBefore: 80,
+      ));
+
+      await service.addInteraction(Interaction.now(
+        type: InteractionType.play,
+        hungerBefore: 40,
+        happinessBefore: 75,
+        energyBefore: 55,
+        healthBefore: 80,
+      ));
+
+      final history = await service.loadInteractionHistory();
+      expect(history.totalInteractions, 2);
+    });
+
+    test('loadInteractionHistory handles corrupted data gracefully', () async {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('interaction_history', 'invalid json');
+
+      final service = StorageService();
+      final history = await service.loadInteractionHistory();
+
+      // Should return empty history
+      expect(history, isNotNull);
+      expect(history.totalInteractions, 0);
+    });
+  });
+
+  group('StorageService - PetPersonality', () {
+    test('loadPetPersonality returns default personality when no data exists', () async {
+      final service = StorageService();
+
+      final personality = await service.loadPetPersonality();
+
+      expect(personality, isNotNull);
+    });
+
+    test('savePetPersonality stores data correctly', () async {
+      final service = StorageService();
+      final personality = PetPersonality();
+
+      await service.savePetPersonality(personality);
+
+      final prefs = await SharedPreferences.getInstance();
+      final savedData = prefs.getString('pet_personality');
+      expect(savedData, isNotNull);
+    });
+
+    test('savePetPersonality and loadPetPersonality preserve data', () async {
+      final service = StorageService();
+      final personality = PetPersonality();
+
+      await service.savePetPersonality(personality);
+      final loadedPersonality = await service.loadPetPersonality();
+
+      expect(loadedPersonality, isNotNull);
+    });
+
+    test('loadPetPersonality handles corrupted data gracefully', () async {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('pet_personality', 'invalid json');
+
+      final service = StorageService();
+      final personality = await service.loadPetPersonality();
+
+      // Should return default personality
+      expect(personality, isNotNull);
+    });
+  });
+
+  group('StorageService - recordInteraction', () {
+    test('recordInteraction saves both history and personality', () async {
+      final service = StorageService();
+
+      final result = await service.recordInteraction(
+        type: InteractionType.feed,
+        hungerBefore: 50,
+        happinessBefore: 70,
+        energyBefore: 60,
+        healthBefore: 80,
+      );
+
+      expect(result.history.totalInteractions, 1);
+      expect(result.personality, isNotNull);
+    });
+
+    test('recordInteraction accumulates interactions', () async {
+      final service = StorageService();
+
+      await service.recordInteraction(
+        type: InteractionType.feed,
+        hungerBefore: 50,
+        happinessBefore: 70,
+        energyBefore: 60,
+        healthBefore: 80,
+      );
+
+      final result = await service.recordInteraction(
+        type: InteractionType.play,
+        hungerBefore: 45,
+        happinessBefore: 75,
+        energyBefore: 55,
+        healthBefore: 80,
+      );
+
+      expect(result.history.totalInteractions, 2);
+    });
+
+    test('recordInteraction persists data across service instances', () async {
+      final service1 = StorageService();
+
+      await service1.recordInteraction(
+        type: InteractionType.clean,
+        hungerBefore: 40,
+        happinessBefore: 65,
+        energyBefore: 70,
+        healthBefore: 90,
+      );
+
+      // New service instance
+      final service2 = StorageService();
+      final history = await service2.loadInteractionHistory();
+
+      expect(history.totalInteractions, 1);
+    });
+
+    test('recordInteraction with metadata preserves metadata', () async {
+      final service = StorageService();
+
+      await service.recordInteraction(
+        type: InteractionType.minigame,
+        hungerBefore: 35,
+        happinessBefore: 80,
+        energyBefore: 65,
+        healthBefore: 85,
+        metadata: {
+          'gameType': 'memory',
+          'score': 1500,
+        },
+      );
+
+      final history = await service.loadInteractionHistory();
+      expect(history.totalInteractions, 1);
+    });
+  });
+
+  group('StorageService - clearAIData', () {
+    test('clearAIData removes interaction history and personality', () async {
+      final service = StorageService();
+
+      // Add some data
+      await service.recordInteraction(
+        type: InteractionType.feed,
+        hungerBefore: 50,
+        happinessBefore: 70,
+        energyBefore: 60,
+        healthBefore: 80,
+      );
+
+      // Clear AI data
+      await service.clearAIData();
+
+      // Verify data is cleared
+      final history = await service.loadInteractionHistory();
+      final personality = await service.loadPetPersonality();
+
+      expect(history.totalInteractions, 0);
+      expect(personality, isNotNull); // Returns default
+    });
+
+    test('clearAIData on empty storage does not crash', () async {
+      final service = StorageService();
+
+      // Should not crash
+      await service.clearAIData();
+
+      final history = await service.loadInteractionHistory();
+      expect(history.totalInteractions, 0);
     });
   });
 }
