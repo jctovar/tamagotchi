@@ -284,7 +284,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Tamagotchi'),
-        actions: [
+        actions: _isLoading ? [] : [
           // Botón de monedas
           Padding(
             padding: const EdgeInsets.only(right: 8),
