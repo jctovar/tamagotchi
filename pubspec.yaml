@@ -49,9 +49,14 @@ dependencies:
   vibration: ^3.1.5
   introduction_screen: ^4.0.0
 
+  # Flame - Motor de juegos
+  flame: ^1.34.0
+  flame_audio: ^2.11.12
+
   # Firebase - Monitoreo y análisis
   firebase_core: ^4.3.0
   firebase_crashlytics: ^5.0.6
+  firebase_analytics: ^12.1.0
 
 dev_dependencies:
   flutter_test:
@@ -83,6 +88,8 @@ flutter:
   assets:
     - assets/
     - assets/icon/
+    - assets/images/
+    - assets/sounds/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
