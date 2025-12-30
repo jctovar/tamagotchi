@@ -2,11 +2,13 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/pet.dart';
+import '../models/minigame_stats.dart';
 import '../utils/constants.dart';
 
 /// Servicio para manejar la persistencia del estado de la mascota
 class StorageService {
   static const String _petStateKey = AppConstants.petStateKey;
+  static const String _miniGameStatsKey = 'minigame_stats';
 
   /// Guarda el estado de la mascota en el almacenamiento local
   Future<void> saveState(Pet pet) async {
@@ -99,5 +101,65 @@ class StorageService {
     } catch (e) {
       // Silent fail
     }
+  }
+
+  /// Guarda las estadísticas de mini-juegos en el almacenamiento local
+  ///
+  /// [stats] Estadísticas completas de todos los mini-juegos a guardar
+  Future<void> saveMiniGameStats(MiniGameStats stats) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final statsJson = jsonEncode(stats.toJson());
+      await prefs.setString(_miniGameStatsKey, statsJson);
+      debugPrint('✅ Estadísticas de mini-juegos guardadas');
+    } catch (e) {
+      debugPrint('❌ Error guardando estadísticas de mini-juegos: $e');
+    }
+  }
+
+  /// Carga las estadísticas de mini-juegos del almacenamiento local
+  ///
+  /// Retorna las estadísticas guardadas o un objeto nuevo con estadísticas
+  /// vacías si no hay datos previos o hay un error.
+  Future<MiniGameStats> loadMiniGameStats() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final statsJson = prefs.getString(_miniGameStatsKey);
+
+      if (statsJson == null) {
+        debugPrint('ℹ️ No hay estadísticas de mini-juegos guardadas');
+        return MiniGameStats(); // Retorna estadísticas vacías
+      }
+
+      debugPrint('✅ Estadísticas de mini-juegos cargadas');
+      final statsMap = jsonDecode(statsJson) as Map<String, dynamic>;
+      return MiniGameStats.fromJson(statsMap);
+    } catch (e) {
+      debugPrint('❌ Error cargando estadísticas de mini-juegos: $e');
+      return MiniGameStats(); // Retorna estadísticas vacías en caso de error
+    }
+  }
+
+  /// Actualiza estadísticas después de completar un mini-juego
+  ///
+  /// [result] Resultado del juego completado con puntuación y recompensas
+  /// Incrementa contadores, actualiza récords y acumula recompensas totales.
+  Future<void> updateGameStats(GameResult result) async {
+    final stats = await loadMiniGameStats();
+    final gameStats = stats.getStats(result.gameType);
+
+    // Actualizar estadísticas incrementando contadores y actualizando récord
+    final updatedGameStats = gameStats.copyWith(
+      timesPlayed: gameStats.timesPlayed + 1,
+      timesWon: result.won ? gameStats.timesWon + 1 : gameStats.timesWon,
+      bestScore: result.score > gameStats.bestScore
+          ? result.score
+          : gameStats.bestScore,
+      totalXpEarned: gameStats.totalXpEarned + result.xpEarned,
+      totalCoinsEarned: gameStats.totalCoinsEarned + result.coinsEarned,
+    );
+
+    final updatedStats = stats.updateGameStats(result.gameType, updatedGameStats);
+    await saveMiniGameStats(updatedStats);
   }
 }

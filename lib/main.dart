@@ -1,4 +1,9 @@
+import 'dart:async';
+import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'firebase_options.dart';
 import 'config/theme.dart';
 import 'screens/main_navigation.dart';
 import 'screens/onboarding_screen.dart';
@@ -8,6 +13,20 @@ import 'services/notification_service.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Inicializar Firebase
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  // Configurar Crashlytics para capturar errores de Flutter
+  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+
+  // Capturar errores asíncronos no manejados
+  PlatformDispatcher.instance.onError = (error, stack) {
+    FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+    return true;
+  };
+
   // Inicializar servicio de notificaciones
   await NotificationService.initialize();
   await NotificationService.requestPermissions();
@@ -16,7 +35,13 @@ void main() async {
   await BackgroundService.initialize();
   await BackgroundService.registerPeriodicTask();
 
-  runApp(const TamagotchiApp());
+  // Ejecutar app dentro de zona de errores
+  runZonedGuarded(
+    () => runApp(const TamagotchiApp()),
+    (error, stack) {
+      FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+    },
+  );
 }
 
 class TamagotchiApp extends StatelessWidget {

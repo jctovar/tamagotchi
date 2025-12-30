@@ -75,11 +75,16 @@ Hoja de ruta para el desarrollo de la aplicación Tamagotchi en Flutter.
 - [x] Agregar sistema de evolución basado en cuidado
 - [x] Crear diferentes formas/variantes de mascota
 
-### Fase 10: Mini-Juegos
+### Fase 10: Mini-Juegos ✅
 
-- [ ] Agregar dependencia `flame` para motor de juegos
-- [ ] Implementar mini-juego de puzzle
-- [ ] Sistema de recompensas por completar juegos
+- [x] Implementar 3 mini-juegos diferentes (Memory, Sliding Puzzle, Reaction Race)
+- [x] Sistema completo de monedas como nueva métrica
+- [x] Sistema de recompensas dinámicas (XP y monedas según rendimiento)
+- [x] Pantalla de selección de mini-juegos con estadísticas
+- [x] Tracking de estadísticas por juego (partidas, victorias, récords)
+- [x] Persistencia de estadísticas con SharedPreferences
+- [x] Integración con HomeScreen (botón y display de monedas)
+- [x] Balance de recompensas (3-8x más XP que acciones normales)
 
 ### Fase 11: Comportamientos con IA
 
@@ -101,20 +106,47 @@ Hoja de ruta para el desarrollo de la aplicación Tamagotchi en Flutter.
 
 ---
 
-## Dependencias Planificadas
+## Dependencias Implementadas
 
 ```yaml
 dependencies:
-  flutter_bloc: ^8.x.x          # Estado reactivo
-  shared_preferences: ^2.x.x    # Persistencia local
-  workmanager: ^0.x.x           # Tareas en background
-  flutter_local_notifications: ^x.x.x  # Notificaciones
-  hive: ^2.x.x                  # Base de datos local (alternativa)
+  # Core
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.6
+
+  # Persistencia
+  shared_preferences: ^2.2.2
+
+  # Background Processing
+  workmanager: ^0.5.1
+
+  # Notificaciones
+  flutter_local_notifications: ^16.3.0
+  permission_handler: ^11.1.0
+
+  # UX y Feedback
+  vibration: ^2.0.0
+  introduction_screen: ^3.1.14
 ```
+
+## Progreso del Proyecto
+
+### ✅ Completadas (Fases 1-10)
+- **Fase 1-2**: Fundamentos e Interacciones Básicas
+- **Fase 3-4**: Persistencia y Temporizadores
+- **Fase 5-6**: Background Processing y Notificaciones
+- **Fase 7-8**: Personalización y Pulido UX
+- **Fase 9**: Sistema de Evolución con 5 etapas de vida
+- **Fase 10**: Sistema de Mini-Juegos con monedas y estadísticas
+
+### 🚀 Total: 53 tareas completadas
 
 ## Notas
 
-- Priorizar las fases 1-6 para un MVP funcional
-- Las fases opcionales pueden implementarse según tiempo y recursos
+- MVP funcional completado (Fases 1-6) ✅
+- Fases opcionales 9-10 implementadas con éxito ✅
+- Las fases 11-13 pueden implementarse según tiempo y recursos
 - Considerar restricciones de batería en dispositivos Android
 - iOS tiene limitaciones adicionales para background processing
+- Sistema de mini-juegos implementado sin dependencias de `flame` (usando Flutter nativo)

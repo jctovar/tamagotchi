@@ -12,6 +12,7 @@ import '../services/preferences_service.dart';
 import '../services/notification_service.dart';
 import '../services/feedback_service.dart';
 import '../utils/constants.dart';
+import 'games/minigames_menu_screen.dart';
 
 /// Pantalla principal de la aplicación
 class HomeScreen extends StatefulWidget {
@@ -178,11 +179,66 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     await _storageService.saveState(_pet);
   }
 
+  /// Navega a la pantalla de selección de mini-juegos
+  ///
+  /// Muestra el menú de mini-juegos y actualiza la mascota cuando
+  /// el jugador completa algún juego y gana recompensas.
+  void _navigateToMiniGames() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => MiniGamesMenuScreen(
+          pet: _pet,
+          onPetUpdated: (updatedPet) {
+            setState(() {
+              _pet = updatedPet;
+            });
+            _saveState();
+          },
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Tamagotchi'),
+        actions: [
+          // Botón de monedas
+          Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: Center(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Colors.amber[100],
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: Colors.amber[700]!, width: 2),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      '🪙',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                    SizedBox(width: 4),
+                    Text(
+                      _pet.coins.toString(),
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.amber[900],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
       body: _isLoading
           ? const Center(
@@ -207,10 +263,41 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
                     // Botones de acción
                     _buildActionButtons(),
+                    const SizedBox(height: 16),
+
+                    // Botón de mini-juegos
+                    _buildMiniGamesButton(),
                   ],
                 ),
               ),
             ),
+    );
+  }
+
+  /// Construye el botón de acceso a mini-juegos
+  ///
+  /// Botón destacado que abre el menú de mini-juegos donde el jugador
+  /// puede ganar XP y monedas extras.
+  Widget _buildMiniGamesButton() {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton.icon(
+        onPressed: _navigateToMiniGames,
+        icon: const Text('🎮', style: TextStyle(fontSize: 24)),
+        label: const Text(
+          'Mini-Juegos',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        style: ElevatedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          backgroundColor: Colors.purple[400],
+          foregroundColor: Colors.white,
+          elevation: 4,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+      ),
     );
   }
 

@@ -19,6 +19,10 @@ class Pet {
   LifeStage lifeStage; // Etapa de vida actual
   PetVariant variant; // Variante según cuidado
 
+  // Sistema de economía
+  /// Monedas acumuladas jugando mini-juegos (usadas para compras futuras)
+  int coins;
+
   Pet({
     required this.name,
     this.hunger = 0,
@@ -34,6 +38,7 @@ class Pet {
     DateTime? birthDate,
     this.lifeStage = LifeStage.egg,
     this.variant = PetVariant.normal,
+    this.coins = 0,
   })  : lastFed = lastFed ?? DateTime.now(),
         lastPlayed = lastPlayed ?? DateTime.now(),
         lastCleaned = lastCleaned ?? DateTime.now(),
@@ -119,6 +124,7 @@ class Pet {
       'birthDate': birthDate.toIso8601String(),
       'lifeStage': lifeStage.index,
       'variant': variant.index,
+      'coins': coins,
     };
   }
 
@@ -145,6 +151,7 @@ class Pet {
       variant: json['variant'] != null
           ? PetVariant.values[json['variant'] as int]
           : PetVariant.normal,
+      coins: json['coins'] as int? ?? 0,
     );
   }
 
@@ -164,6 +171,7 @@ class Pet {
     DateTime? birthDate,
     LifeStage? lifeStage,
     PetVariant? variant,
+    int? coins,
   }) {
     return Pet(
       name: name ?? this.name,
@@ -180,6 +188,7 @@ class Pet {
       birthDate: birthDate ?? this.birthDate,
       lifeStage: lifeStage ?? this.lifeStage,
       variant: variant ?? this.variant,
+      coins: coins ?? this.coins,
     );
   }
 }

@@ -60,12 +60,30 @@ Este proyecto implementa mecánicas modernas de gamificación incluyendo:
 - **Celebración de Evolución**: Diálogo especial cada vez que tu mascota evoluciona
 - **Evolución Dual**: Basada en experiencia O tiempo (lo que ocurra primero)
 
+### 🎮 Sistema de Mini-Juegos
+
+- **3 Mini-Juegos Jugables**: Memory 🧠, Sliding Puzzle 🧩, Reaction Race ⚡
+- **Sistema de Monedas**: Gana monedas 🪙 jugando mini-juegos
+- **Recompensas Dinámicas**: XP y monedas según tu rendimiento
+- **Estadísticas Completas**: Tracking de partidas, victorias, récords y más
+- **Memory Game**: Encuentra 8 parejas de emojis en un grid 4x4
+- **Sliding Puzzle**: Ordena números del 1-8 en un rompecabezas deslizante 3x3
+- **Reaction Race**: 10 rondas de velocidad - presiona cuando cambie a verde
+- **Balance de Recompensas**: Hasta 8x más XP que acciones normales
+
 ### 💾 Persistencia y Background
 
 - **Persistencia Total**: SharedPreferences guarda todo el estado entre sesiones
 - **Background 24/7**: WorkManager ejecuta tareas cada 15 minutos incluso con la app cerrada
 - **Cálculo Retroactivo**: Al reabrir, calcula métricas basadas en tiempo transcurrido
 - **Lifecycle Management**: Manejo correcto de estados de app (pausa, resume, cierre)
+
+### 🔥 Firebase Integration
+
+- **Firebase Crashlytics**: Monitoreo automático de crashes y errores en producción
+- **Reportes Detallados**: Stack traces completos con información de dispositivo
+- **Manejo de Errores**: Captura de errores fatales, asíncronos y en zonas de ejecución
+- **Logging Contextual**: Información personalizada para debugging efectivo
 
 ### 🔔 Notificaciones Inteligentes
 
@@ -286,6 +304,8 @@ graph TD
 ### Backend & Persistencia
 - **SharedPreferences**: Almacenamiento local clave-valor
 - **WorkManager**: Procesamiento en background (Android)
+- **Firebase Core**: Plataforma de servicios en la nube
+- **Firebase Crashlytics**: Monitoreo y reporte de errores
 
 ### Notificaciones
 - **flutter_local_notifications**: Notificaciones locales
@@ -314,12 +334,11 @@ graph TD
 | **Fase 7** | Personalización | ✅ Completada |
 | **Fase 8** | Pulido y UX | ✅ Completada |
 | **Fase 9** | Evolución y Ciclos de Vida | ✅ Completada |
+| **Fase 10** | Mini-Juegos | ✅ Completada |
 
-**Total: 42 tareas completadas** 🎉
+**Total: 53 tareas completadas** 🎉
 
 ### Próximas Mejoras (Opcionales)
-
-- [ ] **Fase 10**: Mini-Juegos (puzzles, carreras)
 - [ ] **Fase 11**: Elementos Sociales (compartir, multijugador)
 - [ ] **Fase 12**: Más Variantes de Evolución
 - [ ] **Fase 13**: IA Adaptativa con TensorFlow Lite
@@ -338,19 +357,21 @@ Cada fase implementada incluye documentación técnica detallada:
 - 📄 [**FASE_7_PERSONALIZACION.md**](FASE_7_PERSONALIZACION.md) - Personalización completa
 - 📄 [**FASE_8_PULIDO_UX.md**](FASE_8_PULIDO_UX.md) - Animaciones y feedback
 - 📄 [**FASE_9_EVOLUCION.md**](FASE_9_EVOLUCION.md) - Sistema de evolución
+- 📄 [**FASE_10_MINIJUEGOS.md**](FASE_10_MINIJUEGOS.md) - Mini-juegos y sistema de monedas
 
 ### Guías Adicionales
 
 - 📄 [**ROADMAP.md**](ROADMAP.md) - Hoja de ruta completa del proyecto
 - 📄 [**COMO_PROBAR_PERSISTENCIA.md**](COMO_PROBAR_PERSISTENCIA.md) - Guía de pruebas
 - 📄 [**ESTRUCTURA_INICIAL.md**](ESTRUCTURA_INICIAL.md) - Estructura del proyecto
+- 📄 [**FIREBASE_CRASHLYTICS.md**](FIREBASE_CRASHLYTICS.md) - Integración de Firebase Crashlytics
 
 ## 🗺️ Roadmap
 
 ```
 ✅ Q4 2024 - Fases 1-6: MVP Funcional
 ✅ Q4 2024 - Fases 7-9: Personalización y Evolución
-🚧 Q1 2025 - Fase 10: Mini-Juegos
+✅ Q1 2025 - Fase 10: Mini-Juegos
 📅 Q2 2025 - Fase 11: Social Features
 📅 Q3 2025 - Fase 12-14: IA y AR
 ```

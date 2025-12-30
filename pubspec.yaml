@@ -48,6 +48,8 @@ dependencies:
   audioplayers: ^6.1.0
   vibration: ^3.1.5
   introduction_screen: ^4.0.0
+
+  # Firebase - Monitoreo y análisis
   firebase_core: ^4.3.0
   firebase_crashlytics: ^5.0.6
 
