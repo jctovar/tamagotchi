@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../models/pet.dart';
 import '../../models/minigame_stats.dart';
 import '../../services/storage_service.dart';
+import '../../services/analytics_service.dart';
 import 'memory_game_screen.dart';
 import 'sliding_puzzle_screen.dart';
 import 'reaction_race_screen.dart';
@@ -64,6 +65,28 @@ class _MiniGamesMenuScreenState extends State<MiniGamesMenuScreen> {
     // Guardar estado actualizado de la mascota
     await _storageService.saveState(updatedPet);
 
+    // Registrar evento en Analytics
+    await AnalyticsService.logMinigameCompleted(
+      gameType: result.gameType.name,
+      score: result.score,
+      won: result.won,
+      coinsEarned: result.coinsEarned,
+      durationSeconds: result.duration.inSeconds,
+    );
+
+    // Registrar ganancia de experiencia
+    await AnalyticsService.logExperienceGained(
+      experienceAmount: result.xpEarned,
+      totalExperience: updatedPet.experience,
+      source: 'minigame',
+    );
+
+    // Registrar monedas ganadas
+    await AnalyticsService.logCoinsEarned(
+      amount: result.coinsEarned,
+      source: 'minigame',
+    );
+
     // Notificar al padre sobre la actualización
     widget.onPetUpdated(updatedPet);
 
@@ -88,7 +111,7 @@ class _MiniGamesMenuScreenState extends State<MiniGamesMenuScreen> {
   /// Navega a la pantalla del juego seleccionado
   ///
   /// [gameType] Tipo de mini-juego a iniciar
-  void _navigateToGame(MiniGameType gameType) {
+  void _navigateToGame(MiniGameType gameType) async {
     Widget gameScreen;
 
     switch (gameType) {
@@ -112,10 +135,17 @@ class _MiniGamesMenuScreenState extends State<MiniGamesMenuScreen> {
         break;
     }
 
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => gameScreen),
+    // Registrar evento de inicio de juego en Analytics
+    await AnalyticsService.logMinigameStarted(
+      gameType: gameType.name,
     );
+
+    if (mounted) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => gameScreen),
+      );
+    }
   }
 
   @override

@@ -15,6 +15,7 @@ import '../services/preferences_service.dart';
 import '../services/notification_service.dart';
 import '../services/feedback_service.dart';
 import '../services/ai_service.dart';
+import '../services/analytics_service.dart';
 import '../utils/constants.dart';
 import 'games/minigames_menu_screen.dart';
 
@@ -94,6 +95,12 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       // Crear una mascota nueva
       debugPrint('🆕 Creando mascota nueva');
       _pet = Pet(name: 'Mi Tamagotchi');
+
+      // Registrar creación de mascota en Analytics
+      await AnalyticsService.logPetCreated(
+        petName: _pet.name,
+        initialColor: preferences.petColor.toString(),
+      );
     }
 
     _lastUpdate = DateTime.now();
@@ -113,6 +120,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
     // Guardar el estado actualizado
     await _storageService.saveState(_pet);
+
+    // Actualizar propiedades de usuario en Analytics
+    await AnalyticsService.updateUserProperties(_pet);
 
     // Iniciar el timer de actualización
     _startUpdateTimer();
@@ -533,6 +543,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   /// Acción: Alimentar a la mascota
   void _feedPet() async {
     final oldStage = _pet.lifeStage;
+    final hungerBefore = _pet.hunger;
+    final levelBefore = _pet.level;
+    final experienceBefore = _pet.experience;
+
     setState(() {
       _pet = _pet.copyWith(
         hunger: (_pet.hunger - 30).clamp(0, 100),
@@ -544,6 +558,31 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     });
     _saveState();
     _checkEvolution(oldStage);
+
+    // Registrar evento en Analytics
+    await AnalyticsService.logFeedPet(
+      hungerBefore: hungerBefore,
+      hungerAfter: _pet.hunger,
+      petLevel: _pet.level,
+    );
+
+    // Registrar ganancia de experiencia
+    final xpGained = _pet.experience - experienceBefore;
+    await AnalyticsService.logExperienceGained(
+      experienceAmount: xpGained,
+      totalExperience: _pet.experience,
+      source: 'interaction',
+    );
+
+    // Registrar subida de nivel si ocurrió
+    if (_pet.level > levelBefore) {
+      await AnalyticsService.logLevelUp(
+        fromLevel: levelBefore,
+        toLevel: _pet.level,
+        experience: _pet.experience,
+        currentStage: _pet.lifeStage,
+      );
+    }
 
     // Registrar interacción para IA
     await _recordInteraction(InteractionType.feed);
@@ -560,6 +599,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   /// Acción: Jugar con la mascota
   void _playWithPet() async {
     final oldStage = _pet.lifeStage;
+    final happinessBefore = _pet.happiness;
+    final levelBefore = _pet.level;
+    final experienceBefore = _pet.experience;
+
     setState(() {
       _pet = _pet.copyWith(
         happiness: (_pet.happiness + 25).clamp(0, 100),
@@ -572,6 +615,31 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     });
     _saveState();
     _checkEvolution(oldStage);
+
+    // Registrar evento en Analytics
+    await AnalyticsService.logPlayWithPet(
+      happinessBefore: happinessBefore,
+      happinessAfter: _pet.happiness,
+      petLevel: _pet.level,
+    );
+
+    // Registrar ganancia de experiencia
+    final xpGained = _pet.experience - experienceBefore;
+    await AnalyticsService.logExperienceGained(
+      experienceAmount: xpGained,
+      totalExperience: _pet.experience,
+      source: 'interaction',
+    );
+
+    // Registrar subida de nivel si ocurrió
+    if (_pet.level > levelBefore) {
+      await AnalyticsService.logLevelUp(
+        fromLevel: levelBefore,
+        toLevel: _pet.level,
+        experience: _pet.experience,
+        currentStage: _pet.lifeStage,
+      );
+    }
 
     // Registrar interacción para IA
     await _recordInteraction(InteractionType.play);
@@ -588,6 +656,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   /// Acción: Limpiar a la mascota
   void _cleanPet() async {
     final oldStage = _pet.lifeStage;
+    final healthBefore = _pet.health;
+    final levelBefore = _pet.level;
+    final experienceBefore = _pet.experience;
+
     setState(() {
       _pet = _pet.copyWith(
         health: (_pet.health + 20).clamp(0, 100),
@@ -599,6 +671,31 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     });
     _saveState();
     _checkEvolution(oldStage);
+
+    // Registrar evento en Analytics
+    await AnalyticsService.logCleanPet(
+      healthBefore: healthBefore,
+      healthAfter: _pet.health,
+      petLevel: _pet.level,
+    );
+
+    // Registrar ganancia de experiencia
+    final xpGained = _pet.experience - experienceBefore;
+    await AnalyticsService.logExperienceGained(
+      experienceAmount: xpGained,
+      totalExperience: _pet.experience,
+      source: 'interaction',
+    );
+
+    // Registrar subida de nivel si ocurrió
+    if (_pet.level > levelBefore) {
+      await AnalyticsService.logLevelUp(
+        fromLevel: levelBefore,
+        toLevel: _pet.level,
+        experience: _pet.experience,
+        currentStage: _pet.lifeStage,
+      );
+    }
 
     // Registrar interacción para IA
     await _recordInteraction(InteractionType.clean);
@@ -615,6 +712,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   /// Acción: Descansar
   void _restPet() async {
     final oldStage = _pet.lifeStage;
+    final energyBefore = _pet.energy;
+    final levelBefore = _pet.level;
+    final experienceBefore = _pet.experience;
+
     setState(() {
       _pet = _pet.copyWith(
         energy: (_pet.energy + 40).clamp(0, 100),
@@ -626,6 +727,31 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     });
     _saveState();
     _checkEvolution(oldStage);
+
+    // Registrar evento en Analytics
+    await AnalyticsService.logRestPet(
+      energyBefore: energyBefore,
+      energyAfter: _pet.energy,
+      petLevel: _pet.level,
+    );
+
+    // Registrar ganancia de experiencia
+    final xpGained = _pet.experience - experienceBefore;
+    await AnalyticsService.logExperienceGained(
+      experienceAmount: xpGained,
+      totalExperience: _pet.experience,
+      source: 'interaction',
+    );
+
+    // Registrar subida de nivel si ocurrió
+    if (_pet.level > levelBefore) {
+      await AnalyticsService.logLevelUp(
+        fromLevel: levelBefore,
+        toLevel: _pet.level,
+        experience: _pet.experience,
+        currentStage: _pet.lifeStage,
+      );
+    }
 
     // Registrar interacción para IA
     await _recordInteraction(InteractionType.rest);
@@ -640,8 +766,20 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   }
 
   /// Verifica si hubo evolución y muestra celebración
-  void _checkEvolution(LifeStage oldStage) {
+  void _checkEvolution(LifeStage oldStage) async {
     if (_pet.lifeStage != oldStage) {
+      // Registrar evento de evolución en Analytics
+      await AnalyticsService.logPetEvolved(
+        fromStage: oldStage,
+        toStage: _pet.lifeStage,
+        variant: _pet.variant,
+        level: _pet.level,
+        experience: _pet.experience,
+      );
+
+      // Actualizar propiedades de usuario
+      await AnalyticsService.updateUserProperties(_pet);
+
       _showEvolutionCelebration();
     }
   }

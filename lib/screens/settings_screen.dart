@@ -3,6 +3,7 @@ import '../models/pet.dart';
 import '../models/pet_preferences.dart';
 import '../services/storage_service.dart';
 import '../services/preferences_service.dart';
+import '../services/analytics_service.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -67,11 +68,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
 
     if (result != null && result.isNotEmpty && result != _pet!.name) {
+      final oldName = _pet!.name;
       final updatedPet = _pet!.copyWith(name: result);
       await _storageService.saveState(updatedPet);
       setState(() {
         _pet = updatedPet;
       });
+
+      // Registrar evento en Analytics
+      await AnalyticsService.logPetRenamed(
+        oldName: oldName,
+        newName: result,
+      );
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Nombre cambiado a "$result"')),
@@ -85,13 +94,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
     setState(() {
       _preferences = _preferences.copyWith(petColor: color);
     });
+
+    // Registrar evento en Analytics
+    await AnalyticsService.logPetColorChanged(
+      newColor: color.toString(),
+      coinsSpent: 0, // El cambio de color es gratuito
+    );
   }
 
   Future<void> _updateAccessory(String accessory) async {
+    final oldAccessory = _preferences.accessory;
     await PreferencesService.updateAccessory(accessory);
     setState(() {
       _preferences = _preferences.copyWith(accessory: accessory);
     });
+
+    // Registrar evento en Analytics
+    await AnalyticsService.logAccessoryChanged(
+      oldAccessory: oldAccessory.isEmpty ? null : oldAccessory,
+      newAccessory: accessory.isEmpty ? null : accessory,
+    );
   }
 
   Future<void> _updateSoundEnabled(bool enabled) async {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:introduction_screen/introduction_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../services/analytics_service.dart';
 
 class OnboardingScreen extends StatelessWidget {
   const OnboardingScreen({super.key});
@@ -21,6 +22,7 @@ class OnboardingScreen extends StatelessWidget {
 
   void _onDone(BuildContext context) async {
     await setOnboardingComplete();
+    await AnalyticsService.logOnboardingCompleted();
     if (context.mounted) {
       Navigator.of(context).pushReplacementNamed('/home');
     }

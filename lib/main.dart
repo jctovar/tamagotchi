@@ -9,6 +9,7 @@ import 'screens/main_navigation.dart';
 import 'screens/onboarding_screen.dart';
 import 'services/background_service.dart';
 import 'services/notification_service.dart';
+import 'services/analytics_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -35,6 +36,9 @@ void main() async {
   await BackgroundService.initialize();
   await BackgroundService.registerPeriodicTask();
 
+  // Registrar apertura de la app
+  await AnalyticsService.logAppOpened();
+
   // Ejecutar app dentro de zona de errores
   runZonedGuarded(
     () => runApp(const TamagotchiApp()),
@@ -53,6 +57,9 @@ class TamagotchiApp extends StatelessWidget {
       title: 'Tamagotchi',
       theme: AppTheme.lightTheme,
       debugShowCheckedModeBanner: false,
+      navigatorObservers: [
+        AnalyticsService.observer,
+      ],
       home: const AppInitializer(),
       routes: {
         '/home': (context) => const MainNavigation(),
