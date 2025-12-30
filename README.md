@@ -233,6 +233,32 @@ Tu mascota evolucionará en diferentes formas según tu cuidado:
 4. **Renombra** tu mascota tocando el botón de edición
 5. Activa/desactiva **sonido** y **notificaciones**
 
+## ⚡ Comandos Rápidos
+
+El proyecto incluye comandos y scripts para facilitar el desarrollo:
+
+### Makefile (Recomendado)
+
+```bash
+make help           # Ver todos los comandos disponibles
+make setup          # Setup inicial completo
+make run            # Ejecutar app en modo debug
+make test           # Ejecutar tests
+make build-release  # Build APK release
+```
+
+### Scripts Bash
+
+```bash
+./scripts/dev.sh help      # Script principal de desarrollo
+./scripts/test.sh all      # Suite completa de tests
+./scripts/build.sh release # Build con verificaciones
+```
+
+**📖 Documentación completa de comandos:** [COMANDOS.md](COMANDOS.md)
+
+---
+
 ## 🏗️ Arquitectura
 
 ### Estructura del Proyecto
@@ -362,6 +388,7 @@ Cada fase implementada incluye documentación técnica detallada:
 ### Guías Adicionales
 
 - 📄 [**ROADMAP.md**](ROADMAP.md) - Hoja de ruta completa del proyecto
+- 📄 [**COMANDOS.md**](COMANDOS.md) - Guía completa de comandos y scripts
 - 📄 [**COMO_PROBAR_PERSISTENCIA.md**](COMO_PROBAR_PERSISTENCIA.md) - Guía de pruebas
 - 📄 [**ESTRUCTURA_INICIAL.md**](ESTRUCTURA_INICIAL.md) - Estructura del proyecto
 - 📄 [**FIREBASE_CRASHLYTICS.md**](FIREBASE_CRASHLYTICS.md) - Integración de Firebase Crashlytics
