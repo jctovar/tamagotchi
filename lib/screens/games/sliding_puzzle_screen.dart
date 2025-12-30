@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flame_audio/flame_audio.dart';
 import '../../models/pet.dart';
 import '../../models/minigame_stats.dart';
 import '../../services/feedback_service.dart';
@@ -39,12 +40,28 @@ class _SlidingPuzzleScreenState extends State<SlidingPuzzleScreen> {
   void initState() {
     super.initState();
     _initGame();
+    _playBackgroundMusic();
   }
 
   @override
   void dispose() {
     _gameTimer?.cancel();
+    _stopBackgroundMusic();
     super.dispose();
+  }
+
+  /// Reproduce música de fondo en loop
+  void _playBackgroundMusic() async {
+    try {
+      await FlameAudio.bgm.play('sounds/Relax.wav', volume: 0.3);
+    } catch (e) {
+      debugPrint('Error al reproducir música de fondo: $e');
+    }
+  }
+
+  /// Detiene la música de fondo
+  void _stopBackgroundMusic() {
+    FlameAudio.bgm.stop();
   }
 
   /// Inicializa o reinicia el juego
