@@ -3,12 +3,16 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/pet.dart';
 import '../models/minigame_stats.dart';
+import '../models/interaction_history.dart';
+import '../models/pet_personality.dart';
 import '../utils/constants.dart';
 
 /// Servicio para manejar la persistencia del estado de la mascota
 class StorageService {
   static const String _petStateKey = AppConstants.petStateKey;
   static const String _miniGameStatsKey = 'minigame_stats';
+  static const String _interactionHistoryKey = 'interaction_history';
+  static const String _petPersonalityKey = 'pet_personality';
 
   /// Guarda el estado de la mascota en el almacenamiento local
   Future<void> saveState(Pet pet) async {
@@ -161,5 +165,126 @@ class StorageService {
 
     final updatedStats = stats.updateGameStats(result.gameType, updatedGameStats);
     await saveMiniGameStats(updatedStats);
+  }
+
+  // ==================== SISTEMA DE IA ====================
+
+  /// Guarda el historial de interacciones
+  Future<void> saveInteractionHistory(InteractionHistory history) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final historyJson = jsonEncode(history.toJson());
+      await prefs.setString(_interactionHistoryKey, historyJson);
+      debugPrint('✅ Historial de interacciones guardado (${history.totalInteractions} interacciones)');
+    } catch (e) {
+      debugPrint('❌ Error guardando historial de interacciones: $e');
+    }
+  }
+
+  /// Carga el historial de interacciones
+  Future<InteractionHistory> loadInteractionHistory() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final historyJson = prefs.getString(_interactionHistoryKey);
+
+      if (historyJson == null) {
+        debugPrint('ℹ️ No hay historial de interacciones guardado');
+        return InteractionHistory();
+      }
+
+      debugPrint('✅ Historial de interacciones cargado');
+      final historyMap = jsonDecode(historyJson) as Map<String, dynamic>;
+      return InteractionHistory.fromJson(historyMap);
+    } catch (e) {
+      debugPrint('❌ Error cargando historial de interacciones: $e');
+      return InteractionHistory();
+    }
+  }
+
+  /// Agrega una nueva interacción al historial
+  Future<InteractionHistory> addInteraction(Interaction interaction) async {
+    final history = await loadInteractionHistory();
+    final updatedHistory = history.addInteraction(interaction);
+    await saveInteractionHistory(updatedHistory);
+    return updatedHistory;
+  }
+
+  /// Guarda la personalidad de la mascota
+  Future<void> savePetPersonality(PetPersonality personality) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final personalityJson = jsonEncode(personality.toJson());
+      await prefs.setString(_petPersonalityKey, personalityJson);
+      debugPrint('✅ Personalidad guardada (Vínculo: ${personality.bondLevel.displayName})');
+    } catch (e) {
+      debugPrint('❌ Error guardando personalidad: $e');
+    }
+  }
+
+  /// Carga la personalidad de la mascota
+  Future<PetPersonality> loadPetPersonality() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final personalityJson = prefs.getString(_petPersonalityKey);
+
+      if (personalityJson == null) {
+        debugPrint('ℹ️ No hay personalidad guardada');
+        return PetPersonality();
+      }
+
+      debugPrint('✅ Personalidad cargada');
+      final personalityMap = jsonDecode(personalityJson) as Map<String, dynamic>;
+      return PetPersonality.fromJson(personalityMap);
+    } catch (e) {
+      debugPrint('❌ Error cargando personalidad: $e');
+      return PetPersonality();
+    }
+  }
+
+  /// Registra una interacción y actualiza la personalidad
+  ///
+  /// Método conveniente que combina el guardado de interacción
+  /// con la actualización de personalidad en una sola llamada.
+  Future<({InteractionHistory history, PetPersonality personality})> recordInteraction({
+    required InteractionType type,
+    required double hungerBefore,
+    required double happinessBefore,
+    required double energyBefore,
+    required double healthBefore,
+    Map<String, dynamic>? metadata,
+  }) async {
+    // Crear interacción
+    final interaction = Interaction.now(
+      type: type,
+      hungerBefore: hungerBefore,
+      happinessBefore: happinessBefore,
+      energyBefore: energyBefore,
+      healthBefore: healthBefore,
+      metadata: metadata,
+    );
+
+    // Cargar y actualizar historial
+    final history = await loadInteractionHistory();
+    final updatedHistory = history.addInteraction(interaction);
+    await saveInteractionHistory(updatedHistory);
+
+    // Cargar y actualizar personalidad
+    final personality = await loadPetPersonality();
+    final updatedPersonality = personality.updateFromInteraction(interaction);
+    await savePetPersonality(updatedPersonality);
+
+    return (history: updatedHistory, personality: updatedPersonality);
+  }
+
+  /// Limpia todos los datos de IA
+  Future<void> clearAIData() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(_interactionHistoryKey);
+      await prefs.remove(_petPersonalityKey);
+      debugPrint('✅ Datos de IA eliminados');
+    } catch (e) {
+      debugPrint('❌ Error eliminando datos de IA: $e');
+    }
   }
 }

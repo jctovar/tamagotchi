@@ -78,6 +78,17 @@ Este proyecto implementa mecánicas modernas de gamificación incluyendo:
 - **Cálculo Retroactivo**: Al reabrir, calcula métricas basadas en tiempo transcurrido
 - **Lifecycle Management**: Manejo correcto de estados de app (pausa, resume, cierre)
 
+### 🧠 IA Adaptativa
+
+- **Personalidad Única**: Tu mascota desarrolla 12 traits de personalidad según tu cuidado
+- **Estados Emocionales**: 8 estados emocionales dinámicos (de Extasiado a Ansioso)
+- **Sistema de Vínculo**: 5 niveles de relación (Desconocido → Alma gemela)
+- **Mensajes Contextuales**: La mascota se comunica según su personalidad y estado
+- **Sugerencias Inteligentes**: Recomendaciones basadas en análisis del estado actual
+- **Respuestas Adaptativas**: Cada acción genera respuestas únicas según la personalidad
+- **Historial de Interacciones**: Tracking completo para análisis de patrones
+- **Predicción de Necesidades**: El sistema anticipa cuándo necesitará atención
+
 ### 🔥 Firebase Integration
 
 - **Firebase Crashlytics**: Monitoreo automático de crashes y errores en producción
@@ -361,14 +372,14 @@ graph TD
 | **Fase 8** | Pulido y UX | ✅ Completada |
 | **Fase 9** | Evolución y Ciclos de Vida | ✅ Completada |
 | **Fase 10** | Mini-Juegos | ✅ Completada |
+| **Fase 11** | IA Adaptativa | ✅ Completada |
 
-**Total: 53 tareas completadas** 🎉
+**Total: 62 tareas completadas** 🎉
 
 ### Próximas Mejoras (Opcionales)
-- [ ] **Fase 11**: Elementos Sociales (compartir, multijugador)
-- [ ] **Fase 12**: Más Variantes de Evolución
-- [ ] **Fase 13**: IA Adaptativa con TensorFlow Lite
-- [ ] **Fase 14**: Realidad Aumentada (ARCore/ARKit)
+
+- [ ] **Fase 12**: Realidad Aumentada (ARCore/ARKit)
+- [ ] **Fase 13**: Características Sociales (compartir, visitas)
 
 ## 📚 Documentación
 
@@ -384,6 +395,7 @@ Cada fase implementada incluye documentación técnica detallada:
 - 📄 [**FASE_8_PULIDO_UX.md**](FASE_8_PULIDO_UX.md) - Animaciones y feedback
 - 📄 [**FASE_9_EVOLUCION.md**](FASE_9_EVOLUCION.md) - Sistema de evolución
 - 📄 [**FASE_10_MINIJUEGOS.md**](FASE_10_MINIJUEGOS.md) - Mini-juegos y sistema de monedas
+- 📄 [**FASE_11_IA_ADAPTATIVA.md**](FASE_11_IA_ADAPTATIVA.md) - Sistema de IA adaptativa
 
 ### Guías Adicionales
 
@@ -399,8 +411,9 @@ Cada fase implementada incluye documentación técnica detallada:
 ✅ Q4 2024 - Fases 1-6: MVP Funcional
 ✅ Q4 2024 - Fases 7-9: Personalización y Evolución
 ✅ Q1 2025 - Fase 10: Mini-Juegos
-📅 Q2 2025 - Fase 11: Social Features
-📅 Q3 2025 - Fase 12-14: IA y AR
+✅ Q1 2025 - Fase 11: IA Adaptativa
+📅 Q2 2025 - Fase 12: Realidad Aumentada
+📅 Q3 2025 - Fase 13: Social Features
 ```
 
 ## 🤝 Contribuir

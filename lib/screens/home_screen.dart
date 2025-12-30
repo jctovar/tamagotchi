@@ -3,14 +3,18 @@ import 'package:flutter/material.dart';
 import '../models/pet.dart';
 import '../models/pet_preferences.dart';
 import '../models/life_stage.dart';
+import '../models/interaction_history.dart';
+import '../models/pet_personality.dart';
 import '../widgets/pet_display.dart';
 import '../widgets/metric_bar.dart';
 import '../widgets/animated_action_button.dart';
+import '../widgets/ai_insight_card.dart';
 import '../config/theme.dart';
 import '../services/storage_service.dart';
 import '../services/preferences_service.dart';
 import '../services/notification_service.dart';
 import '../services/feedback_service.dart';
+import '../services/ai_service.dart';
 import '../utils/constants.dart';
 import 'games/minigames_menu_screen.dart';
 
@@ -26,10 +30,17 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   late Pet _pet;
   PetPreferences _preferences = const PetPreferences();
   final StorageService _storageService = StorageService();
+  final AIService _aiService = AIService();
   bool _isLoading = true;
   Timer? _updateTimer;
   DateTime? _lastUpdate;
   bool _wasCritical = false; // Para evitar notificaciones repetidas
+
+  // Sistema de IA
+  InteractionHistory _interactionHistory = InteractionHistory();
+  PetPersonality _petPersonality = PetPersonality();
+  String _petMessage = '';
+  AISuggestion? _currentSuggestion;
 
   @override
   void initState() {
@@ -61,14 +72,18 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   Future<void> _loadPetState() async {
     debugPrint('🔄 Cargando estado de la mascota...');
 
-    // Cargar preferencias y estado en paralelo
+    // Cargar preferencias, estado, historial y personalidad en paralelo
     final results = await Future.wait([
       _storageService.loadPetState(),
       PreferencesService.loadPreferences(),
+      _storageService.loadInteractionHistory(),
+      _storageService.loadPetPersonality(),
     ]);
 
     final savedPet = results[0] as Pet?;
     final preferences = results[1] as PetPreferences;
+    final history = results[2] as InteractionHistory;
+    final personality = results[3] as PetPersonality;
 
     if (savedPet != null) {
       debugPrint('📊 Estado anterior - Hambre: ${savedPet.hunger}, Felicidad: ${savedPet.happiness}');
@@ -82,6 +97,14 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     }
 
     _lastUpdate = DateTime.now();
+    _interactionHistory = history;
+    _petPersonality = personality;
+
+    // Actualizar estado emocional basado en métricas actuales
+    _updateAIState();
+
+    // Registrar apertura de app
+    await _recordInteraction(InteractionType.appOpen);
 
     setState(() {
       _preferences = preferences;
@@ -179,12 +202,63 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     await _storageService.saveState(_pet);
   }
 
+  /// Actualiza el estado de la IA (mensajes, sugerencias, estado emocional)
+  void _updateAIState() {
+    // Calcular minutos desde última interacción
+    final lastInteraction = _interactionHistory.interactions.isNotEmpty
+        ? _interactionHistory.interactions.last.timestamp
+        : DateTime.now();
+    final minutesSinceInteraction =
+        DateTime.now().difference(lastInteraction).inMinutes;
+
+    // Actualizar estado emocional
+    _petPersonality = _petPersonality.updateEmotionalState(
+      hunger: _pet.hunger,
+      happiness: _pet.happiness,
+      energy: _pet.energy,
+      health: _pet.health,
+      minutesSinceLastInteraction: minutesSinceInteraction,
+    );
+
+    // Generar mensaje de la mascota
+    _petMessage = _aiService.generatePetMessage(
+      pet: _pet,
+      personality: _petPersonality,
+      history: _interactionHistory,
+    );
+
+    // Generar sugerencia
+    _currentSuggestion = _aiService.generateSuggestion(
+      pet: _pet,
+      personality: _petPersonality,
+      history: _interactionHistory,
+    );
+  }
+
+  /// Registra una interacción y actualiza el sistema de IA
+  Future<void> _recordInteraction(InteractionType type, {Map<String, dynamic>? metadata}) async {
+    final result = await _storageService.recordInteraction(
+      type: type,
+      hungerBefore: _pet.hunger,
+      happinessBefore: _pet.happiness,
+      energyBefore: _pet.energy,
+      healthBefore: _pet.health,
+      metadata: metadata,
+    );
+
+    setState(() {
+      _interactionHistory = result.history;
+      _petPersonality = result.personality;
+      _updateAIState();
+    });
+  }
+
   /// Navega a la pantalla de selección de mini-juegos
   ///
   /// Muestra el menú de mini-juegos y actualiza la mascota cuando
   /// el jugador completa algún juego y gana recompensas.
-  void _navigateToMiniGames() {
-    Navigator.push(
+  void _navigateToMiniGames() async {
+    await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => MiniGamesMenuScreen(
@@ -194,10 +268,15 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               _pet = updatedPet;
             });
             _saveState();
+            // Registrar interacción de mini-juego
+            _recordInteraction(InteractionType.minigame);
           },
         ),
       ),
     );
+
+    // Actualizar IA al volver
+    _updateAIState();
   }
 
   @override
@@ -251,6 +330,16 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   children: [
                     // Visualización de la mascota
                     PetDisplay(pet: _pet, preferences: _preferences),
+                    const SizedBox(height: 16),
+
+                    // Card de IA con mensaje y personalidad
+                    AIInsightCard(
+                      pet: _pet,
+                      personality: _petPersonality,
+                      history: _interactionHistory,
+                      petMessage: _petMessage,
+                      suggestion: _currentSuggestion,
+                    ),
                     const SizedBox(height: 16),
 
                     // Alerta de estado crítico
@@ -442,7 +531,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   }
 
   /// Acción: Alimentar a la mascota
-  void _feedPet() {
+  void _feedPet() async {
     final oldStage = _pet.lifeStage;
     setState(() {
       _pet = _pet.copyWith(
@@ -453,13 +542,23 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       _pet = _pet.updateLifeStage();
       _pet = _pet.updateVariant();
     });
-    _saveState(); // Guardar estado
+    _saveState();
     _checkEvolution(oldStage);
-    _showActionFeedback('¡Ñam ñam! 🍔 (+10 XP)');
+
+    // Registrar interacción para IA
+    await _recordInteraction(InteractionType.feed);
+
+    // Mostrar respuesta inteligente
+    final response = _aiService.generateActionResponse(
+      action: InteractionType.feed,
+      pet: _pet,
+      personality: _petPersonality,
+    );
+    _showActionFeedback(response);
   }
 
   /// Acción: Jugar con la mascota
-  void _playWithPet() {
+  void _playWithPet() async {
     final oldStage = _pet.lifeStage;
     setState(() {
       _pet = _pet.copyWith(
@@ -471,13 +570,23 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       _pet = _pet.updateLifeStage();
       _pet = _pet.updateVariant();
     });
-    _saveState(); // Guardar estado
+    _saveState();
     _checkEvolution(oldStage);
-    _showActionFeedback('¡Qué divertido! 🎮 (+15 XP)');
+
+    // Registrar interacción para IA
+    await _recordInteraction(InteractionType.play);
+
+    // Mostrar respuesta inteligente
+    final response = _aiService.generateActionResponse(
+      action: InteractionType.play,
+      pet: _pet,
+      personality: _petPersonality,
+    );
+    _showActionFeedback(response);
   }
 
   /// Acción: Limpiar a la mascota
-  void _cleanPet() {
+  void _cleanPet() async {
     final oldStage = _pet.lifeStage;
     setState(() {
       _pet = _pet.copyWith(
@@ -488,13 +597,23 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       _pet = _pet.updateLifeStage();
       _pet = _pet.updateVariant();
     });
-    _saveState(); // Guardar estado
+    _saveState();
     _checkEvolution(oldStage);
-    _showActionFeedback('¡Qué limpio! 🧼 (+10 XP)');
+
+    // Registrar interacción para IA
+    await _recordInteraction(InteractionType.clean);
+
+    // Mostrar respuesta inteligente
+    final response = _aiService.generateActionResponse(
+      action: InteractionType.clean,
+      pet: _pet,
+      personality: _petPersonality,
+    );
+    _showActionFeedback(response);
   }
 
   /// Acción: Descansar
-  void _restPet() {
+  void _restPet() async {
     final oldStage = _pet.lifeStage;
     setState(() {
       _pet = _pet.copyWith(
@@ -505,9 +624,19 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       _pet = _pet.updateLifeStage();
       _pet = _pet.updateVariant();
     });
-    _saveState(); // Guardar estado
+    _saveState();
     _checkEvolution(oldStage);
-    _showActionFeedback('¡Zzz... 😴 (+5 XP)');
+
+    // Registrar interacción para IA
+    await _recordInteraction(InteractionType.rest);
+
+    // Mostrar respuesta inteligente
+    final response = _aiService.generateActionResponse(
+      action: InteractionType.rest,
+      pet: _pet,
+      personality: _petPersonality,
+    );
+    _showActionFeedback(response);
   }
 
   /// Verifica si hubo evolución y muestra celebración
