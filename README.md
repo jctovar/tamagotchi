@@ -119,14 +119,28 @@ Este proyecto implementa mecánicas modernas de gamificación incluyendo:
 
 ## 🎥 Demo
 
-> 🚧 Sección en desarrollo - Se agregarán capturas de pantalla y video demo
+### Capturas de Pantalla
 
-<!--
-Incluir aquí:
-- Capturas de diferentes etapas de evolución
-- Video de interacciones
-- GIFs de animaciones
--->
+<div align="center">
+
+| Pantalla Principal | Cuidado de la Mascota | Mini-Juegos |
+|:------------------:|:---------------------:|:-----------:|
+| ![Screenshot 1](docs/screenshots/screenshot1.png) | ![Screenshot 2](docs/screenshots/screenshot2.png) | ![Screenshot 3](docs/screenshots/screenshot3.png) |
+
+| Sistema de IA | Configuración |
+|:-------------:|:-------------:|
+| ![Screenshot 4](docs/screenshots/screenshot4.png) | ![Screenshot 5](docs/screenshots/screenshot5.png) |
+
+</div>
+
+### Características Visuales
+
+- **Interfaz moderna** con Material Design 3
+- **Animaciones fluidas** en todas las interacciones
+- **Sistema de evolución visual** con 5 etapas distintas
+- **Personalización completa** de colores y accesorios
+- **Mini-juegos interactivos** con música de fondo
+- **IA adaptativa** que responde según la personalidad de tu mascota
 
 ## 📥 Instalación
 
