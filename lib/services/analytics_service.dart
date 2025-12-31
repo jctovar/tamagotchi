@@ -390,4 +390,116 @@ class AnalyticsService {
       },
     );
   }
+
+  // ==================== Eventos de Machine Learning ====================
+
+  /// Registra cuando se inicializa el servicio ML
+  static Future<void> logMLServiceInitialized({
+    required List<String> modelsLoaded,
+    required int initializationTimeMs,
+    required bool success,
+  }) async {
+    await _analytics.logEvent(
+      name: 'ml_service_initialized',
+      parameters: {
+        'models_loaded': modelsLoaded.join(','),
+        'models_count': modelsLoaded.length,
+        'initialization_time_ms': initializationTimeMs,
+        'success': success,
+      },
+    );
+  }
+
+  /// Registra métricas de inferencia ML
+  static Future<void> logMLInference({
+    required String modelName,
+    required int inferenceTimeMs,
+    required bool success,
+    String? errorType,
+  }) async {
+    await _analytics.logEvent(
+      name: 'ml_inference',
+      parameters: {
+        'model_name': modelName,
+        'inference_time_ms': inferenceTimeMs,
+        'success': success,
+        if (errorType != null) 'error_type': errorType,
+      },
+    );
+  }
+
+  /// Registra cuando se usa ML fallback a reglas
+  static Future<void> logMLFallback({
+    required String modelName,
+    required String reason,
+  }) async {
+    await _analytics.logEvent(
+      name: 'ml_fallback',
+      parameters: {
+        'model_name': modelName,
+        'reason': reason,
+      },
+    );
+  }
+
+  /// Registra estadísticas de rendimiento ML acumuladas
+  static Future<void> logMLPerformanceStats({
+    required String modelName,
+    required int totalInferences,
+    required int successfulInferences,
+    required double averageTimeMs,
+    required double minTimeMs,
+    required double maxTimeMs,
+  }) async {
+    await _analytics.logEvent(
+      name: 'ml_performance_stats',
+      parameters: {
+        'model_name': modelName,
+        'total_inferences': totalInferences,
+        'successful_inferences': successfulInferences,
+        'success_rate': (successfulInferences / totalInferences * 100).round(),
+        'avg_time_ms': averageTimeMs.round(),
+        'min_time_ms': minTimeMs.round(),
+        'max_time_ms': maxTimeMs.round(),
+      },
+    );
+  }
+
+  /// Registra cuando una predicción ML se sigue o ignora
+  static Future<void> logMLPredictionFeedback({
+    required String modelName,
+    required String predictedAction,
+    required String actualAction,
+    required bool followed,
+    required double confidence,
+  }) async {
+    await _analytics.logEvent(
+      name: 'ml_prediction_feedback',
+      parameters: {
+        'model_name': modelName,
+        'predicted_action': predictedAction,
+        'actual_action': actualAction,
+        'followed': followed,
+        'confidence': (confidence * 100).round(),
+      },
+    );
+  }
+
+  /// Registra cuando una sugerencia ML se muestra al usuario
+  static Future<void> logMLSuggestionShown({
+    required String suggestionType,
+    required String action,
+    required double urgency,
+    required bool isUrgent,
+  }) async {
+    await _analytics.logEvent(
+      name: 'ml_suggestion_shown',
+      parameters: {
+        'suggestion_type': suggestionType,
+        'action': action,
+        'urgency': (urgency * 100).round(),
+        'is_urgent': isUrgent,
+      },
+    );
+  }
 }

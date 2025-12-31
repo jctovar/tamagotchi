@@ -1,4 +1,5 @@
 import '../utils/ml_constants.dart';
+import 'interaction_history.dart';
 
 /// Resultado de predicción del modelo ActionPredictor
 ///
@@ -70,10 +71,143 @@ class ActionPrediction {
   /// Verifica si la predicción tiene baja confianza (<40%)
   bool get isLowConfidence => confidence <= 0.4;
 
+  /// Convierte la acción predicha a InteractionType
+  InteractionType? get interactionType {
+    switch (predictedAction) {
+      case PredictedAction.feed:
+        return InteractionType.feed;
+      case PredictedAction.play:
+        return InteractionType.play;
+      case PredictedAction.clean:
+        return InteractionType.clean;
+      case PredictedAction.rest:
+        return InteractionType.rest;
+      case PredictedAction.minigame:
+        return InteractionType.minigame;
+      case PredictedAction.other:
+        return null;
+    }
+  }
+
+  /// Convierte la predicción a una sugerencia de IA
+  MLSuggestion toSuggestion({required String petName}) {
+    final action = interactionType;
+    String message;
+    MLSuggestionType type;
+
+    if (isHighConfidence) {
+      type = MLSuggestionType.confident;
+      message = _getConfidentMessage(petName);
+    } else if (isMediumConfidence) {
+      type = MLSuggestionType.suggestion;
+      message = _getSuggestionMessage(petName);
+    } else {
+      type = MLSuggestionType.hint;
+      message = _getHintMessage(petName);
+    }
+
+    return MLSuggestion(
+      type: type,
+      message: message,
+      action: action,
+      confidence: confidence,
+      predictedAction: predictedAction,
+    );
+  }
+
+  String _getConfidentMessage(String petName) {
+    switch (predictedAction) {
+      case PredictedAction.feed:
+        return '$petName tiene hambre. ¡Es hora de comer!';
+      case PredictedAction.play:
+        return '$petName quiere jugar contigo.';
+      case PredictedAction.clean:
+        return '$petName necesita un baño.';
+      case PredictedAction.rest:
+        return '$petName está cansado. Déjalo descansar.';
+      case PredictedAction.minigame:
+        return '¡$petName quiere jugar un mini-juego!';
+      case PredictedAction.other:
+        return '$petName está bien por ahora.';
+    }
+  }
+
+  String _getSuggestionMessage(String petName) {
+    switch (predictedAction) {
+      case PredictedAction.feed:
+        return 'Quizás $petName tenga un poco de hambre.';
+      case PredictedAction.play:
+        return '$petName podría querer jugar.';
+      case PredictedAction.clean:
+        return 'Podrías limpiar a $petName.';
+      case PredictedAction.rest:
+        return '$petName parece algo cansado.';
+      case PredictedAction.minigame:
+        return '¿Qué tal un mini-juego con $petName?';
+      case PredictedAction.other:
+        return '$petName está tranquilo.';
+    }
+  }
+
+  String _getHintMessage(String petName) {
+    switch (predictedAction) {
+      case PredictedAction.feed:
+        return 'Considera alimentar a $petName.';
+      case PredictedAction.play:
+        return 'Considera jugar con $petName.';
+      case PredictedAction.clean:
+        return 'Considera limpiar a $petName.';
+      case PredictedAction.rest:
+        return 'Considera dejar descansar a $petName.';
+      case PredictedAction.minigame:
+        return 'Los mini-juegos son divertidos.';
+      case PredictedAction.other:
+        return '$petName espera tu decisión.';
+    }
+  }
+
   @override
   String toString() {
     return 'ActionPrediction(action: ${predictedAction.displayName}, '
         'confidence: ${(confidence * 100).toStringAsFixed(1)}%)';
+  }
+}
+
+/// Tipo de sugerencia generada por ML
+enum MLSuggestionType {
+  confident('Predicción', '🎯'),
+  suggestion('Sugerencia', '💡'),
+  hint('Idea', '💭');
+
+  final String displayName;
+  final String emoji;
+
+  const MLSuggestionType(this.displayName, this.emoji);
+}
+
+/// Sugerencia generada por el modelo ML
+class MLSuggestion {
+  final MLSuggestionType type;
+  final String message;
+  final InteractionType? action;
+  final double confidence;
+  final PredictedAction predictedAction;
+
+  MLSuggestion({
+    required this.type,
+    required this.message,
+    required this.action,
+    required this.confidence,
+    required this.predictedAction,
+  });
+
+  /// Prioridad basada en confianza (mayor = más urgente)
+  int get priority => (confidence * 10).round();
+
+  @override
+  String toString() {
+    return 'MLSuggestion(${type.displayName}: $message, '
+        'confidence: ${(confidence * 100).toStringAsFixed(0)}%)';
   }
 }
 

@@ -2,6 +2,9 @@ import 'dart:math';
 import '../models/pet.dart';
 import '../models/interaction_history.dart';
 import '../models/pet_personality.dart';
+import '../models/ml_prediction.dart';
+import '../utils/ml_constants.dart';
+import 'ml_service.dart';
 
 /// Servicio de IA para comportamientos adaptativos de la mascota
 ///
@@ -113,6 +116,85 @@ class AIService {
     if (suggestions.isEmpty) return null;
     suggestions.sort((a, b) => b.priority.compareTo(a.priority));
     return suggestions.first;
+  }
+
+  /// Genera una sugerencia usando ML con fallback a reglas
+  ///
+  /// Intenta primero usar el modelo ML para predecir la acción.
+  /// Si el modelo no está disponible o falla, usa las reglas heurísticas.
+  Future<AISuggestion?> generateSmartSuggestion({
+    required Pet pet,
+    required PetPersonality personality,
+    required InteractionHistory history,
+  }) async {
+    // 1. Intentar usar ML
+    final mlService = MLService();
+    if (mlService.isInitialized) {
+      try {
+        final prediction = await mlService.predictNextAction(
+          pet: pet,
+          personality: personality,
+          history: history,
+        );
+
+        if (prediction != null && prediction.confidence > 0.3) {
+          final mlSuggestion = prediction.toSuggestion(petName: pet.name);
+
+          // Convertir MLSuggestion a AISuggestion
+          return AISuggestion(
+            type: _mlTypeToSuggestionType(mlSuggestion.type),
+            message: mlSuggestion.message,
+            action: mlSuggestion.action,
+            priority: mlSuggestion.priority,
+          );
+        }
+      } catch (e) {
+        // Log error pero continuar con fallback
+        // En producción, loguear a Analytics
+      }
+    }
+
+    // 2. Fallback a reglas heurísticas
+    return generateSuggestion(
+      pet: pet,
+      personality: personality,
+      history: history,
+    );
+  }
+
+  /// Convierte tipo de sugerencia ML a tipo de sugerencia AI
+  SuggestionType _mlTypeToSuggestionType(MLSuggestionType mlType) {
+    switch (mlType) {
+      case MLSuggestionType.confident:
+        return SuggestionType.important;
+      case MLSuggestionType.suggestion:
+        return SuggestionType.tip;
+      case MLSuggestionType.hint:
+        return SuggestionType.friendly;
+    }
+  }
+
+  /// Obtiene predicción ML de la próxima acción (para UI avanzada)
+  Future<MLSuggestion?> getMLPrediction({
+    required Pet pet,
+    required PetPersonality personality,
+    required InteractionHistory history,
+  }) async {
+    final mlService = MLService();
+    if (!mlService.isInitialized) return null;
+
+    try {
+      final prediction = await mlService.predictNextAction(
+        pet: pet,
+        personality: personality,
+        history: history,
+      );
+
+      if (prediction == null) return null;
+      return prediction.toSuggestion(petName: pet.name);
+    } catch (e) {
+      return null;
+    }
   }
 
   /// Genera un mensaje contextual de la mascota
@@ -328,7 +410,7 @@ class AIService {
     return responses[_random.nextInt(responses.length)];
   }
 
-  /// Predice la próxima necesidad de la mascota
+  /// Predice la próxima necesidad de la mascota (versión con reglas)
   PredictedNeed? predictNextNeed({
     required Pet pet,
     required InteractionHistory history,
@@ -383,6 +465,90 @@ class AIService {
     // Retornar la necesidad más urgente
     predictions.sort((a, b) => a.minutesUntilNeeded.compareTo(b.minutesUntilNeeded));
     return predictions.first;
+  }
+
+  /// Predice la próxima necesidad usando ML con fallback a reglas
+  ///
+  /// Intenta usar CriticalTimePredictor para predicciones más precisas.
+  /// Si el modelo no está disponible, usa las reglas heurísticas.
+  Future<PredictedNeed?> predictNextNeedSmart({
+    required Pet pet,
+    required InteractionHistory history,
+  }) async {
+    // 1. Intentar usar ML
+    final mlService = MLService();
+    if (mlService.isInitialized) {
+      try {
+        final mlPrediction = await mlService.predictCriticalTime(
+          pet: pet,
+          history: history,
+        );
+
+        if (mlPrediction != null) {
+          // Convertir CriticalTimePrediction a PredictedNeed
+          return _criticalTimeToPredictedNeed(mlPrediction, pet);
+        }
+      } catch (e) {
+        // Log error pero continuar con fallback
+      }
+    }
+
+    // 2. Fallback a reglas heurísticas
+    return predictNextNeed(pet: pet, history: history);
+  }
+
+  /// Convierte CriticalTimePrediction de ML a PredictedNeed
+  PredictedNeed? _criticalTimeToPredictedNeed(
+    CriticalTimePrediction prediction,
+    Pet pet,
+  ) {
+    final minutes = prediction.getMinutesFor(prediction.mostUrgent).round();
+
+    // Ignorar si es muy lejano (> 3 horas)
+    if (minutes > 180 || minutes <= 0) return null;
+
+    InteractionType type;
+    String message;
+
+    switch (prediction.mostUrgent) {
+      case CriticalMetric.hunger:
+        type = InteractionType.feed;
+        message = '${pet.name} tendrá hambre en ~$minutes minutos';
+      case CriticalMetric.happiness:
+        type = InteractionType.play;
+        message = '${pet.name} necesitará jugar en ~$minutes minutos';
+      case CriticalMetric.energy:
+        type = InteractionType.rest;
+        message = '${pet.name} estará cansado en ~$minutes minutos';
+      case CriticalMetric.health:
+        type = InteractionType.clean;
+        message = 'La salud de ${pet.name} bajará en ~$minutes minutos';
+    }
+
+    return PredictedNeed(
+      type: type,
+      minutesUntilNeeded: minutes,
+      urgency: prediction.urgencyScore,
+      message: message,
+    );
+  }
+
+  /// Obtiene predicción ML de tiempo crítico (para UI avanzada)
+  Future<CriticalTimePrediction?> getMLCriticalTimePrediction({
+    required Pet pet,
+    required InteractionHistory history,
+  }) async {
+    final mlService = MLService();
+    if (!mlService.isInitialized) return null;
+
+    try {
+      return await mlService.predictCriticalTime(
+        pet: pet,
+        history: history,
+      );
+    } catch (e) {
+      return null;
+    }
   }
 
   double _calculateUrgency(int minutes) {
@@ -450,6 +616,52 @@ class AIService {
     }
 
     return mostActive;
+  }
+
+  /// Obtiene recomendación personalizada usando ML
+  ///
+  /// ActionRecommender proporciona scores para cada acción basándose
+  /// en el historial completo y personalidad del pet.
+  Future<ActionRecommendation?> getMLRecommendation({
+    required Pet pet,
+    required PetPersonality personality,
+    required InteractionHistory history,
+  }) async {
+    final mlService = MLService();
+    if (!mlService.isInitialized) return null;
+
+    try {
+      return await mlService.recommendAction(
+        pet: pet,
+        personality: personality,
+        history: history,
+      );
+    } catch (e) {
+      return null;
+    }
+  }
+
+  /// Clasifica el estado emocional óptimo usando ML
+  ///
+  /// EmotionClassifier predice el estado emocional basándose
+  /// en métricas actuales e historial de la sesión.
+  Future<EmotionPrediction?> getMLEmotionPrediction({
+    required Pet pet,
+    required PetPersonality personality,
+    required InteractionHistory history,
+  }) async {
+    final mlService = MLService();
+    if (!mlService.isInitialized) return null;
+
+    try {
+      return await mlService.classifyEmotion(
+        pet: pet,
+        personality: personality,
+        history: history,
+      );
+    } catch (e) {
+      return null;
+    }
   }
 
   /// Genera datos para TensorFlow Lite (preparación de features)

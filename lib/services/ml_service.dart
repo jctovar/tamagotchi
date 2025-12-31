@@ -6,6 +6,8 @@ import '../models/pet.dart';
 import '../models/pet_personality.dart';
 import '../models/interaction_history.dart';
 import '../utils/ml_constants.dart';
+import '../utils/ml_performance_tracker.dart';
+import 'analytics_service.dart';
 
 /// Servicio de Machine Learning para inferencia con TensorFlow Lite
 ///
@@ -42,6 +44,9 @@ class MLService {
   DateTime? _lastInferenceTime;
   final List<String> _availableModels = [];
 
+  // Performance tracking
+  final MLPerformanceTracker _performanceTracker = MLPerformanceTracker();
+
   /// Indica si el servicio está inicializado y listo para usar
   bool get isInitialized => _isInitialized;
 
@@ -53,6 +58,9 @@ class MLService {
 
   /// Lista de modelos disponibles
   List<String> get availableModels => List.unmodifiable(_availableModels);
+
+  /// Tracker de rendimiento para métricas de inferencia
+  MLPerformanceTracker get performanceTracker => _performanceTracker;
 
   /// Obtiene el estado actual del servicio ML
   MLStatus get status => MLStatus(
@@ -73,6 +81,7 @@ class MLService {
     }
 
     debugPrint('[MLService] Iniciando inicialización...');
+    final stopwatch = Stopwatch()..start();
     _availableModels.clear();
     _lastError = null;
 
@@ -101,11 +110,22 @@ class MLService {
       (interpreter) => _emotionClassifier = interpreter,
     );
 
+    stopwatch.stop();
     _isInitialized = _availableModels.isNotEmpty;
+
+    // Registrar métricas de inicialización
+    _performanceTracker.recordInitialization(stopwatch.elapsedMilliseconds);
+
+    // Log a Analytics
+    AnalyticsService.logMLServiceInitialized(
+      modelsLoaded: _availableModels,
+      initializationTimeMs: stopwatch.elapsedMilliseconds,
+      success: _isInitialized,
+    );
 
     if (_isInitialized) {
       debugPrint(
-          '[MLService] Inicializado con ${_availableModels.length} modelos');
+          '[MLService] Inicializado con ${_availableModels.length} modelos en ${stopwatch.elapsedMilliseconds}ms');
     } else {
       debugPrint('[MLService] No se pudo cargar ningún modelo');
       _lastError ??= 'No se encontraron modelos ML';
@@ -140,14 +160,20 @@ class MLService {
     required PetPersonality personality,
     required InteractionHistory history,
   }) async {
+    const modelName = 'ActionPredictor';
+
     if (_actionPredictor == null) {
-      debugPrint('[MLService] ActionPredictor no disponible');
+      debugPrint('[MLService] $modelName no disponible');
+      AnalyticsService.logMLFallback(
+        modelName: modelName,
+        reason: 'model_not_loaded',
+      );
       return null;
     }
 
-    try {
-      final startTime = DateTime.now();
+    final stopwatch = Stopwatch()..start();
 
+    try {
       // Extraer features
       final features = _extractActionFeatures(pet, personality, history);
 
@@ -159,20 +185,50 @@ class MLService {
       // Ejecutar inferencia
       _actionPredictor!.run(input, output);
 
+      stopwatch.stop();
       _lastInferenceTime = DateTime.now();
-      final duration = _lastInferenceTime!.difference(startTime);
+
+      // Registrar métricas
+      _performanceTracker.recordInference(
+        modelName,
+        stopwatch.elapsedMilliseconds,
+        success: true,
+      );
+
+      AnalyticsService.logMLInference(
+        modelName: modelName,
+        inferenceTimeMs: stopwatch.elapsedMilliseconds,
+        success: true,
+      );
 
       debugPrint(
-          '[MLService] Inferencia ActionPredictor en ${duration.inMilliseconds}ms');
+          '[MLService] Inferencia $modelName en ${stopwatch.elapsedMilliseconds}ms');
 
       // Convertir a predicción
       return ActionPrediction.fromProbabilities(
         (output[0] as List).cast<double>(),
       );
     } catch (e, stack) {
+      stopwatch.stop();
       debugPrint('[MLService] Error en predictNextAction: $e');
       debugPrint(stack.toString());
       _lastError = e.toString();
+
+      // Registrar error
+      _performanceTracker.recordInference(
+        modelName,
+        stopwatch.elapsedMilliseconds,
+        success: false,
+        error: e.toString(),
+      );
+
+      AnalyticsService.logMLInference(
+        modelName: modelName,
+        inferenceTimeMs: stopwatch.elapsedMilliseconds,
+        success: false,
+        errorType: e.runtimeType.toString(),
+      );
+
       return null;
     }
   }
@@ -184,14 +240,20 @@ class MLService {
     required Pet pet,
     required InteractionHistory history,
   }) async {
+    const modelName = 'CriticalTimePredictor';
+
     if (_criticalTimePredictor == null) {
-      debugPrint('[MLService] CriticalTimePredictor no disponible');
+      debugPrint('[MLService] $modelName no disponible');
+      AnalyticsService.logMLFallback(
+        modelName: modelName,
+        reason: 'model_not_loaded',
+      );
       return null;
     }
 
-    try {
-      final startTime = DateTime.now();
+    final stopwatch = Stopwatch()..start();
 
+    try {
       // Extraer features
       final features = _extractCriticalTimeFeatures(pet, history);
 
@@ -204,20 +266,50 @@ class MLService {
       // Ejecutar inferencia
       _criticalTimePredictor!.run(input, output);
 
+      stopwatch.stop();
       _lastInferenceTime = DateTime.now();
-      final duration = _lastInferenceTime!.difference(startTime);
+
+      // Registrar métricas
+      _performanceTracker.recordInference(
+        modelName,
+        stopwatch.elapsedMilliseconds,
+        success: true,
+      );
+
+      AnalyticsService.logMLInference(
+        modelName: modelName,
+        inferenceTimeMs: stopwatch.elapsedMilliseconds,
+        success: true,
+      );
 
       debugPrint(
-          '[MLService] Inferencia CriticalTimePredictor en ${duration.inMilliseconds}ms');
+          '[MLService] Inferencia $modelName en ${stopwatch.elapsedMilliseconds}ms');
 
       // Convertir a predicción
       return CriticalTimePrediction.fromModelOutput(
         (output[0] as List).cast<double>(),
       );
     } catch (e, stack) {
+      stopwatch.stop();
       debugPrint('[MLService] Error en predictCriticalTime: $e');
       debugPrint(stack.toString());
       _lastError = e.toString();
+
+      // Registrar error
+      _performanceTracker.recordInference(
+        modelName,
+        stopwatch.elapsedMilliseconds,
+        success: false,
+        error: e.toString(),
+      );
+
+      AnalyticsService.logMLInference(
+        modelName: modelName,
+        inferenceTimeMs: stopwatch.elapsedMilliseconds,
+        success: false,
+        errorType: e.runtimeType.toString(),
+      );
+
       return null;
     }
   }
@@ -230,14 +322,20 @@ class MLService {
     required PetPersonality personality,
     required InteractionHistory history,
   }) async {
+    const modelName = 'ActionRecommender';
+
     if (_actionRecommender == null) {
-      debugPrint('[MLService] ActionRecommender no disponible');
+      debugPrint('[MLService] $modelName no disponible');
+      AnalyticsService.logMLFallback(
+        modelName: modelName,
+        reason: 'model_not_loaded',
+      );
       return null;
     }
 
-    try {
-      final startTime = DateTime.now();
+    final stopwatch = Stopwatch()..start();
 
+    try {
       // Extraer features
       final features = _extractRecommenderFeatures(pet, personality, history);
 
@@ -250,20 +348,50 @@ class MLService {
       // Ejecutar inferencia
       _actionRecommender!.run(input, output);
 
+      stopwatch.stop();
       _lastInferenceTime = DateTime.now();
-      final duration = _lastInferenceTime!.difference(startTime);
+
+      // Registrar métricas
+      _performanceTracker.recordInference(
+        modelName,
+        stopwatch.elapsedMilliseconds,
+        success: true,
+      );
+
+      AnalyticsService.logMLInference(
+        modelName: modelName,
+        inferenceTimeMs: stopwatch.elapsedMilliseconds,
+        success: true,
+      );
 
       debugPrint(
-          '[MLService] Inferencia ActionRecommender en ${duration.inMilliseconds}ms');
+          '[MLService] Inferencia $modelName en ${stopwatch.elapsedMilliseconds}ms');
 
       // Convertir a recomendación
       return ActionRecommendation.fromModelOutput(
         (output[0] as List).cast<double>(),
       );
     } catch (e, stack) {
+      stopwatch.stop();
       debugPrint('[MLService] Error en recommendAction: $e');
       debugPrint(stack.toString());
       _lastError = e.toString();
+
+      // Registrar error
+      _performanceTracker.recordInference(
+        modelName,
+        stopwatch.elapsedMilliseconds,
+        success: false,
+        error: e.toString(),
+      );
+
+      AnalyticsService.logMLInference(
+        modelName: modelName,
+        inferenceTimeMs: stopwatch.elapsedMilliseconds,
+        success: false,
+        errorType: e.runtimeType.toString(),
+      );
+
       return null;
     }
   }
@@ -276,14 +404,20 @@ class MLService {
     required PetPersonality personality,
     required InteractionHistory history,
   }) async {
+    const modelName = 'EmotionClassifier';
+
     if (_emotionClassifier == null) {
-      debugPrint('[MLService] EmotionClassifier no disponible');
+      debugPrint('[MLService] $modelName no disponible');
+      AnalyticsService.logMLFallback(
+        modelName: modelName,
+        reason: 'model_not_loaded',
+      );
       return null;
     }
 
-    try {
-      final startTime = DateTime.now();
+    final stopwatch = Stopwatch()..start();
 
+    try {
       // Extraer features
       final features = _extractEmotionFeatures(pet, personality, history);
 
@@ -296,20 +430,50 @@ class MLService {
       // Ejecutar inferencia
       _emotionClassifier!.run(input, output);
 
+      stopwatch.stop();
       _lastInferenceTime = DateTime.now();
-      final duration = _lastInferenceTime!.difference(startTime);
+
+      // Registrar métricas
+      _performanceTracker.recordInference(
+        modelName,
+        stopwatch.elapsedMilliseconds,
+        success: true,
+      );
+
+      AnalyticsService.logMLInference(
+        modelName: modelName,
+        inferenceTimeMs: stopwatch.elapsedMilliseconds,
+        success: true,
+      );
 
       debugPrint(
-          '[MLService] Inferencia EmotionClassifier en ${duration.inMilliseconds}ms');
+          '[MLService] Inferencia $modelName en ${stopwatch.elapsedMilliseconds}ms');
 
       // Convertir a predicción
       return EmotionPrediction.fromProbabilities(
         (output[0] as List).cast<double>(),
       );
     } catch (e, stack) {
+      stopwatch.stop();
       debugPrint('[MLService] Error en classifyEmotion: $e');
       debugPrint(stack.toString());
       _lastError = e.toString();
+
+      // Registrar error
+      _performanceTracker.recordInference(
+        modelName,
+        stopwatch.elapsedMilliseconds,
+        success: false,
+        error: e.toString(),
+      );
+
+      AnalyticsService.logMLInference(
+        modelName: modelName,
+        inferenceTimeMs: stopwatch.elapsedMilliseconds,
+        success: false,
+        errorType: e.runtimeType.toString(),
+      );
+
       return null;
     }
   }
@@ -589,8 +753,41 @@ class MLService {
     return (count / 20.0).clamp(0.0, 1.0);
   }
 
+  /// Envía estadísticas de rendimiento a Analytics
+  ///
+  /// Llamar periódicamente (ej: al cerrar la app o cada N minutos)
+  Future<void> flushPerformanceStats() async {
+    for (final modelName in _availableModels) {
+      final metrics = _performanceTracker.getMetrics(modelName);
+      if (metrics != null && metrics.totalInferences > 0) {
+        await AnalyticsService.logMLPerformanceStats(
+          modelName: modelName,
+          totalInferences: metrics.totalInferences,
+          successfulInferences: metrics.successfulInferences,
+          averageTimeMs: metrics.averageTimeMs,
+          minTimeMs: metrics.minTimeMs.toDouble(),
+          maxTimeMs: metrics.maxTimeMs.toDouble(),
+        );
+      }
+    }
+    debugPrint('[MLService] Performance stats enviados a Analytics');
+  }
+
+  /// Obtiene un reporte de rendimiento completo
+  Map<String, dynamic> getPerformanceReport() =>
+      _performanceTracker.generateReport();
+
+  /// Resetea las métricas de rendimiento
+  void resetPerformanceMetrics() {
+    _performanceTracker.reset();
+    debugPrint('[MLService] Métricas de rendimiento reseteadas');
+  }
+
   /// Libera recursos de todos los modelos
   void dispose() {
+    // Enviar stats finales antes de cerrar
+    flushPerformanceStats();
+
     _actionPredictor?.close();
     _criticalTimePredictor?.close();
     _actionRecommender?.close();
