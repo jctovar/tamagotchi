@@ -91,10 +91,17 @@ Este proyecto implementa mecánicas modernas de gamificación incluyendo:
 
 ### 🔥 Firebase Integration
 
-- **Firebase Crashlytics**: Monitoreo automático de crashes y errores en producción
+#### Firebase Crashlytics
+- **Monitoreo Automático**: Detección de crashes y errores en producción
 - **Reportes Detallados**: Stack traces completos con información de dispositivo
 - **Manejo de Errores**: Captura de errores fatales, asíncronos y en zonas de ejecución
 - **Logging Contextual**: Información personalizada para debugging efectivo
+
+#### Firebase Analytics
+- **23 Eventos Personalizados**: Tracking completo de interacciones, evolución y economía
+- **Propiedades de Usuario**: Segmentación por stage, nivel, variante y monedas
+- **Análisis de Comportamiento**: Insights sobre engagement, retención y progresión
+- **Cumplimiento de Privacidad**: Sin recopilación de PII (información personal identificable)
 
 ### 🔔 Notificaciones Inteligentes
 
@@ -418,6 +425,7 @@ Cada fase implementada incluye documentación técnica detallada:
 - 📄 [**COMO_PROBAR_PERSISTENCIA.md**](COMO_PROBAR_PERSISTENCIA.md) - Guía de pruebas
 - 📄 [**ESTRUCTURA_INICIAL.md**](ESTRUCTURA_INICIAL.md) - Estructura del proyecto
 - 📄 [**FIREBASE_CRASHLYTICS.md**](FIREBASE_CRASHLYTICS.md) - Integración de Firebase Crashlytics
+- 📄 [**FIREBASE_ANALYTICS.md**](FIREBASE_ANALYTICS.md) - Sistema de análisis y tracking de eventos
 
 ## 🗺️ Roadmap
 
