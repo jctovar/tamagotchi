@@ -4,6 +4,7 @@ import '../models/pet_preferences.dart';
 import '../services/storage_service.dart';
 import '../services/preferences_service.dart';
 import '../services/analytics_service.dart';
+import '../services/ml_data_export_service.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -16,7 +17,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
   PetPreferences _preferences = const PetPreferences();
   Pet? _pet;
   bool _isLoading = true;
+  bool _isExporting = false;
   final _storageService = StorageService();
+  final _mlExportService = MLDataExportService();
 
   @override
   void initState() {
@@ -128,6 +131,97 @@ class _SettingsScreenState extends State<SettingsScreen> {
     setState(() {
       _preferences = _preferences.copyWith(notificationsEnabled: enabled);
     });
+  }
+
+  Future<void> _exportMLData() async {
+    if (_pet == null || _isExporting) return;
+
+    setState(() {
+      _isExporting = true;
+    });
+
+    try {
+      final history = await _storageService.loadInteractionHistory();
+      final personality = await _storageService.loadPetPersonality();
+
+      final result = await _mlExportService.exportTrainingData(
+        pet: _pet!,
+        personality: personality,
+        history: history,
+      );
+
+      if (!mounted) return;
+
+      if (result.success && result.filePath != null) {
+        await _mlExportService.shareExportedData(result.filePath!);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Exportados ${result.recordCount} registros'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(result.error ?? 'Error al exportar'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isExporting = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _generateSyntheticData() async {
+    if (_isExporting) return;
+
+    setState(() {
+      _isExporting = true;
+    });
+
+    try {
+      final result = await _mlExportService.generateSyntheticData(
+        recordCount: 500,
+      );
+
+      if (!mounted) return;
+
+      if (result.success && result.filePath != null) {
+        await _mlExportService.shareExportedData(result.filePath!);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Generados ${result.recordCount} registros sintéticos'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(result.error ?? 'Error al generar datos'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isExporting = false;
+        });
+      }
+    }
   }
 
   @override
@@ -341,6 +435,52 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
             ),
           ],
+
+          const Divider(),
+
+          // Sección: Datos ML (Desarrollador)
+          const Padding(
+            padding: EdgeInsets.all(16.0),
+            child: Text(
+              'Datos ML (Desarrollador)',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+
+          ListTile(
+            leading: _isExporting
+                ? const SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Icon(Icons.upload_file),
+            title: const Text('Exportar datos reales'),
+            subtitle: const Text('Exporta tu historial de interacciones'),
+            trailing: const Icon(Icons.chevron_right),
+            enabled: !_isExporting,
+            onTap: _exportMLData,
+          ),
+
+          ListTile(
+            leading: _isExporting
+                ? const SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Icon(Icons.science),
+            title: const Text('Generar datos sintéticos'),
+            subtitle: const Text('Genera 500 registros para entrenamiento'),
+            trailing: const Icon(Icons.chevron_right),
+            enabled: !_isExporting,
+            onTap: _generateSyntheticData,
+          ),
+
+          const SizedBox(height: 16),
         ],
       ),
     );
