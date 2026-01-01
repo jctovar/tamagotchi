@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -39,13 +38,8 @@ void main() async {
   // Registrar apertura de la app
   await AnalyticsService.logAppOpened();
 
-  // Ejecutar app dentro de zona de errores
-  runZonedGuarded(
-    () => runApp(const TamagotchiApp()),
-    (error, stack) {
-      FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
-    },
-  );
+  // Ejecutar app (los errores ya se capturan via FlutterError.onError y PlatformDispatcher.instance.onError)
+  runApp(const TamagotchiApp());
 }
 
 class TamagotchiApp extends StatelessWidget {
