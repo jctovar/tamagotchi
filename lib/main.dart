@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flame_splash_screen/flame_splash_screen.dart';
 import 'firebase_options.dart';
 import 'config/theme.dart';
 import 'screens/main_navigation.dart';
@@ -68,24 +69,24 @@ class AppInitializer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<bool>(
-      future: OnboardingScreen.hasSeenOnboarding(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Scaffold(
-            body: Center(
-              child: CircularProgressIndicator(),
+    return Container(
+      color: const Color(0xFFFFB5C0), // Color rosa del splash anterior
+      child: FlameSplashScreen(
+        theme: FlameSplashTheme.white,
+        onFinish: (BuildContext context) async {
+          final hasSeenOnboarding = await OnboardingScreen.hasSeenOnboarding();
+          if (!context.mounted) return;
+
+          // Navegar a la pantalla apropiada
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (_) => hasSeenOnboarding
+                  ? const MainNavigation()
+                  : const OnboardingScreen(),
             ),
           );
-        }
-
-        final hasSeenOnboarding = snapshot.data ?? false;
-        if (hasSeenOnboarding) {
-          return const MainNavigation();
-        } else {
-          return const OnboardingScreen();
-        }
-      },
+        },
+      ),
     );
   }
 }
