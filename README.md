@@ -199,22 +199,53 @@ dependencies:
   flutter:
     sdk: flutter
 
+  # Core
+  cupertino_icons: ^1.0.8
+
   # Persistencia
-  shared_preferences: ^2.2.2
+  shared_preferences: ^2.3.5
 
   # Background Processing
-  workmanager: ^0.5.1
+  workmanager: ^0.9.0
 
   # Notificaciones
-  flutter_local_notifications: ^16.3.0
-  permission_handler: ^11.1.0
+  flutter_local_notifications: ^19.5.0
 
-  # UX
-  vibration: ^2.0.0
-  introduction_screen: ^3.1.14
+  # UX & Feedback
+  vibration: ^3.1.5
+  introduction_screen: ^4.0.0
+  flutter_svg: ^2.2.1
+  provider: ^6.1.2
 
-  # Navegación
-  cupertino_icons: ^1.0.6
+  # Audio & Games
+  audioplayers: ^6.1.0
+  flame: ^1.34.0
+  flame_audio: ^2.11.12
+  flame_splash_screen: ^0.3.1+2
+
+  # Firebase
+  firebase_core: ^4.3.0
+  firebase_crashlytics: ^5.0.6
+  firebase_analytics: ^12.1.0
+
+  # Machine Learning
+  tflite_flutter: ^0.12.1
+  share_plus: ^10.1.4
+  path_provider: ^2.1.5
+
+  # Utilidades
+  logger: ^2.5.0
+  timeago: ^3.1.0
+  package_info_plus: ^9.0.0
+  intl: ^0.20.2
+
+  # Herramientas de Desarrollo
+  flutter_launcher_icons: ^0.14.4
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
 ```
 
 ## 🚀 Uso
@@ -375,7 +406,7 @@ graph TD
 
 ### Herramientas de Desarrollo
 - **flutter_launcher_icons**: Generación de iconos
-- **flutter_native_splash**: Splash screen nativo
+- **flame_splash_screen**: Splash screen animado con Flame engine
 
 ## 📊 Estado del Proyecto
 

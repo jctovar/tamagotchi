@@ -314,6 +314,116 @@ adb logcat | grep -i firebase
 ./scripts/dev.sh firebase logs
 ```
 
+### Ver Analytics
+
+```bash
+# Ver eventos de Analytics en consola (logs en tiempo real)
+adb logcat | grep -i analytics
+
+# Firebase Console (navegador web)
+# https://console.firebase.google.com/project/[tu-proyecto]/analytics
+```
+
+**Eventos disponibles:**
+- `app_open` - App abierta
+- `feed_pet`, `play_pet`, `clean_pet`, `rest_pet` - Acciones de cuidado
+- `evolution` - Evolución de mascota
+- `customize_pet` - Personalización
+- `game_started`, `game_completed` - Mini-juegos
+- Y 14 eventos más...
+
+---
+
+## 🎮 Mini-Juegos
+
+### Jugar Mini-Juegos
+
+Los mini-juegos están integrados en la app:
+1. Ejecutar la app (`flutter run`)
+2. Ir a la pestaña de **Juegos** 🎮
+3. Seleccionar un juego:
+   - 🧠 **Memory Game**: Encuentra pares de cartas
+   - ⚡ **Reaction Game**: Presiona los botones rápido
+   - 🎯 **Pattern Game**: Memoriza y repite patrones
+
+### Ver Estadísticas de Juegos
+
+Las estadísticas se guardan automáticamente:
+- Ir a **Configuración** → Ver estadísticas
+- Información disponible:
+  - Partidas jugadas
+  - Partidas ganadas
+  - Mejor puntuación
+  - Tasa de victorias
+
+### Ganar Monedas
+
+- 🥇 Ganar juego: +50 monedas
+- 🥈 Perder juego: +10 monedas
+
+Las monedas se usan para comprar accesorios en la tienda.
+
+---
+
+## 🤖 IA Adaptativa
+
+### Ver Sistema de IA
+
+1. Ejecutar la app
+2. Ir a **Configuración** → **Sistema de IA**
+
+### Funcionalidades de IA
+
+**Personalidad:**
+- 12 traits de personalidad dinámicos
+- 5 niveles de vínculo (Desconocido → Mejor amigo)
+- Adaptación basada en interacciones
+
+**Estados Emocionales:**
+- 8 emociones distintas
+- Mensajes personalizados según estado
+- Respuestas adaptativas a acciones
+
+**Predicción de Necesidades:**
+- Predicción basada en patrones
+- Sugerencias inteligentes
+- Alertas proactivas
+
+### Exportar Datos de Entrenamiento ML
+
+```bash
+# 1. Abrir la app
+flutter run
+
+# 2. Ir a Configuración → Sistema de IA → Exportar Datos
+
+# 3. Los datos se guardan como JSON y se pueden compartir
+# Ubicación: Directorio de descargas del dispositivo
+```
+
+**Datos exportados:**
+- Historial de interacciones (timestamp, tipo, métricas)
+- Rasgos de personalidad
+- Preferencias del usuario
+- Estadísticas de uso
+
+**Formato:**
+```json
+{
+  "interactions": [...],
+  "personality": {...},
+  "preferences": {...},
+  "timestamp": "..."
+}
+```
+
+### Ver Logs de IA
+
+```bash
+# Ver predicciones y decisiones de IA en tiempo real
+adb logcat | grep -E "AIService|MLService"
+```
+
 ---
 
 ## 📦 Git

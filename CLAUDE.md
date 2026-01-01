@@ -4,7 +4,118 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a Flutter-based Tamagotchi virtual pet application for Android that simulates caring for a digital pet. The app includes mechanics like feeding, playing, health monitoring, and state persistence to keep the pet "alive" even when the app is closed.
+Tamagotchi Virtual es una aplicación Flutter completamente funcional de mascota virtual con:
+- 11 fases de desarrollo completadas (62 tareas)
+- Sistema de evolución con 5 etapas de vida
+- IA adaptativa con TensorFlow Lite
+- 3 mini-juegos integrados con Flame engine
+- Firebase Crashlytics y Analytics
+- Background processing 24/7 con WorkManager
+- Sistema completo de persistencia
+
+**Estado actual: PRODUCCIÓN - Fase 11 completada**
+
+## Architecture Overview
+
+### Tech Stack
+
+**Frontend:**
+- Flutter 3.10.4+
+- Material Design 3
+- Flame 1.34.0 (Game Engine)
+
+**Backend & Services:**
+- SharedPreferences (Local Storage)
+- WorkManager (Background Processing)
+- Firebase Core, Crashlytics, Analytics
+- TensorFlow Lite (Machine Learning)
+
+**State Management:**
+- StatefulWidget con setState
+- Provider para estado global
+
+### Project Structure
+
+```
+lib/
+├── config/              # Configuración y temas
+│   ├── theme.dart
+│   └── app_constants.dart
+├── models/              # Modelos de datos
+│   ├── pet.dart
+│   ├── life_stage.dart
+│   ├── pet_preferences.dart
+│   ├── pet_personality.dart
+│   ├── interaction_history.dart
+│   ├── minigame_stats.dart
+│   └── credit_model.dart
+├── screens/             # Pantallas de la app
+│   ├── home_screen.dart
+│   ├── main_navigation.dart
+│   ├── settings_screen.dart
+│   ├── onboarding_screen.dart
+│   ├── customization_screen.dart
+│   ├── games/           # Mini-juegos
+│   │   ├── memory_game_screen.dart
+│   │   ├── reaction_game_screen.dart
+│   │   └── pattern_game_screen.dart
+│   └── ai/              # Pantallas de IA
+│       ├── ai_insights_screen.dart
+│       └── personality_screen.dart
+├── services/            # Capa de servicios
+│   ├── storage_service.dart
+│   ├── background_service.dart
+│   ├── notification_service.dart
+│   ├── analytics_service.dart
+│   ├── ai_service.dart
+│   ├── ml_service.dart
+│   ├── feedback_service.dart
+│   └── preferences_service.dart
+├── widgets/             # Componentes reutilizables
+│   ├── pet_widget.dart
+│   ├── metric_bar.dart
+│   ├── action_button.dart
+│   ├── evolution_animation.dart
+│   └── ai/
+│       ├── personality_trait_card.dart
+│       └── emotion_indicator.dart
+└── utils/               # Utilidades y constantes
+    ├── ml_feature_extractor.dart
+    └── ml_performance_tracker.dart
+```
+
+### Key Services
+
+1. **StorageService**: Persistencia con SharedPreferences
+   - Estado de la mascota
+   - Preferencias del usuario
+   - Historial de interacciones
+   - Estadísticas de mini-juegos
+
+2. **BackgroundService**: WorkManager para procesamiento 24/7
+   - Actualización de métricas cada 15 minutos
+   - Funciona con app cerrada
+   - Solo Android (iOS tiene restricciones)
+
+3. **NotificationService**: Alertas push locales
+   - Notificaciones cuando la mascota necesita atención
+   - Estados críticos (hambre alta, felicidad baja, etc.)
+
+4. **AnalyticsService**: Tracking de eventos con Firebase
+   - 23 eventos personalizados
+   - Tracking de acciones del usuario
+   - Métricas de engagement
+
+5. **AIService**: Personalidad adaptativa y predicciones
+   - 12 traits de personalidad
+   - 8 estados emocionales
+   - Sistema de vínculo (5 niveles)
+   - Predicción de necesidades
+
+6. **MLService**: Machine Learning con TensorFlow Lite
+   - Preparado para modelos ML
+   - Extracción de features
+   - Exportación de datos de entrenamiento
 
 ## Development Commands
 
@@ -12,6 +123,7 @@ This is a Flutter-based Tamagotchi virtual pet application for Android that simu
 ```bash
 flutter pub get                    # Install dependencies
 flutter pub upgrade                # Upgrade dependencies
+make setup                         # Setup completo (dependencias + verificación)
 ```
 
 ### Running the Application
@@ -19,6 +131,8 @@ flutter pub upgrade                # Upgrade dependencies
 flutter run                        # Run on connected device/emulator
 flutter run -d <device-id>         # Run on specific device
 flutter run --release              # Run in release mode
+make run                           # Alias para flutter run
+make run-release                   # Alias para flutter run --release
 ```
 
 ### Testing
@@ -26,12 +140,14 @@ flutter run --release              # Run in release mode
 flutter test                       # Run all tests
 flutter test test/widget_test.dart # Run a specific test file
 flutter test --coverage            # Run tests with coverage report
+make test                          # Alias para flutter test
 ```
 
 ### Code Quality
 ```bash
 flutter analyze                    # Run static analysis
 flutter pub outdated               # Check for outdated packages
+make analyze                       # Alias para flutter analyze
 ```
 
 ### Building
@@ -39,95 +155,266 @@ flutter pub outdated               # Check for outdated packages
 flutter build apk                  # Build Android APK
 flutter build appbundle            # Build Android App Bundle
 flutter build apk --release        # Build release APK
+make build-release                 # Build APK release
+make build-bundle                  # App bundle para Play Store
+./scripts/build.sh optimized       # APKs optimizados por ABI
 ```
 
 ### Hot Reload
 - Press `r` in the terminal during `flutter run` for hot reload
 - Press `R` for hot restart (resets app state)
 
-## Architecture and Design Patterns
+## Implemented Features
 
-### Core Functionality (per README.md)
+### ✅ Core Features (Fases 1-6)
+- Sistema completo de cuidado (4 acciones: alimentar, jugar, limpiar, descansar)
+- Métricas en tiempo real (4 métricas: hambre, felicidad, energía, salud)
+- Persistencia total con SharedPreferences
+- Background processing con WorkManager (cada 15 minutos)
+- Sistema de notificaciones locales
+- Animaciones y feedback háptico (vibración)
+- Temporizadores de decaimiento en tiempo real
 
-The app is designed around continuous pet simulation with these key architectural components:
+### ✅ Advanced Features (Fases 7-9)
+- Personalización completa
+  - 8 colores para la mascota
+  - 5 tipos de accesorios
+  - Renombrar mascota
+- Sistema de evolución (5 etapas de vida)
+  - Huevo → Bebé → Niño → Adolescente → Adulto
+  - 3 variantes según calidad de cuidado (Descuidado, Normal, Excelente)
+- Sistema de experiencia y niveles
+  - Puntos de experiencia por interacciones
+  - Subida de nivel con celebración
+- Onboarding interactivo para nuevos usuarios
 
-**State Management Architecture:**
-- Pet state must persist across app closures using local storage (planned: `shared_preferences` or `Hive`)
-- State includes metrics like hunger, happiness, energy, and health
-- Timestamp-based calculations to update pet state when app reopens (e.g., time since last feeding)
+### ✅ Premium Features (Fases 10-11)
+- 3 mini-juegos con Flame engine
+  - Memory Game (memoria)
+  - Reaction Game (reflejos)
+  - Pattern Game (patrones)
+- Sistema de monedas y recompensas
+  - Ganar monedas en mini-juegos
+  - Usar monedas para accesorios
+- IA adaptativa
+  - 12 traits de personalidad
+  - 8 estados emocionales dinámicos
+  - Sistema de vínculo (5 niveles: Desconocido → Mejor amigo)
+  - Predicción de necesidades
+- Preparación para TensorFlow Lite
+  - Features extraídas y listas
+  - Sistema de exportación de datos
 
-**Background Processing:**
-- Android: Use `WorkManager` for periodic OS-level tasks that survive app closure
-- Background tasks update pet metrics (e.g., increase hunger every 15 minutes)
-- Isolates for intensive computations without blocking UI
-- iOS has more restrictions on background tasks
+### ✅ Production Features
+- Firebase Crashlytics (monitoreo de errores)
+- Firebase Analytics (23 eventos personalizados)
+- Splash screen animado con flame_splash_screen
+- Logging completo con logger package
+- Sistema de reset de Tamagotchi
+- Exportación de datos ML
 
-**Timer-Based Updates:**
-- `Timer.periodic` handles foreground metric updates
-- Metrics like hunger/happiness decay naturally over time
-- Critical state changes trigger notifications
+## Next Phases (Optional)
 
-**Notification System:**
-- Push notifications for reminders when pet needs attention
-- Alerts for critical states (e.g., "Your pet is hungry")
-- Integration planned with `firebase_messaging` or `flutter_local_notifications`
+### Fase 12: Machine Learning Avanzado
+- Entrenar modelos TensorFlow Lite
+- Predicción de comportamiento del usuario
+- Recomendaciones personalizadas
 
-### Planned Core Functions
+### Fase 13: Realidad Aumentada
+- Integración ARCore/ARKit
+- Visualización AR de la mascota
 
-Based on README.md, these are the essential functions to implement:
-
-- `initApp()`: Initialize state, timers, and background services
-- `loadPetState()`: Load persistent data and timestamps
-- `updateMood()`: Calculate mood based on elapsed time
-- `feedPet()`: Update hunger state, set happy mood, save changes
-- `playWithPet()`: Improve happiness, update timestamps, trigger animations
-- `saveState()`: Persist data to local storage
-- `startBackgroundTimer()`: Configure periodic background tasks
-- `handleNotifications()`: Send push alerts for critical states
-- `disposeResources()`: Clean up timers and services
-
-### Feature Requirements
-
-**Must-Have Features:**
-- Routine care actions: feed, clean, play, rest
-- Real-time state monitoring: hunger, happiness, energy, health
-- Pet customization: naming, appearance changes
-- Visual feedback with animations
-- Push notifications for care reminders
-- State persistence across sessions
-
-**Optional Advanced Features:**
-- AI-driven adaptive behaviors using TensorFlow Lite
-- Mini-games for rewards (using Flame engine)
-- AR integration with ARCore/ARKit
-- Social features and multiplayer
-- Pet evolution through life stages
-
-## Project Structure
-
-```
-lib/
-  main.dart           # Entry point with boilerplate Flutter app
-test/
-  widget_test.dart    # Basic widget test example
-android/              # Android-specific configuration
-ios/                  # iOS-specific configuration (future)
-```
+### Fase 14: Social Features
+- Sistema de amigos
+- Compartir mascotas
+- Visitas entre usuarios
 
 ## Important Notes
 
-### Current State
-- The project currently contains only Flutter's default counter app boilerplate
-- Main implementation following the README.md architecture has not yet begun
-- No state management, background processing, or persistence is currently implemented
+### Background Processing
+- WorkManager ejecuta cada 15 minutos
+- Funciona incluso con app cerrada
+- Solo Android (iOS tiene restricciones significativas)
+- Las métricas se actualizan basadas en tiempo transcurrido
 
-### When Implementing Features
-- Background tasks on Android require WorkManager plugin
-- State persistence should use `shared_preferences` or `Hive`
-- Use `flutter_bloc` or similar for reactive state management
-- Animations can use Flutter's built-in animation framework
-- Consider battery optimization for background timer intervals
+### Firebase
+- Crashlytics SOLO funciona en modo release (por diseño de Firebase)
+- Analytics funciona en debug y release
+- Configuración en `firebase_options.dart`
+- 23 eventos personalizados implementados
 
-### Linting
-- Uses `package:flutter_lints/flutter.yaml` for recommended Flutter lints
-- Run `flutter analyze` before committing changes
+### Flame Engine
+- Usado para 3 mini-juegos completos
+- Usado para splash screen animado
+- Audio con `flame_audio`
+- Física y colisiones básicas
+
+### TensorFlow Lite
+- Features preparadas para 4 modelos ML:
+  - Action Predictor (15 features)
+  - Critical Time Predictor (20 features)
+  - Action Recommender (25 features)
+  - Emotion Classifier (16 features)
+- Modelo pendiente de entrenar
+- Exportación de datos lista (`share_plus`, `path_provider`)
+
+### State Persistence
+- Usa `shared_preferences` para todo
+- Guardado automático cada 20 segundos
+- Guardado en cada acción del usuario
+- Cálculo de decaimiento basado en timestamps
+
+## Testing
+
+El proyecto tiene cobertura completa de tests:
+
+### Unit Tests (600+ pruebas)
+```bash
+flutter test                       # Run all tests
+```
+
+**Archivos de prueba:**
+- Models: `pet_test.dart`, `life_stage_test.dart`, `interaction_history_test.dart`, `minigame_stats_test.dart`, `pet_personality_test.dart`, `credit_model_test.dart`
+- Services: `storage_service_test.dart`, `ai_service_test.dart`, `notification_service_test.dart`, `preferences_service_test.dart`, `feedback_service_test.dart`, `local_service_test.dart`, `ml_service_test.dart`, `ml_data_export_service_test.dart`, `ai_ml_integration_test.dart`, `critical_time_integration_test.dart`, `advanced_ml_integration_test.dart`
+- Utils: `ml_feature_extractor_test.dart`, `ml_performance_tracker_test.dart`
+
+### Integration Tests
+- Probar persistencia: matar app y reabrir (estado debe mantenerse)
+- Probar background: matar app y esperar 15 minutos (métricas deben cambiar)
+- Probar notificaciones: dejar mascota en estado crítico
+
+## Common Commands
+
+### Desarrollo
+```bash
+make run                    # Debug mode
+make run-release           # Release mode
+make test                  # Run tests
+make analyze               # Static analysis
+```
+
+### Build
+```bash
+make build-release         # Build APK release
+make build-bundle          # App bundle para Play Store
+./scripts/build.sh optimized  # APKs por ABI
+```
+
+### Limpieza
+```bash
+make clean                 # Clean normal
+make clean-all            # Deep clean (incluye build cache)
+make reset                # Reset completo (limpia todo + pub get)
+```
+
+### Firebase
+```bash
+# Crashlytics solo funciona en release
+flutter run --release
+# Ver crashes en: https://console.firebase.google.com/project/[tu-proyecto]/crashlytics
+
+# Analytics
+# Ver eventos en: https://console.firebase.google.com/project/[tu-proyecto]/analytics
+```
+
+### Utilidades
+```bash
+make devices              # Listar dispositivos
+make help                 # Ver todos los comandos
+flutter devices           # Listar dispositivos conectados
+```
+
+## Documentation
+
+- [README.md](README.md) - Overview completo del proyecto
+- [ROADMAP.md](ROADMAP.md) - Hoja de ruta y fases
+- [COMANDOS.md](COMANDOS.md) - Guía completa de comandos
+- [FIREBASE_CRASHLYTICS.md](FIREBASE_CRASHLYTICS.md) - Integración Firebase Crashlytics
+- [FIREBASE_ANALYTICS.md](FIREBASE_ANALYTICS.md) - Sistema de analytics
+- [COMO_PROBAR_PERSISTENCIA.md](COMO_PROBAR_PERSISTENCIA.md) - Guía de pruebas
+- [FASE_*_*.md](.) - Documentación técnica por fase
+
+## Dependencies Overview
+
+### Production Dependencies (31 packages)
+
+**Flutter Core:**
+- `flutter` - Framework base
+- `cupertino_icons` - Iconos iOS
+
+**Storage & Persistence:**
+- `shared_preferences` - Persistencia local
+
+**Background Processing:**
+- `workmanager` - Tareas en background
+
+**Notifications:**
+- `flutter_local_notifications` - Notificaciones locales
+
+**UI/UX:**
+- `vibration` - Feedback háptico
+- `introduction_screen` - Onboarding
+- `flutter_svg` - Imágenes SVG
+- `provider` - Gestión de estado
+- `flutter_launcher_icons` - Iconos de la app
+
+**Games:**
+- `flame` - Motor de juegos
+- `flame_audio` - Audio para juegos
+- `flame_splash_screen` - Splash screen animado
+- `audioplayers` - Reproducción de audio
+
+**Utils:**
+- `logger` - Sistema de logging
+- `timeago` - Timestamps humanizados
+- `package_info_plus` - Información del paquete
+- `intl` - Internacionalización
+
+**Firebase:**
+- `firebase_core` - Core de Firebase
+- `firebase_crashlytics` - Monitoreo de errores
+- `firebase_analytics` - Analytics
+
+**Machine Learning:**
+- `tflite_flutter` - TensorFlow Lite
+- `share_plus` - Compartir archivos
+- `path_provider` - Acceso al filesystem
+
+### Dev Dependencies (2 packages)
+- `flutter_test` - Testing framework
+- `flutter_lints` - Linting rules
+
+## Performance Considerations
+
+- Background tasks optimizados para batería (solo cada 15 min)
+- Timers cancelados cuando app está en background
+- Persistencia eficiente con SharedPreferences (guardado cada 20s)
+- Lazy loading de recursos de audio
+- Splash screen optimizado con Flame
+- Cálculos de decaimiento basados en tiempo transcurrido (no en loops)
+
+## Linting
+
+- Usa `flutter_lints` para análisis estático
+- Ejecutar `flutter analyze` antes de commits
+- Formatear con `dart format lib/ test/`
+- Sin warnings en el análisis estático actual
+
+## Current State Summary
+
+**Fase 11 completada:**
+- ✅ 62 tareas completadas
+- ✅ 600+ tests pasando
+- ✅ Sin warnings de análisis estático
+- ✅ Firebase integrado (Crashlytics + Analytics)
+- ✅ 3 mini-juegos funcionales
+- ✅ IA adaptativa completa
+- ✅ Sistema de evolución con 5 etapas
+- ✅ Background processing 24/7
+- ✅ Persistencia completa
+- ✅ Splash screen animado con Flame
+
+**Próximos pasos opcionales:**
+- Entrenar modelos ML con TensorFlow Lite
+- Agregar AR con ARCore/ARKit
+- Features sociales y multiplayer
