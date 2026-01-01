@@ -1,11 +1,11 @@
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/pet.dart';
 import '../models/minigame_stats.dart';
 import '../models/interaction_history.dart';
 import '../models/pet_personality.dart';
 import '../utils/constants.dart';
+import '../utils/logger.dart';
 
 /// Servicio para manejar la persistencia del estado de la mascota
 class StorageService {
@@ -20,9 +20,9 @@ class StorageService {
       final prefs = await SharedPreferences.getInstance();
       final petJson = jsonEncode(pet.toJson());
       await prefs.setString(_petStateKey, petJson);
-      debugPrint('✅ Estado guardado: ${petJson.substring(0, 100)}...');
-    } catch (e) {
-      debugPrint('❌ Error guardando estado: $e');
+      appLogger.d('Estado guardado - Nombre: ${pet.name}, Salud: ${pet.health.toStringAsFixed(1)}');
+    } catch (e, stackTrace) {
+      appLogger.e('Error guardando estado', error: e, stackTrace: stackTrace);
     }
   }
 
@@ -33,15 +33,16 @@ class StorageService {
       final petJson = prefs.getString(_petStateKey);
 
       if (petJson == null) {
-        debugPrint('ℹ️ No hay estado guardado previo');
+        appLogger.d('No hay estado guardado previo');
         return null; // No hay estado guardado
       }
 
-      debugPrint('✅ Estado cargado: ${petJson.substring(0, 100)}...');
       final petMap = jsonDecode(petJson) as Map<String, dynamic>;
-      return Pet.fromJson(petMap);
-    } catch (e) {
-      debugPrint('❌ Error cargando estado: $e');
+      final pet = Pet.fromJson(petMap);
+      appLogger.d('Estado cargado - Nombre: ${pet.name}, Salud: ${pet.health.toStringAsFixed(1)}');
+      return pet;
+    } catch (e, stackTrace) {
+      appLogger.e('Error cargando estado', error: e, stackTrace: stackTrace);
       return null;
     }
   }
@@ -115,9 +116,9 @@ class StorageService {
       final prefs = await SharedPreferences.getInstance();
       final statsJson = jsonEncode(stats.toJson());
       await prefs.setString(_miniGameStatsKey, statsJson);
-      debugPrint('✅ Estadísticas de mini-juegos guardadas');
-    } catch (e) {
-      debugPrint('❌ Error guardando estadísticas de mini-juegos: $e');
+      appLogger.d('Estadísticas de mini-juegos guardadas');
+    } catch (e, stackTrace) {
+      appLogger.e('Error guardando estadísticas de mini-juegos', error: e, stackTrace: stackTrace);
     }
   }
 
@@ -131,15 +132,15 @@ class StorageService {
       final statsJson = prefs.getString(_miniGameStatsKey);
 
       if (statsJson == null) {
-        debugPrint('ℹ️ No hay estadísticas de mini-juegos guardadas');
+        appLogger.d('No hay estadísticas de mini-juegos guardadas');
         return MiniGameStats(); // Retorna estadísticas vacías
       }
 
-      debugPrint('✅ Estadísticas de mini-juegos cargadas');
+      appLogger.d('Estadísticas de mini-juegos cargadas');
       final statsMap = jsonDecode(statsJson) as Map<String, dynamic>;
       return MiniGameStats.fromJson(statsMap);
-    } catch (e) {
-      debugPrint('❌ Error cargando estadísticas de mini-juegos: $e');
+    } catch (e, stackTrace) {
+      appLogger.e('Error cargando estadísticas de mini-juegos', error: e, stackTrace: stackTrace);
       return MiniGameStats(); // Retorna estadísticas vacías en caso de error
     }
   }
@@ -175,9 +176,9 @@ class StorageService {
       final prefs = await SharedPreferences.getInstance();
       final historyJson = jsonEncode(history.toJson());
       await prefs.setString(_interactionHistoryKey, historyJson);
-      debugPrint('✅ Historial de interacciones guardado (${history.totalInteractions} interacciones)');
-    } catch (e) {
-      debugPrint('❌ Error guardando historial de interacciones: $e');
+      appLogger.d('Historial de interacciones guardado (${history.totalInteractions} interacciones)');
+    } catch (e, stackTrace) {
+      appLogger.e('Error guardando historial de interacciones', error: e, stackTrace: stackTrace);
     }
   }
 
@@ -188,15 +189,15 @@ class StorageService {
       final historyJson = prefs.getString(_interactionHistoryKey);
 
       if (historyJson == null) {
-        debugPrint('ℹ️ No hay historial de interacciones guardado');
+        appLogger.d('No hay historial de interacciones guardado');
         return InteractionHistory();
       }
 
-      debugPrint('✅ Historial de interacciones cargado');
+      appLogger.d('Historial de interacciones cargado');
       final historyMap = jsonDecode(historyJson) as Map<String, dynamic>;
       return InteractionHistory.fromJson(historyMap);
-    } catch (e) {
-      debugPrint('❌ Error cargando historial de interacciones: $e');
+    } catch (e, stackTrace) {
+      appLogger.e('Error cargando historial de interacciones', error: e, stackTrace: stackTrace);
       return InteractionHistory();
     }
   }
@@ -215,9 +216,9 @@ class StorageService {
       final prefs = await SharedPreferences.getInstance();
       final personalityJson = jsonEncode(personality.toJson());
       await prefs.setString(_petPersonalityKey, personalityJson);
-      debugPrint('✅ Personalidad guardada (Vínculo: ${personality.bondLevel.displayName})');
-    } catch (e) {
-      debugPrint('❌ Error guardando personalidad: $e');
+      appLogger.d('Personalidad guardada (Vínculo: ${personality.bondLevel.displayName})');
+    } catch (e, stackTrace) {
+      appLogger.e('Error guardando personalidad', error: e, stackTrace: stackTrace);
     }
   }
 
@@ -228,15 +229,15 @@ class StorageService {
       final personalityJson = prefs.getString(_petPersonalityKey);
 
       if (personalityJson == null) {
-        debugPrint('ℹ️ No hay personalidad guardada');
+        appLogger.d('No hay personalidad guardada');
         return PetPersonality();
       }
 
-      debugPrint('✅ Personalidad cargada');
+      appLogger.d('Personalidad cargada');
       final personalityMap = jsonDecode(personalityJson) as Map<String, dynamic>;
       return PetPersonality.fromJson(personalityMap);
-    } catch (e) {
-      debugPrint('❌ Error cargando personalidad: $e');
+    } catch (e, stackTrace) {
+      appLogger.e('Error cargando personalidad', error: e, stackTrace: stackTrace);
       return PetPersonality();
     }
   }
@@ -282,9 +283,31 @@ class StorageService {
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove(_interactionHistoryKey);
       await prefs.remove(_petPersonalityKey);
-      debugPrint('✅ Datos de IA eliminados');
-    } catch (e) {
-      debugPrint('❌ Error eliminando datos de IA: $e');
+      appLogger.i('Datos de IA eliminados');
+    } catch (e, stackTrace) {
+      appLogger.e('Error eliminando datos de IA', error: e, stackTrace: stackTrace);
     }
+  }
+
+  /// Limpia las estadísticas de mini-juegos
+  Future<void> clearMiniGameStats() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(_miniGameStatsKey);
+      appLogger.i('Estadísticas de mini-juegos eliminadas');
+    } catch (e, stackTrace) {
+      appLogger.e('Error eliminando estadísticas de mini-juegos', error: e, stackTrace: stackTrace);
+    }
+  }
+
+  /// Limpia TODOS los datos del juego (reset completo)
+  ///
+  /// Elimina: estado de mascota, estadísticas de minijuegos,
+  /// historial de interacciones y personalidad.
+  Future<void> clearAllData() async {
+    await clearState();
+    await clearMiniGameStats();
+    await clearAIData();
+    appLogger.i('Todos los datos del juego han sido eliminados');
   }
 }

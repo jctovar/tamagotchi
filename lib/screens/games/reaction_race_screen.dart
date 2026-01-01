@@ -35,7 +35,7 @@ class _ReactionRaceScreenState extends State<ReactionRaceScreen> {
 
   GameState _gameState = GameState.waiting;
   int _currentRound = 0;
-  List<int> _reactionTimes = [];
+  final List<int> _reactionTimes = [];
   DateTime? _targetTime;
   Timer? _changeTimer;
   bool _tooEarly = false;
@@ -58,7 +58,7 @@ class _ReactionRaceScreenState extends State<ReactionRaceScreen> {
   /// Reproduce música de fondo en loop
   void _playBackgroundMusic() async {
     try {
-      await FlameAudio.bgm.play('sounds/Chase.wav', volume: 0.3);
+      await FlameAudio.bgm.play('Chase.wav', volume: 0.3);
     } catch (e) {
       debugPrint('Error al reproducir música de fondo: $e');
     }

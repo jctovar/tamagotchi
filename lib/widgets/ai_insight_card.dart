@@ -61,7 +61,7 @@ class AIInsightCard extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: _getEmotionColor().withOpacity(0.2),
+            color: _getEmotionColor().withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Text(
@@ -105,7 +105,7 @@ class AIInsightCard extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           decoration: BoxDecoration(
-            color: Colors.purple.withOpacity(0.1),
+            color: Colors.purple.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Row(
@@ -300,7 +300,7 @@ class AIInsightCard extends StatelessWidget {
               ),
             ),
             Text(
-              '${currentPoints}/${pointsNeeded}',
+              '$currentPoints/$pointsNeeded',
               style: TextStyle(
                 fontSize: 11,
                 color: Colors.grey.shade600,
@@ -378,7 +378,7 @@ class AICompactInsight extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),

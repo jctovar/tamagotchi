@@ -17,6 +17,7 @@ import '../services/feedback_service.dart';
 import '../services/ai_service.dart';
 import '../services/analytics_service.dart';
 import '../utils/constants.dart';
+import '../utils/logger.dart';
 import 'games/minigames_menu_screen.dart';
 
 /// Pantalla principal de la aplicación
@@ -24,10 +25,10 @@ class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<HomeScreen> createState() => HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
+class HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   late Pet _pet;
   PetPreferences _preferences = const PetPreferences();
   final StorageService _storageService = StorageService();
@@ -47,7 +48,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _loadPetState();
+    loadPetState();
   }
 
   @override
@@ -60,18 +61,18 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.paused) {
-      debugPrint('⏸️ App pausada - guardando estado');
+      appLogger.d('App pausada - guardando estado');
       _saveState();
       _updateTimer?.cancel();
     } else if (state == AppLifecycleState.resumed) {
-      debugPrint('▶️ App resumida - reiniciando timer');
+      appLogger.d('App resumida - reiniciando timer');
       _startUpdateTimer();
     }
   }
 
   /// Carga el estado de la mascota del almacenamiento
-  Future<void> _loadPetState() async {
-    debugPrint('🔄 Cargando estado de la mascota...');
+  Future<void> loadPetState() async {
+    appLogger.d('Cargando estado de la mascota...');
 
     // Cargar preferencias, estado, historial y personalidad en paralelo
     final results = await Future.wait([
@@ -87,13 +88,13 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     final personality = results[3] as PetPersonality;
 
     if (savedPet != null) {
-      debugPrint('📊 Estado anterior - Hambre: ${savedPet.hunger}, Felicidad: ${savedPet.happiness}');
+      appLogger.d('Estado anterior - Hambre: ${savedPet.hunger.toStringAsFixed(1)}, Felicidad: ${savedPet.happiness.toStringAsFixed(1)}');
       // Actualizar métricas basado en tiempo transcurrido
       _pet = _storageService.updatePetMetrics(savedPet);
-      debugPrint('📊 Estado actualizado - Hambre: ${_pet.hunger}, Felicidad: ${_pet.happiness}');
+      appLogger.d('Estado actualizado - Hambre: ${_pet.hunger.toStringAsFixed(1)}, Felicidad: ${_pet.happiness.toStringAsFixed(1)}');
     } else {
       // Crear una mascota nueva
-      debugPrint('🆕 Creando mascota nueva');
+      appLogger.i('Creando mascota nueva');
       _pet = Pet(name: 'Mi Tamagotchi');
 
       // Registrar creación de mascota en Analytics
@@ -137,7 +138,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       Duration(seconds: AppConstants.foregroundUpdateInterval),
       (timer) => _updateMetrics(),
     );
-    debugPrint('⏱️ Timer iniciado - actualizando cada ${AppConstants.foregroundUpdateInterval}s');
+    appLogger.d('Timer iniciado - actualizando cada ${AppConstants.foregroundUpdateInterval}s');
   }
 
   /// Actualiza las métricas de la mascota

@@ -53,7 +53,7 @@ class _SlidingPuzzleScreenState extends State<SlidingPuzzleScreen> {
   /// Reproduce música de fondo en loop
   void _playBackgroundMusic() async {
     try {
-      await FlameAudio.bgm.play('sounds/Relax.wav', volume: 0.3);
+      await FlameAudio.bgm.play('Relax.wav', volume: 0.3);
     } catch (e) {
       debugPrint('Error al reproducir música de fondo: $e');
     }
@@ -408,7 +408,7 @@ class _SlidingPuzzleScreenState extends State<SlidingPuzzleScreen> {
               ? []
               : [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withValues(alpha: 0.1),
                     blurRadius: 4,
                     offset: const Offset(0, 2),
                   ),

@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/pet_preferences.dart';
+import '../utils/logger.dart';
 
 class PreferencesService {
   static const String _preferencesKey = 'pet_preferences';
@@ -14,7 +15,7 @@ class PreferencesService {
     final prefs = await SharedPreferences.getInstance();
     final preferencesJson = jsonEncode(preferences.toJson());
     await prefs.setString(_preferencesKey, preferencesJson);
-    print('✅ Preferencias guardadas: $preferencesJson');
+    appLogger.i('Preferencias guardadas: $preferencesJson');
   }
 
   /// Carga las preferencias guardadas
@@ -23,17 +24,17 @@ class PreferencesService {
     final preferencesJson = prefs.getString(_preferencesKey);
 
     if (preferencesJson == null) {
-      print('📋 No hay preferencias guardadas, usando valores por defecto');
+      appLogger.d('No hay preferencias guardadas, usando valores por defecto');
       return const PetPreferences();
     }
 
     try {
       final Map<String, dynamic> json = jsonDecode(preferencesJson);
       final preferences = PetPreferences.fromJson(json);
-      print('✅ Preferencias cargadas: $preferencesJson');
+      appLogger.i('Preferencias cargadas: $preferencesJson');
       return preferences;
     } catch (e) {
-      print('⚠️ Error al cargar preferencias: $e');
+      appLogger.e('Error al cargar preferencias', error: e);
       return const PetPreferences();
     }
   }
@@ -67,5 +68,16 @@ class PreferencesService {
     final updatedPreferences =
         preferences.copyWith(notificationsEnabled: enabled);
     await savePreferences(updatedPreferences);
+  }
+
+  /// Elimina todas las preferencias guardadas
+  static Future<void> clearPreferences() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(_preferencesKey);
+      appLogger.i('Preferencias eliminadas');
+    } catch (e) {
+      appLogger.e('Error al eliminar preferencias', error: e);
+    }
   }
 }

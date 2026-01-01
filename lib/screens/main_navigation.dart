@@ -13,11 +13,13 @@ class MainNavigation extends StatefulWidget {
 
 class _MainNavigationState extends State<MainNavigation> {
   int _currentIndex = 0;
+  final GlobalKey<HomeScreenState> _homeScreenKey = GlobalKey();
+  final GlobalKey<SettingsScreenState> _settingsScreenKey = GlobalKey();
 
   // Lista de pantallas
-  final List<Widget> _screens = [
-    const HomeScreen(),
-    const SettingsScreen(),
+  late final List<Widget> _screens = [
+    HomeScreen(key: _homeScreenKey),
+    SettingsScreen(key: _settingsScreenKey),
     const AboutScreen(),
   ];
 
@@ -34,6 +36,13 @@ class _MainNavigationState extends State<MainNavigation> {
           setState(() {
             _currentIndex = index;
           });
+
+          // Recargar estado según el tab seleccionado
+          if (index == 0) {
+            _homeScreenKey.currentState?.loadPetState();
+          } else if (index == 1) {
+            _settingsScreenKey.currentState?.loadSettings();
+          }
         },
         type: BottomNavigationBarType.fixed,
         selectedItemColor: Theme.of(context).colorScheme.primary,

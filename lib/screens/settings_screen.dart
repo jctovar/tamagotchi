@@ -10,10 +10,10 @@ class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
 
   @override
-  State<SettingsScreen> createState() => _SettingsScreenState();
+  State<SettingsScreen> createState() => SettingsScreenState();
 }
 
-class _SettingsScreenState extends State<SettingsScreen> {
+class SettingsScreenState extends State<SettingsScreen> {
   PetPreferences _preferences = const PetPreferences();
   Pet? _pet;
   bool _isLoading = true;
@@ -24,10 +24,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   void initState() {
     super.initState();
-    _loadSettings();
+    loadSettings();
   }
 
-  Future<void> _loadSettings() async {
+  /// Carga las configuraciones y estado de la mascota
+  Future<void> loadSettings() async {
     final preferences = await PreferencesService.loadPreferences();
     final pet = await _storageService.loadPetState();
 
@@ -481,8 +482,187 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
 
           const SizedBox(height: 16),
+
+          // Sección: Zona de Peligro
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 16.0),
+            padding: const EdgeInsets.all(16.0),
+            decoration: BoxDecoration(
+              color: Colors.red.shade50,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.red.shade200),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.warning_amber, color: Colors.red.shade700),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Zona de Peligro',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.red.shade700,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: Icon(Icons.restart_alt, color: Colors.red.shade700),
+                  title: Text(
+                    'Reiniciar Tamagotchi',
+                    style: TextStyle(color: Colors.red.shade700),
+                  ),
+                  subtitle: const Text(
+                    'Elimina todos los datos y comienza de nuevo',
+                  ),
+                  trailing: Icon(Icons.chevron_right, color: Colors.red.shade700),
+                  onTap: _showResetConfirmationDialog,
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 32),
         ],
       ),
     );
+  }
+
+  Future<void> _showResetConfirmationDialog() async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Row(
+            children: [
+              Icon(Icons.warning, color: Colors.red.shade700, size: 28),
+              const SizedBox(width: 8),
+              const Text('¿Reiniciar Tamagotchi?'),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                '¡Atención! Esta acción no se puede deshacer.',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 16),
+              const Text('Se eliminarán permanentemente:'),
+              const SizedBox(height: 8),
+              _buildWarningItem('Tu mascota actual y todo su progreso'),
+              _buildWarningItem('Nivel, experiencia y monedas'),
+              _buildWarningItem('Estadísticas de mini-juegos'),
+              _buildWarningItem('Historial de interacciones'),
+              _buildWarningItem('Personalidad desarrollada'),
+              _buildWarningItem('Preferencias de personalización'),
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.amber.shade50,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.amber.shade300),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.info_outline, color: Colors.amber.shade700),
+                    const SizedBox(width: 8),
+                    const Expanded(
+                      child: Text(
+                        'Comenzarás con una nueva mascota desde cero.',
+                        style: TextStyle(fontSize: 13),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancelar'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(context, true),
+              style: FilledButton.styleFrom(
+                backgroundColor: Colors.red,
+              ),
+              child: const Text('Sí, reiniciar'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (result == true) {
+      await _resetTamagotchi();
+    }
+  }
+
+  Widget _buildWarningItem(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 8, top: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('• ', style: TextStyle(color: Colors.red)),
+          Expanded(child: Text(text, style: const TextStyle(fontSize: 13))),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _resetTamagotchi() async {
+    // Mostrar indicador de carga
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
+
+    try {
+      // Eliminar todos los datos
+      await _storageService.clearAllData();
+      await PreferencesService.clearPreferences();
+
+      if (!mounted) return;
+
+      // Cerrar el indicador de carga
+      Navigator.pop(context);
+
+      // Mostrar mensaje de éxito
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Tamagotchi reiniciado. ¡Comienza una nueva aventura!'),
+          backgroundColor: Colors.green,
+        ),
+      );
+
+      // Navegar al inicio de la app (reiniciar completamente)
+      Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
+    } catch (e) {
+      if (!mounted) return;
+
+      // Cerrar el indicador de carga
+      Navigator.pop(context);
+
+      // Mostrar error
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error al reiniciar: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 }

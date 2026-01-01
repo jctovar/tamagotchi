@@ -62,7 +62,7 @@ class _MemoryGameScreenState extends State<MemoryGameScreen> {
   /// Reproduce música de fondo en loop
   void _playBackgroundMusic() async {
     try {
-      await FlameAudio.bgm.play('sounds/Cool.wav', volume: 0.3);
+      await FlameAudio.bgm.play('Cool.wav', volume: 0.3);
     } catch (e) {
       debugPrint('Error al reproducir música de fondo: $e');
     }
@@ -397,7 +397,7 @@ class _MemoryGameScreenState extends State<MemoryGameScreen> {
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withValues(alpha: 0.1),
               blurRadius: 4,
               offset: const Offset(0, 2),
             ),

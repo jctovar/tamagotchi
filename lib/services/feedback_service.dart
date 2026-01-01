@@ -25,8 +25,8 @@ class FeedbackService {
     if (!preferences.soundEnabled) return;
 
     // Verificar si el dispositivo soporta vibración
-    final hasVibrator = await Vibration.hasVibrator() ?? false;
-    if (!hasVibrator) return;
+    final hasVibrator = await Vibration.hasVibrator();
+    if (hasVibrator != true) return;
 
     switch (type) {
       case FeedbackType.feed:
@@ -39,7 +39,7 @@ class FeedbackService {
 
       case FeedbackType.success:
         // Patrón de vibración para éxito
-        if (await Vibration.hasCustomVibrationsSupport() ?? false) {
+        if (await Vibration.hasCustomVibrationsSupport() == true) {
           Vibration.vibrate(pattern: [0, 100, 50, 100]);
         } else {
           HapticFeedback.heavyImpact();
@@ -48,7 +48,7 @@ class FeedbackService {
 
       case FeedbackType.error:
         // Patrón de vibración para error
-        if (await Vibration.hasCustomVibrationsSupport() ?? false) {
+        if (await Vibration.hasCustomVibrationsSupport() == true) {
           Vibration.vibrate(pattern: [0, 50, 50, 50, 50, 50]);
         } else {
           HapticFeedback.heavyImpact();
@@ -102,11 +102,11 @@ class FeedbackService {
     final preferences = await PreferencesService.loadPreferences();
     if (!preferences.soundEnabled) return;
 
-    final hasVibrator = await Vibration.hasVibrator() ?? false;
-    if (!hasVibrator) return;
+    final hasVibrator = await Vibration.hasVibrator();
+    if (hasVibrator != true) return;
 
     if (pattern != null) {
-      if (await Vibration.hasCustomVibrationsSupport() ?? false) {
+      if (await Vibration.hasCustomVibrationsSupport() == true) {
         Vibration.vibrate(pattern: pattern);
       }
     } else {
