@@ -38,9 +38,9 @@ class _MainNavigationState extends State<MainNavigation> {
           });
 
           // Recargar estado según el tab seleccionado
-          if (index == 0) {
-            _homeScreenKey.currentState?.loadPetState();
-          } else if (index == 1) {
+          // NOTA: NO recargar automáticamente en tab 0 para evitar
+          // sobrescribir cambios recientes (ej. monedas de mini-juegos)
+          if (index == 1) {
             _settingsScreenKey.currentState?.loadSettings();
           }
         },

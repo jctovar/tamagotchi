@@ -9,6 +9,7 @@ import '../widgets/pet_display.dart';
 import '../widgets/metric_bar.dart';
 import '../widgets/animated_action_button.dart';
 import '../widgets/ai_insight_card.dart';
+import '../widgets/coins_display.dart';
 import '../config/theme.dart';
 import '../services/storage_service.dart';
 import '../services/preferences_service.dart';
@@ -296,38 +297,7 @@ class HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       appBar: AppBar(
         title: const Text('Tamagotchi'),
         actions: _isLoading ? [] : [
-          // Botón de monedas
-          Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: Center(
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: Colors.amber[100],
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: Colors.amber[700]!, width: 2),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      '🪙',
-                      style: TextStyle(fontSize: 18),
-                    ),
-                    SizedBox(width: 4),
-                    Text(
-                      _pet.coins.toString(),
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.amber[900],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
+          CoinsDisplay(coins: _pet.coins),
         ],
       ),
       body: _isLoading

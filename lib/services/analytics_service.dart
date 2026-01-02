@@ -249,7 +249,7 @@ class AnalyticsService {
       parameters: {
         'game_type': gameType,
         'score': score,
-        'won': won,
+        'won': won ? 1 : 0, // Firebase solo acepta num o String
         'coins_earned': coinsEarned,
         'duration_seconds': durationSeconds,
       },
@@ -405,7 +405,7 @@ class AnalyticsService {
         'models_loaded': modelsLoaded.join(','),
         'models_count': modelsLoaded.length,
         'initialization_time_ms': initializationTimeMs,
-        'success': success,
+        'success': success ? 1 : 0, // Firebase solo acepta num o String
       },
     );
   }
@@ -422,7 +422,7 @@ class AnalyticsService {
       parameters: {
         'model_name': modelName,
         'inference_time_ms': inferenceTimeMs,
-        'success': success,
+        'success': success ? 1 : 0, // Firebase solo acepta num o String
         if (errorType != null) 'error_type': errorType,
       },
     );
@@ -479,7 +479,7 @@ class AnalyticsService {
         'model_name': modelName,
         'predicted_action': predictedAction,
         'actual_action': actualAction,
-        'followed': followed,
+        'followed': followed ? 1 : 0, // Firebase solo acepta num o String
         'confidence': (confidence * 100).round(),
       },
     );
@@ -498,7 +498,7 @@ class AnalyticsService {
         'suggestion_type': suggestionType,
         'action': action,
         'urgency': (urgency * 100).round(),
-        'is_urgent': isUrgent,
+        'is_urgent': isUrgent ? 1 : 0, // Firebase solo acepta num o String
       },
     );
   }

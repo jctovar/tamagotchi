@@ -98,13 +98,25 @@ Hoja de ruta para el desarrollo de la aplicación Tamagotchi en Flutter.
 - [x] Predicción de necesidades futuras
 - [x] Preparación de features para TensorFlow Lite
 
-### Fase 12: Realidad Aumentada
+### Fase 12: Estadisticas
+
+- [ ] Mostrar en la barra de navehacion un boton con la pantalla de estadisticas
+- [ ] Estadisticas del modelo de tensor flow (dashboard con graficas de linea o barras)
+- [ ] Informe de actividades virtuales, estilo diario
+
+### Fase 13: Integracion con Flutter Flame
+
+- [ ] Creacion del espacio virtual (usar png para background, recamara, jardin, sala de estar)
+- [ ] Animar una Sprite Sheet
+- [ ] Interacciones del objeto con su entorno virtual (pelota, regalo, dulce)
+
+### Fase 14: Realidad Aumentada
 
 - [ ] Integrar ARCore
 - [ ] Proyectar mascota en mundo real
 - [ ] Interacciones AR
 
-### Fase 13: Características Sociales
+### Fase 15: Características Sociales
 
 - [ ] Compartir progreso en redes sociales
 - [ ] Sistema de visitas a mascotas de amigos
