@@ -15,6 +15,7 @@ import '../services/ai_service.dart';
 import '../providers/pet_state_provider.dart';
 import '../providers/preferences_provider.dart';
 import '../providers/ai_state_provider.dart';
+import '../providers/metrics_update_provider.dart';
 import 'games/minigames_menu_screen.dart';
 
 /// Pantalla principal de la aplicación (Refactorizada con Riverpod)
@@ -32,10 +33,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   void initState() {
     super.initState();
 
-    // Inicializar timer de actualización automática
+    // Inicializar providers de timer y lifecycle
     Future.microtask(() {
-      // El timer se inicializará en MetricsUpdateProvider (Fase 3)
-      // Por ahora, solo cargamos el estado
+      // Inicializar el timer de actualización automática
+      ref.read(metricsUpdateNotifierProvider);
+
+      // Inicializar el observer de lifecycle
+      ref.read(appLifecycleNotifierProvider);
     });
   }
 
