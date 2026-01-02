@@ -1,22 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../models/pet.dart';
 import '../models/pet_preferences.dart';
 import '../services/storage_service.dart';
-import '../services/preferences_service.dart';
 import '../services/analytics_service.dart';
 import '../services/ml_data_export_service.dart';
-import '../providers/pet_provider.dart';
+import '../providers/pet_state_provider.dart';
+import '../providers/preferences_provider.dart';
 import '../widgets/pet_name_display.dart';
 
-class SettingsScreen extends StatefulWidget {
+class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
 
   @override
-  State<SettingsScreen> createState() => SettingsScreenState();
+  ConsumerState<SettingsScreen> createState() => SettingsScreenState();
 }
 
-class SettingsScreenState extends State<SettingsScreen> {
+class SettingsScreenState extends ConsumerState<SettingsScreen> {
   PackageInfo? _packageInfo;
   bool _isLoading = true;
   bool _isExporting = false;
@@ -40,18 +41,14 @@ class SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _updatePetColor(BuildContext context, Color color) async {
-    final petProvider = context.read<PetProvider>();
-    await petProvider.updatePetColor(color.toARGB32());
-
-    // Registrar evento en Analytics
-    await AnalyticsService.logPetColorChanged(
-      newColor: color.toString(),
-      coinsSpent: 0, // El cambio de color es gratuito
-    );
+    await ref.read(preferencesStateProvider.notifier).updatePetColor(color);
   }
 
-  Future<void> _showRenameDialog(BuildContext context, PetProvider petProvider) async {
-    final currentName = petProvider.pet!.name;
+  Future<void> _showRenameDialog(BuildContext context) async {
+    final pet = ref.read(petStateProvider).value;
+    if (pet == null) return;
+
+    final currentName = pet.name;
     final controller = TextEditingController(text: currentName);
 
     // Capturar ScaffoldMessenger antes de operaciones async
@@ -100,7 +97,7 @@ class SettingsScreenState extends State<SettingsScreen> {
 
     // Procesar resultado ANTES de dispose
     if (result != null && result.isNotEmpty && result != currentName) {
-      await petProvider.updatePetName(result);
+      await ref.read(petStateProvider.notifier).updateName(result);
 
       await AnalyticsService.logPetRenamed(
         oldName: currentName,
@@ -126,37 +123,20 @@ class SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _updateAccessory(BuildContext context, String accessory) async {
-    final petProvider = context.read<PetProvider>();
-    final oldAccessory = petProvider.preferences.accessory;
-
-    await petProvider.updateAccessory(accessory);
-
-    // Registrar evento en Analytics
-    await AnalyticsService.logAccessoryChanged(
-      oldAccessory: oldAccessory.isEmpty ? null : oldAccessory,
-      newAccessory: accessory.isEmpty ? null : accessory,
-    );
+    await ref.read(preferencesStateProvider.notifier).updateAccessory(accessory);
   }
 
   Future<void> _updateSoundEnabled(BuildContext context, bool enabled) async {
-    final petProvider = context.read<PetProvider>();
-    await PreferencesService.updateSoundEnabled(enabled);
-
-    final updatedPreferences = petProvider.preferences.copyWith(soundEnabled: enabled);
-    await petProvider.updatePreferences(updatedPreferences);
+    await ref.read(preferencesStateProvider.notifier).updateSoundEnabled(enabled);
   }
 
   Future<void> _updateNotificationsEnabled(BuildContext context, bool enabled) async {
-    final petProvider = context.read<PetProvider>();
-    await PreferencesService.updateNotificationsEnabled(enabled);
-
-    final updatedPreferences = petProvider.preferences.copyWith(notificationsEnabled: enabled);
-    await petProvider.updatePreferences(updatedPreferences);
+    await ref.read(preferencesStateProvider.notifier).updateNotificationsEnabled(enabled);
   }
 
   Future<void> _exportMLData(BuildContext context) async {
-    final petProvider = context.read<PetProvider>();
-    if (petProvider.pet == null || _isExporting) return;
+    final pet = ref.read(petStateProvider).value;
+    if (pet == null || _isExporting) return;
 
     setState(() {
       _isExporting = true;
@@ -170,7 +150,7 @@ class SettingsScreenState extends State<SettingsScreen> {
       final personality = await _storageService.loadPetPersonality();
 
       final result = await _mlExportService.exportTrainingData(
-        pet: petProvider.pet!,
+        pet: pet,
         personality: personality,
         history: history,
       );
@@ -260,18 +240,32 @@ class SettingsScreenState extends State<SettingsScreen> {
       );
     }
 
-    return Consumer<PetProvider>(
-      builder: (context, petProvider, child) {
-        if (petProvider.isLoading) {
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
-          );
-        }
+    final petAsync = ref.watch(petStateProvider);
+    final prefsAsync = ref.watch(preferencesStateProvider);
 
-        final pet = petProvider.pet;
-        final preferences = petProvider.preferences;
+    return petAsync.when(
+      loading: () => const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      ),
+      error: (err, stack) => Scaffold(
+        body: Center(child: Text('Error: $err')),
+      ),
+      data: (pet) => prefsAsync.when(
+        loading: () => const Scaffold(
+          body: Center(child: CircularProgressIndicator()),
+        ),
+        error: (err, stack) => Scaffold(
+          body: Center(child: Text('Error: $err')),
+        ),
+        data: (preferences) {
+          return _buildContent(context, pet, preferences);
+        },
+      ),
+    );
+  }
 
-        return Scaffold(
+  Widget _buildContent(BuildContext context, Pet pet, PetPreferences preferences) {
+    return Scaffold(
           appBar: AppBar(
             title: const Text('Configuración'),
           ),
@@ -301,7 +295,7 @@ class SettingsScreenState extends State<SettingsScreen> {
               ),
             ),
             trailing: const Icon(Icons.chevron_right),
-            onTap: () => _showRenameDialog(context, petProvider),
+            onTap: () => _showRenameDialog(context),
           ),
 
           const Divider(),
@@ -475,15 +469,13 @@ class SettingsScreenState extends State<SettingsScreen> {
             ),
           ),
 
-          if (pet != null) ...[
-            ListTile(
+          ListTile(
               leading: const Icon(Icons.cake),
               title: const Text('Creado el'),
               subtitle: Text(
                 '${pet.birthDate.day}/${pet.birthDate.month}/${pet.birthDate.year}',
               ),
             ),
-          ],
 
           const Divider(),
 
@@ -579,8 +571,6 @@ class SettingsScreenState extends State<SettingsScreen> {
             ],
           ),
         );
-      },
-    );
   }
 
   Future<void> _showResetConfirmationDialog() async {
@@ -671,8 +661,6 @@ class SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _resetTamagotchi() async {
-    final petProvider = context.read<PetProvider>();
-
     // Mostrar indicador de carga
     showDialog(
       context: context,
@@ -684,7 +672,8 @@ class SettingsScreenState extends State<SettingsScreen> {
 
     try {
       // Resetear todo usando el provider
-      await petProvider.reset();
+      await ref.read(petStateProvider.notifier).reset();
+      await ref.read(preferencesStateProvider.notifier).reset();
 
       if (!mounted) return;
 

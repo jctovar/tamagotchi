@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../providers/pet_provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../providers/pet_state_provider.dart';
 import '../services/analytics_service.dart';
 
 /// Widget reutilizable para mostrar el nombre del Tamagotchi
 ///
 /// Muestra el nombre actual y permite editarlo al hacer tap (si está habilitado).
-/// Se sincroniza automáticamente con el PetProvider.
-class PetNameDisplay extends StatelessWidget {
+/// Se sincroniza automáticamente con Riverpod providers.
+class PetNameDisplay extends ConsumerWidget {
   /// Estilo del texto
   final TextStyle? textStyle;
 
@@ -25,18 +25,22 @@ class PetNameDisplay extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    return Consumer<PetProvider>(
-      builder: (context, petProvider, child) {
-        if (petProvider.isLoading || petProvider.pet == null) {
-          return Text(
-            'Cargando...',
-            style: textStyle,
-            textAlign: textAlign,
-          );
-        }
+  Widget build(BuildContext context, WidgetRef ref) {
+    final petAsync = ref.watch(petStateProvider);
 
-        final petName = petProvider.pet!.name;
+    return petAsync.when(
+      loading: () => Text(
+        'Cargando...',
+        style: textStyle,
+        textAlign: textAlign,
+      ),
+      error: (err, stack) => Text(
+        'Error',
+        style: textStyle,
+        textAlign: textAlign,
+      ),
+      data: (pet) {
+        final petName = pet.name;
 
         if (!editable) {
           return Text(
@@ -47,7 +51,7 @@ class PetNameDisplay extends StatelessWidget {
         }
 
         return InkWell(
-          onTap: () => _showRenameDialog(context, petProvider),
+          onTap: () => _showRenameDialog(context, ref),
           borderRadius: BorderRadius.circular(8),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -80,8 +84,11 @@ class PetNameDisplay extends StatelessWidget {
 
   /// Muestra el diálogo para renombrar la mascota
   Future<void> _showRenameDialog(
-      BuildContext context, PetProvider petProvider) async {
-    final currentName = petProvider.pet!.name;
+      BuildContext context, WidgetRef ref) async {
+    final pet = ref.read(petStateProvider).value;
+    if (pet == null) return;
+
+    final currentName = pet.name;
     final controller = TextEditingController(text: currentName);
 
     final result = await showDialog<String>(
@@ -122,7 +129,7 @@ class PetNameDisplay extends StatelessWidget {
     // Procesar resultado ANTES de dispose
     if (result != null && result.isNotEmpty && result != currentName) {
       // Actualizar nombre en el provider
-      await petProvider.updatePetName(result);
+      await ref.read(petStateProvider.notifier).updateName(result);
 
       // Registrar evento en Analytics
       await AnalyticsService.logPetRenamed(
