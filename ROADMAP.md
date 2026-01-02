@@ -98,11 +98,11 @@ Hoja de ruta para el desarrollo de la aplicación Tamagotchi en Flutter.
 - [x] Predicción de necesidades futuras
 - [x] Preparación de features para TensorFlow Lite
 
-### Fase 12: Estadisticas
+### Fase 12: Estadísticas ✅
 
-- [ ] Mostrar en la barra de navehacion un boton con la pantalla de estadisticas
-- [ ] Estadisticas del modelo de tensor flow (dashboard con graficas de linea o barras)
-- [ ] Informe de actividades virtuales, estilo diario
+- [x] Mostrar en la barra de navegación un botón con la pantalla de estadísticas
+- [x] Estadísticas del modelo de TensorFlow (dashboard con gráficas de línea o barras)
+- [x] Informe de actividades virtuales, estilo diario
 
 ### Fase 13: Integracion con Flutter Flame
 

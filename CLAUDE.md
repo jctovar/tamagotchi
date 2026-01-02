@@ -5,15 +5,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Project Overview
 
 Tamagotchi Virtual es una aplicación Flutter completamente funcional de mascota virtual con:
-- 11 fases de desarrollo completadas (62 tareas)
+- 12 fases de desarrollo completadas (65 tareas)
 - Sistema de evolución con 5 etapas de vida
 - IA adaptativa con TensorFlow Lite
 - 3 mini-juegos integrados con Flame engine
 - Firebase Crashlytics y Analytics
 - Background processing 24/7 con WorkManager
 - Sistema completo de persistencia
+- Dashboard de estadísticas con gráficas
 
-**Estado actual: PRODUCCIÓN - Fase 11 completada**
+**Estado actual: PRODUCCIÓN - Fase 12 completada**
 
 ## Architecture Overview
 
@@ -23,6 +24,7 @@ Tamagotchi Virtual es una aplicación Flutter completamente funcional de mascota
 - Flutter 3.10.4+
 - Material Design 3
 - Flame 1.34.0 (Game Engine)
+- FL Chart 0.69.0 (Gráficas)
 
 **Backend & Services:**
 - SharedPreferences (Local Storage)
@@ -204,6 +206,19 @@ make build-bundle                  # App bundle para Play Store
 - Preparación para TensorFlow Lite
   - Features extraídas y listas
   - Sistema de exportación de datos
+
+### ✅ Analytics & Stats (Fase 12)
+- Pantalla de estadísticas con 3 tabs
+  - Tab "Hoy": Timeline de actividades diarias
+  - Tab "Juegos": Estadísticas de mini-juegos con gráficas
+  - Tab "IA/ML": Dashboard de rendimiento ML
+- Gráficas con FL Chart
+  - BarChart para win rate de juegos
+  - BarChart para rendimiento de modelos ML
+- Métricas detalladas
+  - Interacciones por tipo y período del día
+  - Estadísticas completas por mini-juego
+  - Performance de modelos de Machine Learning
 
 ### ✅ Production Features
 - Firebase Crashlytics (monitoreo de errores)
@@ -402,8 +417,8 @@ flutter devices           # Listar dispositivos conectados
 
 ## Current State Summary
 
-**Fase 11 completada:**
-- ✅ 62 tareas completadas
+**Fase 12 completada:**
+- ✅ 65 tareas completadas
 - ✅ 600+ tests pasando
 - ✅ Sin warnings de análisis estático
 - ✅ Firebase integrado (Crashlytics + Analytics)
@@ -413,8 +428,10 @@ flutter devices           # Listar dispositivos conectados
 - ✅ Background processing 24/7
 - ✅ Persistencia completa
 - ✅ Splash screen animado con Flame
+- ✅ Dashboard de estadísticas con gráficas
 
 **Próximos pasos opcionales:**
 - Entrenar modelos ML con TensorFlow Lite
 - Agregar AR con ARCore/ARKit
 - Features sociales y multiplayer
+- Integración avanzada con Flutter Flame (Fase 13)

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'home_screen.dart';
 import 'about_screen.dart';
 import 'settings_screen.dart';
+import 'stats_screen.dart';
 
 /// Widget principal con Bottom Navigation Bar
 class MainNavigation extends StatefulWidget {
@@ -19,6 +20,7 @@ class _MainNavigationState extends State<MainNavigation> {
   // Lista de pantallas
   late final List<Widget> _screens = [
     HomeScreen(key: _homeScreenKey),
+    const StatsScreen(),
     SettingsScreen(key: _settingsScreenKey),
     const AboutScreen(),
   ];
@@ -40,7 +42,7 @@ class _MainNavigationState extends State<MainNavigation> {
           // Recargar estado según el tab seleccionado
           // NOTA: NO recargar automáticamente en tab 0 para evitar
           // sobrescribir cambios recientes (ej. monedas de mini-juegos)
-          if (index == 1) {
+          if (index == 2) {
             _settingsScreenKey.currentState?.loadSettings();
           }
         },
@@ -52,6 +54,11 @@ class _MainNavigationState extends State<MainNavigation> {
             icon: Icon(Icons.pets),
             label: 'Mi Mascota',
             tooltip: 'Cuidar a tu Tamagotchi',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.bar_chart),
+            label: 'Estadísticas',
+            tooltip: 'Ver estadísticas y análisis',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.settings),

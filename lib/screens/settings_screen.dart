@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import '../models/pet.dart';
 import '../models/pet_preferences.dart';
 import '../services/storage_service.dart';
@@ -16,6 +17,7 @@ class SettingsScreen extends StatefulWidget {
 class SettingsScreenState extends State<SettingsScreen> {
   PetPreferences _preferences = const PetPreferences();
   Pet? _pet;
+  PackageInfo? _packageInfo;
   bool _isLoading = true;
   bool _isExporting = false;
   final _storageService = StorageService();
@@ -31,10 +33,12 @@ class SettingsScreenState extends State<SettingsScreen> {
   Future<void> loadSettings() async {
     final preferences = await PreferencesService.loadPreferences();
     final pet = await _storageService.loadPetState();
+    final packageInfo = await PackageInfo.fromPlatform();
 
     setState(() {
       _preferences = preferences;
       _pet = pet;
+      _packageInfo = packageInfo;
       _isLoading = false;
     });
   }
@@ -424,7 +428,11 @@ class SettingsScreenState extends State<SettingsScreen> {
           ListTile(
             leading: const Icon(Icons.info_outline),
             title: const Text('Versión'),
-            subtitle: const Text('1.0.0'),
+            subtitle: Text(
+              _packageInfo != null
+                  ? '${_packageInfo!.version} (${_packageInfo!.buildNumber})'
+                  : 'Cargando...',
+            ),
           ),
 
           if (_pet != null) ...[
