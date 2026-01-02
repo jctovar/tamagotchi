@@ -158,7 +158,7 @@ final petNameProvider = AutoDisposeProvider<String>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef PetNameRef = AutoDisposeProviderRef<String>;
-String _$petStateHash() => r'b1f4e739cdb96b5a0f38172f62de4e3c1f17294d';
+String _$petStateHash() => r'49302135d346b8492f99d0bfa952ecd90f32204b';
 
 /// Provider para el estado principal del Pet
 ///

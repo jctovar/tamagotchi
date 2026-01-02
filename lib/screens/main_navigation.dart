@@ -14,14 +14,14 @@ class MainNavigation extends StatefulWidget {
 
 class _MainNavigationState extends State<MainNavigation> {
   int _currentIndex = 0;
-  final GlobalKey<HomeScreenState> _homeScreenKey = GlobalKey();
-  final GlobalKey<SettingsScreenState> _settingsScreenKey = GlobalKey();
 
   // Lista de pantallas
+  // NOTA: Con Riverpod, los GlobalKeys no son necesarios
+  // El estado se sincroniza automáticamente a través de providers
   late final List<Widget> _screens = [
-    HomeScreen(key: _homeScreenKey),
+    const HomeScreen(),
     const StatsScreen(),
-    SettingsScreen(key: _settingsScreenKey),
+    const SettingsScreen(),
     const AboutScreen(),
   ];
 
@@ -39,12 +39,8 @@ class _MainNavigationState extends State<MainNavigation> {
             _currentIndex = index;
           });
 
-          // Recargar estado según el tab seleccionado
-          // NOTA: NO recargar automáticamente en tab 0 para evitar
-          // sobrescribir cambios recientes (ej. monedas de mini-juegos)
-          if (index == 2) {
-            _settingsScreenKey.currentState?.loadSettings();
-          }
+          // Con Riverpod, no es necesario recargar manualmente
+          // El estado se sincroniza automáticamente a través de providers
         },
         type: BottomNavigationBarType.fixed,
         selectedItemColor: Theme.of(context).colorScheme.primary,
