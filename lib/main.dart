@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flame_splash_screen/flame_splash_screen.dart';
+import 'package:provider/provider.dart' as provider;
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'firebase_options.dart';
 import 'config/theme.dart';
 import 'screens/main_navigation.dart';
@@ -10,6 +12,7 @@ import 'screens/onboarding_screen.dart';
 import 'services/background_service.dart';
 import 'services/notification_service.dart';
 import 'services/analytics_service.dart';
+import 'providers/pet_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -40,7 +43,12 @@ void main() async {
   await AnalyticsService.logAppOpened();
 
   // Ejecutar app (los errores ya se capturan via FlutterError.onError y PlatformDispatcher.instance.onError)
-  runApp(const TamagotchiApp());
+  runApp(
+    // ProviderScope para Riverpod (migración en progreso)
+    const ProviderScope(
+      child: TamagotchiApp(),
+    ),
+  );
 }
 
 class TamagotchiApp extends StatelessWidget {
@@ -48,17 +56,20 @@ class TamagotchiApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Tamagotchi',
-      theme: AppTheme.lightTheme,
-      debugShowCheckedModeBanner: false,
-      navigatorObservers: [
-        AnalyticsService.observer,
-      ],
-      home: const AppInitializer(),
-      routes: {
-        '/home': (context) => const MainNavigation(),
-      },
+    return provider.ChangeNotifierProvider(
+      create: (_) => PetProvider()..loadPet(),
+      child: MaterialApp(
+        title: 'Tamagotchi',
+        theme: AppTheme.lightTheme,
+        debugShowCheckedModeBanner: false,
+        navigatorObservers: [
+          AnalyticsService.observer,
+        ],
+        home: const AppInitializer(),
+        routes: {
+          '/home': (context) => const MainNavigation(),
+        },
+      ),
     );
   }
 }

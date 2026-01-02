@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/pet.dart';
 import '../models/pet_preferences.dart';
 import '../models/life_stage.dart';
+import 'pet_name_display.dart';
 
 /// Widget para mostrar la visualización de la mascota
 class PetDisplay extends StatefulWidget {
@@ -57,9 +58,9 @@ class _PetDisplayState extends State<PetDisplay>
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              widget.pet.name,
-              style: const TextStyle(
+            const PetNameDisplay(
+              editable: true,
+              textStyle: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
               ),
