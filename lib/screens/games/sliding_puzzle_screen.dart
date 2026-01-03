@@ -1,34 +1,26 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flame_audio/flame_audio.dart';
-import '../../models/pet.dart';
 import '../../models/minigame_stats.dart';
 import '../../services/feedback_service.dart';
+import '../../providers/minigames_provider.dart';
 
-/// Pantalla del juego Sliding Puzzle (rompecabezas deslizante)
+/// Pantalla del juego Sliding Puzzle (rompecabezas deslizante) - Refactorizada con Riverpod
 ///
 /// Implementa el clásico puzzle de 8 fichas donde el jugador debe ordenar
 /// los números del 1 al 8 deslizando las fichas hacia el espacio vacío.
 /// Las recompensas dependen del número de movimientos y tiempo empleado.
-class SlidingPuzzleScreen extends StatefulWidget {
-  /// Mascota actual del jugador
-  final Pet pet;
-
-  /// Callback ejecutado al completar el juego con la mascota actualizada y resultados
-  final Function(Pet updatedPet, GameResult result) onGameComplete;
-
-  const SlidingPuzzleScreen({
-    super.key,
-    required this.pet,
-    required this.onGameComplete,
-  });
+/// Sincronización automática con providers - sin callbacks manuales.
+class SlidingPuzzleScreen extends ConsumerStatefulWidget {
+  const SlidingPuzzleScreen({super.key});
 
   @override
-  State<SlidingPuzzleScreen> createState() => _SlidingPuzzleScreenState();
+  ConsumerState<SlidingPuzzleScreen> createState() => _SlidingPuzzleScreenState();
 }
 
-class _SlidingPuzzleScreenState extends State<SlidingPuzzleScreen> {
+class _SlidingPuzzleScreenState extends ConsumerState<SlidingPuzzleScreen> {
   late List<int> _tiles;
   int _emptyIndex = 8; // Índice del espacio vacío
   int _moves = 0;
@@ -243,13 +235,25 @@ class _SlidingPuzzleScreenState extends State<SlidingPuzzleScreen> {
             child: const Text('Jugar de nuevo'),
           ),
           FilledButton(
-            onPressed: () {
-              final updatedPet = widget.pet.copyWith(
-                experience: widget.pet.experience + result.xpEarned,
-                coins: widget.pet.coins + result.coinsEarned,
-              );
-              Navigator.pop(context);
-              widget.onGameComplete(updatedPet, result);
+            onPressed: () async {
+              // Actualizar estadísticas y recompensas automáticamente vía provider
+              await ref.read(miniGameStatsStateProvider.notifier).updateStats(result);
+
+              // Navegar de vuelta y mostrar mensaje
+              if (mounted) {
+                Navigator.pop(context); // Cerrar diálogo
+                Navigator.pop(context); // Volver al menú
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      '¡Juego completado! +${result.xpEarned} XP, +${result.coinsEarned} monedas',
+                    ),
+                    duration: const Duration(seconds: 3),
+                    behavior: SnackBarBehavior.floating,
+                  ),
+                );
+              }
             },
             child: const Text('Finalizar'),
           ),

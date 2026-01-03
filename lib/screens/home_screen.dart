@@ -382,20 +382,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   /// Navega a la pantalla de mini-juegos
   void _navigateToMiniGames() {
-    final pet = ref.read(petStateProvider).value;
-    if (pet == null) return;
-
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => MiniGamesMenuScreen(
-          pet: pet,
-          onPetUpdated: (updatedPet) {
-            // TODO: Fase 5 - Eliminar callback y usar providers
-            // Por ahora, invalidar el provider para recargar
-            ref.invalidate(petStateProvider);
-          },
-        ),
+        builder: (context) => const MiniGamesMenuScreen(),
       ),
     );
   }

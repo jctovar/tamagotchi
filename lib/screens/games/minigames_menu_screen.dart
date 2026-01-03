@@ -1,196 +1,70 @@
 import 'package:flutter/material.dart';
-import '../../models/pet.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../models/minigame_stats.dart';
-import '../../services/storage_service.dart';
 import '../../services/analytics_service.dart';
+import '../../providers/minigames_provider.dart';
 import 'memory_game_screen.dart';
 import 'sliding_puzzle_screen.dart';
 import 'reaction_race_screen.dart';
 
-/// Pantalla de selección de mini-juegos
+/// Pantalla de selección de mini-juegos (Refactorizada con Riverpod)
 ///
-/// Muestra todos los mini-juegos disponibles con sus estadísticas
-/// y permite al jugador seleccionar uno para jugar.
-class MiniGamesMenuScreen extends StatefulWidget {
-  /// Mascota actual del jugador
-  final Pet pet;
-
-  /// Callback ejecutado cuando la mascota es actualizada tras completar un juego
-  final Function(Pet updatedPet) onPetUpdated;
-
-  const MiniGamesMenuScreen({
-    super.key,
-    required this.pet,
-    required this.onPetUpdated,
-  });
+/// Muestra todos los mini-juegos disponibles con sus estadísticas.
+/// Sincronización automática con providers - sin callbacks manuales.
+class MiniGamesMenuScreen extends ConsumerWidget {
+  const MiniGamesMenuScreen({super.key});
 
   @override
-  State<MiniGamesMenuScreen> createState() => _MiniGamesMenuScreenState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final statsAsync = ref.watch(miniGameStatsStateProvider);
 
-class _MiniGamesMenuScreenState extends State<MiniGamesMenuScreen> {
-  final StorageService _storageService = StorageService();
-  MiniGameStats _stats = MiniGameStats();
-  bool _isLoading = true;
-  late Pet _currentPet;
-
-  @override
-  void initState() {
-    super.initState();
-    _currentPet = widget.pet;
-    _loadStats();
-  }
-
-  /// Carga las estadísticas de mini-juegos desde el almacenamiento
-  Future<void> _loadStats() async {
-    final stats = await _storageService.loadMiniGameStats();
-    setState(() {
-      _stats = stats;
-      _isLoading = false;
-    });
-  }
-
-  /// Callback ejecutado cuando se completa un mini-juego
-  ///
-  /// [updatedPet] Mascota con XP y monedas actualizadas
-  /// [result] Resultados del juego completado
-  /// Actualiza estadísticas, guarda el estado y notifica cambios.
-  void _onGameComplete(Pet updatedPet, GameResult result) async {
-    // Actualizar estadísticas del juego en el almacenamiento
-    await _storageService.updateGameStats(result);
-
-    // Recargar estadísticas para reflejar los cambios
-    await _loadStats();
-
-    // Guardar estado actualizado de la mascota
-    await _storageService.saveState(updatedPet);
-
-    // Registrar evento en Analytics
-    await AnalyticsService.logMinigameCompleted(
-      gameType: result.gameType.name,
-      score: result.score,
-      won: result.won,
-      coinsEarned: result.coinsEarned,
-      durationSeconds: result.duration.inSeconds,
-    );
-
-    // Registrar ganancia de experiencia
-    await AnalyticsService.logExperienceGained(
-      experienceAmount: result.xpEarned,
-      totalExperience: updatedPet.experience,
-      source: 'minigame',
-    );
-
-    // Registrar monedas ganadas
-    await AnalyticsService.logCoinsEarned(
-      amount: result.coinsEarned,
-      source: 'minigame',
-    );
-
-    // Notificar al padre sobre la actualización
-    widget.onPetUpdated(updatedPet);
-
-    setState(() {
-      _currentPet = updatedPet;
-    });
-
-    // Mostrar snackbar con resumen
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            '¡Juego completado! +${result.xpEarned} XP, +${result.coinsEarned} monedas',
-          ),
-          duration: const Duration(seconds: 3),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-    }
-  }
-
-  /// Navega a la pantalla del juego seleccionado
-  ///
-  /// [gameType] Tipo de mini-juego a iniciar
-  void _navigateToGame(MiniGameType gameType) async {
-    Widget gameScreen;
-
-    switch (gameType) {
-      case MiniGameType.memory:
-        gameScreen = MemoryGameScreen(
-          pet: _currentPet,
-          onGameComplete: _onGameComplete,
-        );
-        break;
-      case MiniGameType.slidingPuzzle:
-        gameScreen = SlidingPuzzleScreen(
-          pet: _currentPet,
-          onGameComplete: _onGameComplete,
-        );
-        break;
-      case MiniGameType.reactionRace:
-        gameScreen = ReactionRaceScreen(
-          pet: _currentPet,
-          onGameComplete: _onGameComplete,
-        );
-        break;
-    }
-
-    // Registrar evento de inicio de juego en Analytics
-    await AnalyticsService.logMinigameStarted(
-      gameType: gameType.name,
-    );
-
-    if (mounted) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => gameScreen),
-      );
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Mini-Juegos'),
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : SafeArea(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Resumen general
-                    _buildOverallStats(),
-                    const SizedBox(height: 24),
-
-                    // Título
-                    const Text(
-                      'Elige un juego',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Lista de juegos
-                    ...MiniGameType.values.map((gameType) {
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 16),
-                        child: _buildGameCard(gameType),
-                      );
-                    }),
-                  ],
-                ),
-              ),
-            ),
+      body: statsAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (err, stack) => Center(child: Text('Error: $err')),
+        data: (stats) => _buildContent(context, ref, stats),
+      ),
     );
   }
 
-  Widget _buildOverallStats() {
+  Widget _buildContent(BuildContext context, WidgetRef ref, MiniGameStats stats) {
+    return SafeArea(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Resumen general
+            _buildOverallStats(stats),
+            const SizedBox(height: 24),
+
+            // Título
+            const Text(
+              'Elige un juego',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // Lista de juegos
+            ...MiniGameType.values.map((gameType) {
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: _buildGameCard(context, ref, gameType, stats),
+              );
+            }),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildOverallStats(MiniGameStats stats) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -216,22 +90,22 @@ class _MiniGamesMenuScreenState extends State<MiniGamesMenuScreen> {
               children: [
                 _buildStatColumn(
                   'Partidas',
-                  _stats.totalGamesPlayed.toString(),
+                  stats.totalGamesPlayed.toString(),
                   Icons.gamepad,
                 ),
                 _buildStatColumn(
                   'Victorias',
-                  _stats.totalWins.toString(),
+                  stats.totalWins.toString(),
                   Icons.star,
                 ),
                 _buildStatColumn(
                   'XP Total',
-                  _stats.totalXpEarned.toString(),
+                  stats.totalXpEarned.toString(),
                   Icons.trending_up,
                 ),
                 _buildStatColumn(
                   'Monedas',
-                  '${_stats.totalCoinsEarned} 🪙',
+                  '${stats.totalCoinsEarned} 🪙',
                   Icons.monetization_on,
                 ),
               ],
@@ -265,14 +139,14 @@ class _MiniGamesMenuScreenState extends State<MiniGamesMenuScreen> {
     );
   }
 
-  Widget _buildGameCard(MiniGameType gameType) {
-    final gameStats = _stats.getStats(gameType);
+  Widget _buildGameCard(BuildContext context, WidgetRef ref, MiniGameType gameType, MiniGameStats stats) {
+    final gameStats = stats.getStats(gameType);
     final winRate = gameStats.winRate;
 
     return Card(
       elevation: 2,
       child: InkWell(
-        onTap: () => _navigateToGame(gameType),
+        onTap: () => _navigateToGame(context, ref, gameType),
         borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -283,7 +157,7 @@ class _MiniGamesMenuScreenState extends State<MiniGamesMenuScreen> {
                 width: 70,
                 height: 70,
                 decoration: BoxDecoration(
-                  color: Color(gameType.colorValue).withAlpha(30),
+                  color: Color(gameType.colorValue).withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Center(
@@ -311,50 +185,43 @@ class _MiniGamesMenuScreenState extends State<MiniGamesMenuScreen> {
                     Text(
                       gameType.description,
                       style: TextStyle(
-                        fontSize: 13,
+                        fontSize: 14,
                         color: Colors.grey[600],
                       ),
                     ),
-                    const SizedBox(height: 8),
-
+                    const SizedBox(height: 12),
                     // Estadísticas del juego
-                    if (gameStats.timesPlayed > 0) ...[
-                      Wrap(
-                        spacing: 12,
-                        children: [
-                          _buildMiniStat(
-                            '${gameStats.timesPlayed} jugadas',
-                            Icons.play_circle_outline,
-                          ),
-                          _buildMiniStat(
-                            '${winRate.toStringAsFixed(0)}% victorias',
-                            Icons.check_circle_outline,
-                          ),
-                          _buildMiniStat(
-                            'Récord: ${gameStats.bestScore}',
-                            Icons.star_outline,
-                          ),
-                        ],
-                      ),
-                    ] else ...[
-                      Text(
-                        '¡Nuevo! Juega por primera vez',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.green[700],
-                          fontWeight: FontWeight.bold,
+                    Wrap(
+                      spacing: 12,
+                      runSpacing: 4,
+                      children: [
+                        _buildGameStat(
+                          '🎮 ${gameStats.timesPlayed}',
+                          'jugadas',
                         ),
-                      ),
-                    ],
+                        _buildGameStat(
+                          '⭐ ${gameStats.timesWon}',
+                          'victorias',
+                        ),
+                        _buildGameStat(
+                          '📊 ${winRate.toStringAsFixed(0)}%',
+                          'win rate',
+                        ),
+                        _buildGameStat(
+                          '🏆 ${gameStats.bestScore}',
+                          'récord',
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),
 
               // Flecha
               Icon(
-                Icons.arrow_forward_ios,
-                size: 20,
-                color: Colors.grey[400],
+                Icons.chevron_right,
+                color: Color(gameType.colorValue),
+                size: 32,
               ),
             ],
           ),
@@ -363,20 +230,54 @@ class _MiniGamesMenuScreenState extends State<MiniGamesMenuScreen> {
     );
   }
 
-  Widget _buildMiniStat(String text, IconData icon) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
+  Widget _buildGameStat(String value, String label) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, size: 14, color: Colors.grey[600]),
-        const SizedBox(width: 4),
         Text(
-          text,
+          value,
+          style: const TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        Text(
+          label,
           style: TextStyle(
-            fontSize: 12,
-            color: Colors.grey[700],
+            fontSize: 10,
+            color: Colors.grey[600],
           ),
         ),
       ],
     );
+  }
+
+  /// Navega a la pantalla del juego seleccionado
+  void _navigateToGame(BuildContext context, WidgetRef ref, MiniGameType gameType) async {
+    Widget gameScreen;
+
+    switch (gameType) {
+      case MiniGameType.memory:
+        gameScreen = const MemoryGameScreen();
+        break;
+      case MiniGameType.slidingPuzzle:
+        gameScreen = const SlidingPuzzleScreen();
+        break;
+      case MiniGameType.reactionRace:
+        gameScreen = const ReactionRaceScreen();
+        break;
+    }
+
+    // Registrar evento de inicio de juego en Analytics
+    await AnalyticsService.logMinigameStarted(
+      gameType: gameType.name,
+    );
+
+    if (context.mounted) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => gameScreen),
+      );
+    }
   }
 }

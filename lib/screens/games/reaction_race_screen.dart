@@ -1,34 +1,26 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flame_audio/flame_audio.dart';
-import '../../models/pet.dart';
 import '../../models/minigame_stats.dart';
 import '../../services/feedback_service.dart';
+import '../../providers/minigames_provider.dart';
 
-/// Pantalla del juego Reaction Race (carrera de reacción)
+/// Pantalla del juego Reaction Race (carrera de reacción) - Refactorizada con Riverpod
 ///
 /// Juego de reflejos donde el jugador debe presionar cuando el círculo
 /// cambia de naranja a verde. Se mide el tiempo de reacción en cada ronda.
 /// Las recompensas dependen de la velocidad de reacción promedio.
-class ReactionRaceScreen extends StatefulWidget {
-  /// Mascota actual del jugador
-  final Pet pet;
-
-  /// Callback ejecutado al completar el juego con la mascota actualizada y resultados
-  final Function(Pet updatedPet, GameResult result) onGameComplete;
-
-  const ReactionRaceScreen({
-    super.key,
-    required this.pet,
-    required this.onGameComplete,
-  });
+/// Sincronización automática con providers - sin callbacks manuales.
+class ReactionRaceScreen extends ConsumerStatefulWidget {
+  const ReactionRaceScreen({super.key});
 
   @override
-  State<ReactionRaceScreen> createState() => _ReactionRaceScreenState();
+  ConsumerState<ReactionRaceScreen> createState() => _ReactionRaceScreenState();
 }
 
-class _ReactionRaceScreenState extends State<ReactionRaceScreen> {
+class _ReactionRaceScreenState extends ConsumerState<ReactionRaceScreen> {
   static const int _totalRounds = 10;
   static const int _minWaitMs = 1000;
   static const int _maxWaitMs = 4000;
@@ -245,13 +237,25 @@ class _ReactionRaceScreenState extends State<ReactionRaceScreen> {
             child: const Text('Jugar de nuevo'),
           ),
           FilledButton(
-            onPressed: () {
-              final updatedPet = widget.pet.copyWith(
-                experience: widget.pet.experience + result.xpEarned,
-                coins: widget.pet.coins + result.coinsEarned,
-              );
-              Navigator.pop(context);
-              widget.onGameComplete(updatedPet, result);
+            onPressed: () async {
+              // Actualizar estadísticas y recompensas automáticamente vía provider
+              await ref.read(miniGameStatsStateProvider.notifier).updateStats(result);
+
+              // Navegar de vuelta y mostrar mensaje
+              if (mounted) {
+                Navigator.pop(context); // Cerrar diálogo
+                Navigator.pop(context); // Volver al menú
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      '¡Juego completado! +${result.xpEarned} XP, +${result.coinsEarned} monedas',
+                    ),
+                    duration: const Duration(seconds: 3),
+                    behavior: SnackBarBehavior.floating,
+                  ),
+                );
+              }
             },
             child: const Text('Finalizar'),
           ),

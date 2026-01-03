@@ -1,34 +1,26 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flame_audio/flame_audio.dart';
-import '../../models/pet.dart';
 import '../../models/minigame_stats.dart';
 import '../../services/feedback_service.dart';
+import '../../providers/minigames_provider.dart';
 
-/// Pantalla del juego Memory (parejas de emojis)
+/// Pantalla del juego Memory (parejas de emojis) - Refactorizada con Riverpod
 ///
 /// Implementa el clásico juego de memoria donde el jugador debe encontrar
 /// pares de cartas iguales. Las recompensas se calculan basándose en la
 /// cantidad de movimientos y el tiempo empleado.
-class MemoryGameScreen extends StatefulWidget {
-  /// Mascota actual del jugador
-  final Pet pet;
-
-  /// Callback ejecutado al completar el juego con la mascota actualizada y resultados
-  final Function(Pet updatedPet, GameResult result) onGameComplete;
-
-  const MemoryGameScreen({
-    super.key,
-    required this.pet,
-    required this.onGameComplete,
-  });
+/// Sincronización automática con providers - sin callbacks manuales.
+class MemoryGameScreen extends ConsumerStatefulWidget {
+  const MemoryGameScreen({super.key});
 
   @override
-  State<MemoryGameScreen> createState() => _MemoryGameScreenState();
+  ConsumerState<MemoryGameScreen> createState() => _MemoryGameScreenState();
 }
 
-class _MemoryGameScreenState extends State<MemoryGameScreen> {
+class _MemoryGameScreenState extends ConsumerState<MemoryGameScreen> {
   static const List<String> _emojis = [
     '🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼',
   ];
@@ -257,13 +249,25 @@ class _MemoryGameScreenState extends State<MemoryGameScreen> {
             child: const Text('Jugar de nuevo'),
           ),
           FilledButton(
-            onPressed: () {
-              final updatedPet = widget.pet.copyWith(
-                experience: widget.pet.experience + result.xpEarned,
-                coins: widget.pet.coins + result.coinsEarned,
-              );
-              Navigator.pop(context);
-              widget.onGameComplete(updatedPet, result);
+            onPressed: () async {
+              // Actualizar estadísticas y recompensas automáticamente vía provider
+              await ref.read(miniGameStatsStateProvider.notifier).updateStats(result);
+
+              // Navegar de vuelta y mostrar mensaje
+              if (mounted) {
+                Navigator.pop(context); // Cerrar diálogo
+                Navigator.pop(context); // Volver al menú
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      '¡Juego completado! +${result.xpEarned} XP, +${result.coinsEarned} monedas',
+                    ),
+                    duration: const Duration(seconds: 3),
+                    behavior: SnackBarBehavior.floating,
+                  ),
+                );
+              }
             },
             child: const Text('Finalizar'),
           ),

@@ -30,7 +30,7 @@ final metricsUpdateNotifierProvider =
 
 typedef _$MetricsUpdateNotifier = AutoDisposeNotifier<void>;
 String _$appLifecycleNotifierHash() =>
-    r'cffddb317a857b5605961053f952ef40321297fc';
+    r'afe647c647327273bc8a5192d0febe2b907d1445';
 
 /// Provider para el estado del lifecycle de la aplicación
 ///
