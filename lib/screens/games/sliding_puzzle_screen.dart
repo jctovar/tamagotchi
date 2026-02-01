@@ -17,7 +17,8 @@ class SlidingPuzzleScreen extends ConsumerStatefulWidget {
   const SlidingPuzzleScreen({super.key});
 
   @override
-  ConsumerState<SlidingPuzzleScreen> createState() => _SlidingPuzzleScreenState();
+  ConsumerState<SlidingPuzzleScreen> createState() =>
+      _SlidingPuzzleScreenState();
 }
 
 class _SlidingPuzzleScreenState extends ConsumerState<SlidingPuzzleScreen> {
@@ -45,6 +46,8 @@ class _SlidingPuzzleScreenState extends ConsumerState<SlidingPuzzleScreen> {
   /// Reproduce música de fondo en loop
   void _playBackgroundMusic() async {
     try {
+      // Verificar si el audio está disponible
+      await FlameAudio.audioCache.load('Relax.wav');
       await FlameAudio.bgm.play('Relax.wav', volume: 0.3);
     } catch (e) {
       debugPrint('Error al reproducir música de fondo: $e');
@@ -61,22 +64,26 @@ class _SlidingPuzzleScreenState extends ConsumerState<SlidingPuzzleScreen> {
   /// Genera un puzzle mezclado pero siempre resoluble realizando
   /// movimientos aleatorios válidos desde el estado resuelto.
   void _initGame() {
-    // Crear puzzle en estado resuelto (0-8)
-    _tiles = List.generate(9, (index) => index);
+    if (!mounted) return;
 
-    // Mezclar haciendo movimientos aleatorios válidos (garantiza que sea resoluble)
-    final random = Random();
-    for (int i = 0; i < 100; i++) {
-      final validMoves = _getValidMoves();
-      if (validMoves.isNotEmpty) {
-        final randomMove = validMoves[random.nextInt(validMoves.length)];
-        _swapTiles(randomMove, _emptyIndex);
+    setState(() {
+      // Crear puzzle en estado resuelto (0-8)
+      _tiles = List.generate(9, (index) => index);
+
+      // Mezclar haciendo movimientos aleatorios válidos (garantiza que sea resoluble)
+      final random = Random();
+      for (int i = 0; i < 100; i++) {
+        final validMoves = _getValidMoves();
+        if (validMoves.isNotEmpty) {
+          final randomMove = validMoves[random.nextInt(validMoves.length)];
+          _swapTiles(randomMove, _emptyIndex);
+        }
       }
-    }
 
-    _moves = 0;
-    _startTime = DateTime.now();
-    _elapsedSeconds = 0;
+      _moves = 0;
+      _startTime = DateTime.now();
+      _elapsedSeconds = 0;
+    });
 
     // Iniciar timer
     _gameTimer?.cancel();
@@ -85,6 +92,8 @@ class _SlidingPuzzleScreenState extends ConsumerState<SlidingPuzzleScreen> {
         setState(() {
           _elapsedSeconds++;
         });
+      } else {
+        timer.cancel();
       }
     });
   }
@@ -119,10 +128,14 @@ class _SlidingPuzzleScreenState extends ConsumerState<SlidingPuzzleScreen> {
   /// [index] Índice de la ficha tocada en el grid (0-8)
   /// Solo permite el movimiento si la ficha es adyacente al espacio vacío.
   void _onTileTap(int index) {
+    if (!mounted) return;
+
     // Verificar que la ficha sea movible (adyacente al espacio vacío)
     if (!_getValidMoves().contains(index)) return;
 
-    FeedbackService.playHaptic(FeedbackType.play);
+    FeedbackService.playHaptic(FeedbackType.play).catchError((e) {
+      debugPrint('Error en feedback haptic: $e');
+    });
 
     setState(() {
       _swapTiles(index, _emptyIndex);
@@ -150,10 +163,14 @@ class _SlidingPuzzleScreenState extends ConsumerState<SlidingPuzzleScreen> {
   /// Calcula la puntuación final basada en movimientos y tiempo,
   /// determina las recompensas de XP y monedas, y muestra el diálogo de victoria.
   void _onGameWon() {
+    if (!mounted) return;
+
     _gameTimer?.cancel();
     final duration = DateTime.now().difference(_startTime);
 
-    FeedbackService.playHaptic(FeedbackType.feed);
+    FeedbackService.playHaptic(FeedbackType.feed).catchError((e) {
+      debugPrint('Error en feedback de victoria: $e');
+    });
 
     // Calcular puntuación: base menos penalizaciones por movimientos y tiempo
     final baseScore = 1000;
@@ -192,10 +209,17 @@ class _SlidingPuzzleScreenState extends ConsumerState<SlidingPuzzleScreen> {
       duration: duration,
     );
 
-    _showVictoryDialog(result);
+    // Pequeño retraso para asegurar que la UI se actualice antes de mostrar el diálogo
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _showVictoryDialog(result);
+      }
+    });
   }
 
   void _showVictoryDialog(GameResult result) {
+    if (!mounted) return;
+
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -228,22 +252,29 @@ class _SlidingPuzzleScreenState extends ConsumerState<SlidingPuzzleScreen> {
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              setState(() {
-                _initGame();
-              });
+              if (mounted) {
+                setState(() {
+                  _initGame();
+                });
+              }
             },
             child: const Text('Jugar de nuevo'),
           ),
           FilledButton(
             onPressed: () async {
               // Actualizar estadísticas y recompensas automáticamente vía provider
-              await ref.read(miniGameStatsStateProvider.notifier).updateStats(result);
+              try {
+                await ref
+                    .read(miniGameStatsStateProvider.notifier)
+                    .updateStats(result);
+              } catch (e) {
+                debugPrint('Error al actualizar estadísticas: $e');
+              }
 
               // Navegar de vuelta y mostrar mensaje
               if (mounted) {
                 Navigator.pop(context); // Cerrar diálogo
                 Navigator.pop(context); // Volver al menú
-
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(
@@ -347,11 +378,12 @@ class _SlidingPuzzleScreenState extends ConsumerState<SlidingPuzzleScreen> {
                     child: GridView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 3,
-                        crossAxisSpacing: 8,
-                        mainAxisSpacing: 8,
-                      ),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 3,
+                            crossAxisSpacing: 8,
+                            mainAxisSpacing: 8,
+                          ),
                       itemCount: 9,
                       itemBuilder: (context, index) {
                         return _buildTile(index);
@@ -372,19 +404,10 @@ class _SlidingPuzzleScreenState extends ConsumerState<SlidingPuzzleScreen> {
       children: [
         Text(
           value,
-          style: const TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
+          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 4),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.grey[600],
-          ),
-        ),
+        Text(label, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
       ],
     );
   }
@@ -396,13 +419,14 @@ class _SlidingPuzzleScreenState extends ConsumerState<SlidingPuzzleScreen> {
 
     return GestureDetector(
       onTap: () => _onTileTap(index),
-      child: Container(
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
         decoration: BoxDecoration(
           color: isEmpty
               ? Colors.grey[200]
               : canMove
-                  ? Colors.blue[400]
-                  : Colors.blue[300],
+              ? Colors.blue[400]
+              : Colors.blue[300],
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: isEmpty ? Colors.grey[300]! : Colors.blue[700]!,
