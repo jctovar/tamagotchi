@@ -423,7 +423,7 @@ class AnalyticsService {
         'model_name': modelName,
         'inference_time_ms': inferenceTimeMs,
         'success': success ? 1 : 0, // Firebase solo acepta num o String
-        if (errorType != null) 'error_type': errorType,
+        'error_type': ?errorType,
       },
     );
   }
