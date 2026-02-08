@@ -76,7 +76,7 @@ class _SlidingPuzzleScreenState extends ConsumerState<SlidingPuzzleScreen> {
         final validMoves = _getValidMoves();
         if (validMoves.isNotEmpty) {
           final randomMove = validMoves[random.nextInt(validMoves.length)];
-          _swapTiles(randomMove, _emptyIndex);
+          _swapTiles(_emptyIndex, randomMove);
         }
       }
 
