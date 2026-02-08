@@ -42,12 +42,12 @@ dependencies:
   flutter_svg: ^2.2.1
 
   # Riverpod - State Management (migración en progreso)
-  flutter_riverpod: ^2.6.1
-  riverpod_annotation: ^2.6.1
+  flutter_riverpod: ^3.1.0
+  riverpod_annotation: ^4.0.0
 
   shared_preferences: ^2.3.5
   workmanager: ^0.9.0
-  flutter_local_notifications: ^19.5.0
+  flutter_local_notifications: ^20.0.0
   audioplayers: ^6.1.0
   vibration: ^3.1.5
   introduction_screen: ^4.0.0
@@ -63,13 +63,13 @@ dependencies:
   firebase_analytics: ^12.1.0
 
   # Gráficas y visualización
-  fl_chart: ^0.69.0
+  fl_chart: ^1.1.1
 
   # TensorFlow Lite - Machine Learning
   tflite_flutter: ^0.12.1
 
   # Exportación de datos ML
-  share_plus: ^10.1.4
+  share_plus: ^12.0.1
   path_provider: ^2.1.5
 
 dev_dependencies:
@@ -84,7 +84,7 @@ dev_dependencies:
   flutter_lints: ^6.0.0
 
   # Riverpod - Code generation
-  riverpod_generator: ^2.6.2
+  riverpod_generator: ^4.0.0+1
   build_runner: ^2.4.14
 
 # For information on the generic Dart part of this file, see the
