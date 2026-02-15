@@ -5,12 +5,11 @@ import '../models/pet_preferences.dart';
 import '../models/life_stage.dart';
 import '../models/interaction_history.dart';
 import '../widgets/pet_display.dart';
-import '../widgets/metric_bar.dart';
-import '../widgets/animated_action_button.dart';
 import '../widgets/ai_insight_card.dart';
 import '../widgets/coins_display.dart';
-import '../config/theme.dart';
-import '../services/feedback_service.dart';
+import '../widgets/retro/retro_progress_bar.dart';
+import '../widgets/retro/retro_button.dart';
+import '../config/retro_theme.dart';
 import '../services/ai_service.dart';
 import '../providers/pet_state_provider.dart';
 import '../providers/preferences_provider.dart';
@@ -54,7 +53,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Tamagotchi'),
+        title: const Text('Tamagotchi', style: TextStyle(fontFamily: 'VT323')),
         actions: petAsync.maybeWhen(
           data: (pet) => [CoinsDisplay(coins: pet.coins)],
           orElse: () => [],
@@ -142,32 +141,33 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     String message = '¡Tu mascota necesita atención urgente!';
 
     if (pet.health < 30) {
-      message = '⚠️ ¡Salud crítica! Tu mascota está muy enferma.';
+      message = '¡Salud crítica! Tu mascota está muy enferma.';
     } else if (pet.hunger > 80) {
-      message = '⚠️ ¡Hambre extrema! Alimenta a tu mascota ahora.';
+      message = '¡Hambre extrema! Alimenta a tu mascota ahora.';
     } else if (pet.energy < 20) {
-      message = '⚠️ ¡Sin energía! Tu mascota necesita descansar.';
+      message = '¡Sin energía! Tu mascota necesita descansar.';
     }
 
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.red[50],
-        border: Border.all(color: Colors.red, width: 2),
-        borderRadius: BorderRadius.circular(12),
+        color: RetroColors.red.withValues(alpha: 0.2),
+        border: Border.all(color: RetroColors.red, width: 2),
+        borderRadius: BorderRadius.zero,
       ),
       child: Row(
         children: [
-          Icon(Icons.warning_amber_rounded, color: Colors.red[700], size: 32),
+          Icon(Icons.warning_amber_rounded, color: RetroColors.red, size: 32),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
               message,
-              style: TextStyle(
-                color: Colors.red[900],
+              style: const TextStyle(
+                color: RetroColors.red,
                 fontWeight: FontWeight.bold,
-                fontSize: 14,
+                fontSize: 16,
+                fontFamily: 'VT323',
               ),
             ),
           ),
@@ -190,33 +190,38 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Estado',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'VT323',
+                color: RetroColors.dark,
+              ),
             ),
             const SizedBox(height: 12),
-            MetricBar(
+            RetroMetricBar(
               label: 'Hambre',
               value: hunger,
-              color: AppTheme.hungerColor,
+              color: RetroColors.orange,
               icon: Icons.restaurant,
             ),
-            MetricBar(
+            RetroMetricBar(
               label: 'Felicidad',
               value: happiness,
-              color: AppTheme.happinessColor,
+              color: RetroColors.yellow,
               icon: Icons.sentiment_satisfied,
             ),
-            MetricBar(
+            RetroMetricBar(
               label: 'Energía',
               value: energy,
-              color: AppTheme.energyColor,
+              color: RetroColors.green,
               icon: Icons.battery_charging_full,
             ),
-            MetricBar(
+            RetroMetricBar(
               label: 'Salud',
               value: health,
-              color: AppTheme.healthColor,
+              color: RetroColors.red,
               icon: Icons.favorite,
             ),
           ],
@@ -230,48 +235,46 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return Column(
       children: [
         Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Expanded(
-              child: AnimatedActionButton(
+              child: RetroButton(
                 label: 'Alimentar',
                 icon: Icons.restaurant,
-                color: AppTheme.hungerColor,
+                color: RetroColors.orange,
                 onPressed: _feedPet,
-                feedbackType: FeedbackType.feed,
               ),
             ),
             const SizedBox(width: 12),
             Expanded(
-              child: AnimatedActionButton(
+              child: RetroButton(
                 label: 'Jugar',
                 icon: Icons.sports_esports,
-                color: AppTheme.happinessColor,
+                color: RetroColors.green,
                 onPressed: _playWithPet,
-                feedbackType: FeedbackType.play,
               ),
             ),
           ],
         ),
         const SizedBox(height: 12),
         Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Expanded(
-              child: AnimatedActionButton(
+              child: RetroButton(
                 label: 'Limpiar',
                 icon: Icons.cleaning_services,
-                color: AppTheme.healthColor,
+                color: RetroColors.blue,
                 onPressed: _cleanPet,
-                feedbackType: FeedbackType.clean,
               ),
             ),
             const SizedBox(width: 12),
             Expanded(
-              child: AnimatedActionButton(
+              child: RetroButton(
                 label: 'Descansar',
                 icon: Icons.bedtime,
-                color: AppTheme.energyColor,
+                color: RetroColors.purple,
                 onPressed: _restPet,
-                feedbackType: FeedbackType.rest,
               ),
             ),
           ],
@@ -289,15 +292,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         icon: const Text('🎮', style: TextStyle(fontSize: 24)),
         label: const Text(
           'Mini-Juegos',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            fontFamily: 'VT323',
+          ),
         ),
         style: ElevatedButton.styleFrom(
           padding: const EdgeInsets.symmetric(vertical: 16),
-          backgroundColor: Colors.purple[400],
-          foregroundColor: Colors.white,
-          elevation: 4,
+          backgroundColor: RetroColors.purple,
+          foregroundColor: RetroColors.light,
+          elevation: 0,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.zero,
+            side: const BorderSide(color: RetroColors.black, width: 2),
           ),
         ),
       ),
@@ -390,11 +398,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Row(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.zero,
+          side: const BorderSide(color: RetroColors.black, width: 2),
+        ),
+        title: Row(
           children: [
-            Text('🎉', style: TextStyle(fontSize: 32)),
-            SizedBox(width: 8),
-            Text('¡Evolución!'),
+            const Text('🎉', style: TextStyle(fontSize: 32)),
+            const SizedBox(width: 8),
+            Text(
+              '¡Evolución!',
+              style: const TextStyle(
+                fontFamily: 'VT323',
+                fontSize: 24,
+                color: RetroColors.dark,
+              ),
+            ),
           ],
         ),
         content: Column(
@@ -402,7 +421,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           children: [
             Text(
               '¡${pet.name} ha evolucionado!',
-              style: const TextStyle(fontSize: 18),
+              style: const TextStyle(
+                fontSize: 18,
+                fontFamily: 'VT323',
+                color: RetroColors.dark,
+              ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),
@@ -411,20 +434,32 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             Text(
               'Ahora es un ${pet.lifeStage.displayName}',
               style: TextStyle(
-                fontSize: 16,
+                fontSize: 18,
                 fontWeight: FontWeight.bold,
                 color: Color(pet.lifeStage.colorValue),
+                fontFamily: 'VT323',
               ),
             ),
           ],
         ),
         actions: [
           FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: RetroColors.green,
+              foregroundColor: RetroColors.dark,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.zero,
+                side: const BorderSide(color: RetroColors.black, width: 2),
+              ),
+            ),
             onPressed: () {
               ref.read(showEvolutionDialogProvider.notifier).hide();
               Navigator.pop(context);
             },
-            child: const Text('¡Genial!'),
+            child: const Text(
+              '¡Genial!',
+              style: TextStyle(fontFamily: 'VT323', fontSize: 18),
+            ),
           ),
         ],
       ),
@@ -437,9 +472,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message),
+        content: Text(message, style: const TextStyle(fontFamily: 'VT323')),
         duration: const Duration(seconds: 2),
         behavior: SnackBarBehavior.floating,
+        backgroundColor: RetroColors.dark,
       ),
     );
   }

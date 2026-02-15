@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'retro_theme.dart';
 
 /// Configuración de tema para la aplicación Tamagotchi
 class AppTheme {
+  static bool useRetroTheme = true;
+
   // Colores principales
   static const Color primaryColor = Color(0xFF6B4CE6);
   static const Color secondaryColor = Color(0xFFFF6B9D);
@@ -19,7 +22,7 @@ class AppTheme {
   static const Color sadColor = Color(0xFF95A5A6);
   static const Color criticalColor = Color(0xFFFF6B6B);
 
-  /// Tema claro de la aplicación
+  /// Tema claro de la aplicación (Moderno)
   static ThemeData lightTheme = ThemeData(
     useMaterial3: true,
     colorScheme: ColorScheme.fromSeed(
@@ -45,6 +48,12 @@ class AppTheme {
       foregroundColor: Colors.white,
     ),
   );
+
+  /// Tema retro pixel-art (Tamagotchi style)
+  static ThemeData get retroTheme => RetroTheme.theme;
+
+  /// Obtener tema actual según configuración
+  static ThemeData get currentTheme => useRetroTheme ? retroTheme : lightTheme;
 
   /// Obtener color según el estado de ánimo
   static Color getMoodColor(String mood) {

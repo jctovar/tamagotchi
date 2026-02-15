@@ -6,6 +6,7 @@ import 'package:flame_splash_screen/flame_splash_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'firebase_options.dart';
 import 'config/theme.dart';
+import 'config/retro_theme.dart';
 import 'screens/main_navigation.dart';
 import 'screens/onboarding_screen.dart';
 import 'services/background_service.dart';
@@ -52,7 +53,7 @@ class TamagotchiApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Tamagotchi',
-      theme: AppTheme.lightTheme,
+      theme: AppTheme.currentTheme,
       debugShowCheckedModeBanner: false,
       navigatorObservers: [AnalyticsService.observer],
       home: const AppInitializer(),
@@ -68,7 +69,7 @@ class AppInitializer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: const Color(0xFFFFB5C0), // Color rosa del splash anterior
+      color: RetroColors.pink,
       child: FlameSplashScreen(
         theme: FlameSplashTheme.white,
         onFinish: (BuildContext context) async {
