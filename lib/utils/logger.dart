@@ -18,9 +18,6 @@ final appLogger = Logger(
 
 /// Logger simplificado sin emojis ni colores (útil para logs de producción)
 final simpleLogger = Logger(
-  printer: SimplePrinter(
-    colors: false,
-    printTime: true,
-  ),
+  printer: SimplePrinter(colors: false, printTime: true),
   level: Level.info,
 );

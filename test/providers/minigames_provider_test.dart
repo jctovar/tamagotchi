@@ -123,9 +123,7 @@ void main() {
 
     test('fromJson usa valores por defecto para campos faltantes', () {
       // Arrange
-      final json = {
-        'gameType': MiniGameType.slidingPuzzle.index,
-      };
+      final json = {'gameType': MiniGameType.slidingPuzzle.index};
 
       // Act
       final stats = GameStats.fromJson(json);
@@ -141,24 +139,27 @@ void main() {
   });
 
   group('MiniGameStats Model', () {
-    test('MiniGameStats se crea con estadísticas vacías para todos los juegos', () {
-      // Act
-      final allStats = MiniGameStats();
+    test(
+      'MiniGameStats se crea con estadísticas vacías para todos los juegos',
+      () {
+        // Act
+        final allStats = MiniGameStats();
 
-      // Assert
-      expect(allStats.stats.length, MiniGameType.values.length);
-      expect(allStats.stats.containsKey(MiniGameType.memory), true);
-      expect(allStats.stats.containsKey(MiniGameType.slidingPuzzle), true);
-      expect(allStats.stats.containsKey(MiniGameType.reactionRace), true);
+        // Assert
+        expect(allStats.stats.length, MiniGameType.values.length);
+        expect(allStats.stats.containsKey(MiniGameType.memory), true);
+        expect(allStats.stats.containsKey(MiniGameType.slidingPuzzle), true);
+        expect(allStats.stats.containsKey(MiniGameType.reactionRace), true);
 
-      // Todas las estadísticas deben estar vacías inicialmente
-      for (final gameType in MiniGameType.values) {
-        final stats = allStats.getStats(gameType);
-        expect(stats.timesPlayed, 0);
-        expect(stats.timesWon, 0);
-        expect(stats.bestScore, 0);
-      }
-    });
+        // Todas las estadísticas deben estar vacías inicialmente
+        for (final gameType in MiniGameType.values) {
+          final stats = allStats.getStats(gameType);
+          expect(stats.timesPlayed, 0);
+          expect(stats.timesWon, 0);
+          expect(stats.bestScore, 0);
+        }
+      },
+    );
 
     test('getStats retorna estadísticas correctas para cada tipo de juego', () {
       // Arrange
@@ -173,10 +174,12 @@ void main() {
         timesWon: 3,
       );
 
-      final allStats = MiniGameStats(stats: {
-        MiniGameType.memory: memoryStats,
-        MiniGameType.slidingPuzzle: puzzleStats,
-      });
+      final allStats = MiniGameStats(
+        stats: {
+          MiniGameType.memory: memoryStats,
+          MiniGameType.slidingPuzzle: puzzleStats,
+        },
+      );
 
       // Act & Assert
       expect(allStats.getStats(MiniGameType.memory).timesPlayed, 10);
@@ -209,7 +212,10 @@ void main() {
       );
 
       // Act
-      final updated = allStats.updateGameStats(MiniGameType.memory, newMemoryStats);
+      final updated = allStats.updateGameStats(
+        MiniGameType.memory,
+        newMemoryStats,
+      );
 
       // Assert
       expect(updated.getStats(MiniGameType.memory).timesPlayed, 5);
@@ -223,20 +229,22 @@ void main() {
 
     test('totalGamesPlayed calcula suma correcta', () {
       // Arrange
-      final allStats = MiniGameStats(stats: {
-        MiniGameType.memory: GameStats(
-          gameType: MiniGameType.memory,
-          timesPlayed: 10,
-        ),
-        MiniGameType.slidingPuzzle: GameStats(
-          gameType: MiniGameType.slidingPuzzle,
-          timesPlayed: 5,
-        ),
-        MiniGameType.reactionRace: GameStats(
-          gameType: MiniGameType.reactionRace,
-          timesPlayed: 8,
-        ),
-      });
+      final allStats = MiniGameStats(
+        stats: {
+          MiniGameType.memory: GameStats(
+            gameType: MiniGameType.memory,
+            timesPlayed: 10,
+          ),
+          MiniGameType.slidingPuzzle: GameStats(
+            gameType: MiniGameType.slidingPuzzle,
+            timesPlayed: 5,
+          ),
+          MiniGameType.reactionRace: GameStats(
+            gameType: MiniGameType.reactionRace,
+            timesPlayed: 8,
+          ),
+        },
+      );
 
       // Act & Assert
       expect(allStats.totalGamesPlayed, 23); // 10 + 5 + 8
@@ -244,23 +252,25 @@ void main() {
 
     test('totalWins calcula suma correcta', () {
       // Arrange
-      final allStats = MiniGameStats(stats: {
-        MiniGameType.memory: GameStats(
-          gameType: MiniGameType.memory,
-          timesPlayed: 10,
-          timesWon: 8,
-        ),
-        MiniGameType.slidingPuzzle: GameStats(
-          gameType: MiniGameType.slidingPuzzle,
-          timesPlayed: 5,
-          timesWon: 3,
-        ),
-        MiniGameType.reactionRace: GameStats(
-          gameType: MiniGameType.reactionRace,
-          timesPlayed: 8,
-          timesWon: 7,
-        ),
-      });
+      final allStats = MiniGameStats(
+        stats: {
+          MiniGameType.memory: GameStats(
+            gameType: MiniGameType.memory,
+            timesPlayed: 10,
+            timesWon: 8,
+          ),
+          MiniGameType.slidingPuzzle: GameStats(
+            gameType: MiniGameType.slidingPuzzle,
+            timesPlayed: 5,
+            timesWon: 3,
+          ),
+          MiniGameType.reactionRace: GameStats(
+            gameType: MiniGameType.reactionRace,
+            timesPlayed: 8,
+            timesWon: 7,
+          ),
+        },
+      );
 
       // Act & Assert
       expect(allStats.totalWins, 18); // 8 + 3 + 7
@@ -268,20 +278,22 @@ void main() {
 
     test('totalXpEarned calcula suma correcta', () {
       // Arrange
-      final allStats = MiniGameStats(stats: {
-        MiniGameType.memory: GameStats(
-          gameType: MiniGameType.memory,
-          totalXpEarned: 200,
-        ),
-        MiniGameType.slidingPuzzle: GameStats(
-          gameType: MiniGameType.slidingPuzzle,
-          totalXpEarned: 150,
-        ),
-        MiniGameType.reactionRace: GameStats(
-          gameType: MiniGameType.reactionRace,
-          totalXpEarned: 300,
-        ),
-      });
+      final allStats = MiniGameStats(
+        stats: {
+          MiniGameType.memory: GameStats(
+            gameType: MiniGameType.memory,
+            totalXpEarned: 200,
+          ),
+          MiniGameType.slidingPuzzle: GameStats(
+            gameType: MiniGameType.slidingPuzzle,
+            totalXpEarned: 150,
+          ),
+          MiniGameType.reactionRace: GameStats(
+            gameType: MiniGameType.reactionRace,
+            totalXpEarned: 300,
+          ),
+        },
+      );
 
       // Act & Assert
       expect(allStats.totalXpEarned, 650); // 200 + 150 + 300
@@ -289,20 +301,22 @@ void main() {
 
     test('totalCoinsEarned calcula suma correcta', () {
       // Arrange
-      final allStats = MiniGameStats(stats: {
-        MiniGameType.memory: GameStats(
-          gameType: MiniGameType.memory,
-          totalCoinsEarned: 50,
-        ),
-        MiniGameType.slidingPuzzle: GameStats(
-          gameType: MiniGameType.slidingPuzzle,
-          totalCoinsEarned: 40,
-        ),
-        MiniGameType.reactionRace: GameStats(
-          gameType: MiniGameType.reactionRace,
-          totalCoinsEarned: 60,
-        ),
-      });
+      final allStats = MiniGameStats(
+        stats: {
+          MiniGameType.memory: GameStats(
+            gameType: MiniGameType.memory,
+            totalCoinsEarned: 50,
+          ),
+          MiniGameType.slidingPuzzle: GameStats(
+            gameType: MiniGameType.slidingPuzzle,
+            totalCoinsEarned: 40,
+          ),
+          MiniGameType.reactionRace: GameStats(
+            gameType: MiniGameType.reactionRace,
+            totalCoinsEarned: 60,
+          ),
+        },
+      );
 
       // Act & Assert
       expect(allStats.totalCoinsEarned, 150); // 50 + 40 + 60
@@ -310,18 +324,20 @@ void main() {
 
     test('toJson serializa todas las estadísticas correctamente', () {
       // Arrange
-      final allStats = MiniGameStats(stats: {
-        MiniGameType.memory: GameStats(
-          gameType: MiniGameType.memory,
-          timesPlayed: 10,
-          timesWon: 8,
-        ),
-        MiniGameType.slidingPuzzle: GameStats(
-          gameType: MiniGameType.slidingPuzzle,
-          timesPlayed: 5,
-          timesWon: 3,
-        ),
-      });
+      final allStats = MiniGameStats(
+        stats: {
+          MiniGameType.memory: GameStats(
+            gameType: MiniGameType.memory,
+            timesPlayed: 10,
+            timesWon: 8,
+          ),
+          MiniGameType.slidingPuzzle: GameStats(
+            gameType: MiniGameType.slidingPuzzle,
+            timesPlayed: 5,
+            timesWon: 3,
+          ),
+        },
+      );
 
       // Act
       final json = allStats.toJson();
@@ -330,7 +346,10 @@ void main() {
       expect(json.containsKey('stats'), true);
       final statsMap = json['stats'] as Map<String, dynamic>;
       expect(statsMap.containsKey(MiniGameType.memory.index.toString()), true);
-      expect(statsMap.containsKey(MiniGameType.slidingPuzzle.index.toString()), true);
+      expect(
+        statsMap.containsKey(MiniGameType.slidingPuzzle.index.toString()),
+        true,
+      );
     });
 
     test('fromJson deserializa todas las estadísticas correctamente', () {
@@ -353,7 +372,7 @@ void main() {
             'totalXpEarned': 100,
             'totalCoinsEarned': 30,
           },
-        }
+        },
       };
 
       // Act
@@ -377,7 +396,7 @@ void main() {
             'timesPlayed': 10,
             'timesWon': 8,
           },
-        }
+        },
       };
 
       // Act
@@ -465,9 +484,18 @@ void main() {
     });
 
     test('description retorna descripciones correctas', () {
-      expect(MiniGameType.memory.description, 'Encuentra las parejas de emojis');
-      expect(MiniGameType.slidingPuzzle.description, 'Ordena los números del 1 al 8');
-      expect(MiniGameType.reactionRace.description, 'Presiona cuando cambie el color');
+      expect(
+        MiniGameType.memory.description,
+        'Encuentra las parejas de emojis',
+      );
+      expect(
+        MiniGameType.slidingPuzzle.description,
+        'Ordena los números del 1 al 8',
+      );
+      expect(
+        MiniGameType.reactionRace.description,
+        'Presiona cuando cambie el color',
+      );
     });
 
     test('icon retorna emojis correctos', () {

@@ -76,18 +76,14 @@ class AIInsightCard extends StatelessWidget {
             children: [
               Text(
                 pet.name,
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 4),
               Row(
                 children: [
-                  Icon(
-                    Icons.favorite,
-                    size: 16,
-                    color: _getBondColor(),
-                  ),
+                  Icon(Icons.favorite, size: 16, color: _getBondColor()),
                   const SizedBox(width: 4),
                   Text(
                     personality.bondLevel.displayName,
@@ -142,9 +138,9 @@ class AIInsightCard extends StatelessWidget {
           Expanded(
             child: Text(
               petMessage,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    fontStyle: FontStyle.italic,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(fontStyle: FontStyle.italic),
             ),
           ),
         ],
@@ -221,9 +217,9 @@ class AIInsightCard extends StatelessWidget {
       children: [
         Text(
           'Personalidad',
-          style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+          style: Theme.of(
+            context,
+          ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 8),
         Wrap(
@@ -283,8 +279,8 @@ class AIInsightCard extends StatelessWidget {
     final pointsNeeded = nextLevel.requiredInteractions;
     final currentPoints = personality.bondPoints;
     final previousRequired = personality.bondLevel.requiredInteractions;
-    final progress = (currentPoints - previousRequired) /
-        (pointsNeeded - previousRequired);
+    final progress =
+        (currentPoints - previousRequired) / (pointsNeeded - previousRequired);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -294,17 +290,11 @@ class AIInsightCard extends StatelessWidget {
           children: [
             Text(
               'Siguiente: ${nextLevel.displayName}',
-              style: TextStyle(
-                fontSize: 11,
-                color: Colors.grey.shade600,
-              ),
+              style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
             ),
             Text(
               '$currentPoints/$pointsNeeded',
-              style: TextStyle(
-                fontSize: 11,
-                color: Colors.grey.shade600,
-              ),
+              style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
             ),
           ],
         ),
@@ -353,56 +343,5 @@ class AIInsightCard extends StatelessWidget {
       case BondLevel.soulmate:
         return Colors.pink;
     }
-  }
-}
-
-/// Widget compacto para mostrar solo el estado emocional y mensaje
-class AICompactInsight extends StatelessWidget {
-  final Pet pet;
-  final PetPersonality personality;
-  final String petMessage;
-
-  const AICompactInsight({
-    super.key,
-    required this.pet,
-    required this.personality,
-    required this.petMessage,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Text(
-            personality.emotionalState.emoji,
-            style: const TextStyle(fontSize: 24),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              petMessage,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    fontStyle: FontStyle.italic,
-                  ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-        ],
-      ),
-    );
   }
 }

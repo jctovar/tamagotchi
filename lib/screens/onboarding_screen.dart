@@ -44,12 +44,7 @@ class OnboardingScreen extends StatelessWidget {
                 color: Theme.of(context).colorScheme.primaryContainer,
                 shape: BoxShape.circle,
               ),
-              child: Center(
-                child: Text(
-                  '😊',
-                  style: TextStyle(fontSize: 100),
-                ),
-              ),
+              child: Center(child: Text('😊', style: TextStyle(fontSize: 100))),
             ),
           ),
           decoration: PageDecoration(
@@ -75,14 +70,22 @@ class OnboardingScreen extends StatelessWidget {
                   children: [
                     _buildActionIcon(context, Icons.restaurant, Colors.orange),
                     SizedBox(width: 16),
-                    _buildActionIcon(context, Icons.sports_esports, Colors.blue),
+                    _buildActionIcon(
+                      context,
+                      Icons.sports_esports,
+                      Colors.blue,
+                    ),
                   ],
                 ),
                 SizedBox(height: 16),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    _buildActionIcon(context, Icons.cleaning_services, Colors.green),
+                    _buildActionIcon(
+                      context,
+                      Icons.cleaning_services,
+                      Colors.green,
+                    ),
                     SizedBox(width: 16),
                     _buildActionIcon(context, Icons.bedtime, Colors.purple),
                   ],
@@ -117,10 +120,7 @@ class OnboardingScreen extends StatelessWidget {
                     border: Border.all(color: Colors.pink, width: 3),
                   ),
                   child: Center(
-                    child: Text(
-                      '😊',
-                      style: TextStyle(fontSize: 100),
-                    ),
+                    child: Text('😊', style: TextStyle(fontSize: 100)),
                   ),
                 ),
                 Positioned(
@@ -172,10 +172,7 @@ class OnboardingScreen extends StatelessWidget {
                     border: Border.all(color: Colors.red, width: 3),
                   ),
                   child: Center(
-                    child: Text(
-                      '😵',
-                      style: TextStyle(fontSize: 100),
-                    ),
+                    child: Text('😵', style: TextStyle(fontSize: 100)),
                   ),
                 ),
                 SizedBox(height: 20),
@@ -189,7 +186,10 @@ class OnboardingScreen extends StatelessWidget {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.warning_amber_rounded, color: Colors.red.shade700),
+                      Icon(
+                        Icons.warning_amber_rounded,
+                        color: Colors.red.shade700,
+                      ),
                       SizedBox(width: 8),
                       Text(
                         '¡Tu mascota necesita\natención!',
@@ -235,11 +235,7 @@ class OnboardingScreen extends StatelessWidget {
                 shape: BoxShape.circle,
               ),
               child: Center(
-                child: Icon(
-                  Icons.pets,
-                  size: 100,
-                  color: Colors.white,
-                ),
+                child: Icon(Icons.pets, size: 100, color: Colors.white),
               ),
             ),
           ),
@@ -259,7 +255,10 @@ class OnboardingScreen extends StatelessWidget {
       showSkipButton: true,
       skip: const Text('Saltar', style: TextStyle(fontWeight: FontWeight.w600)),
       next: const Icon(Icons.arrow_forward),
-      done: const Text('Comenzar', style: TextStyle(fontWeight: FontWeight.w600)),
+      done: const Text(
+        'Comenzar',
+        style: TextStyle(fontWeight: FontWeight.w600),
+      ),
       dotsDecorator: DotsDecorator(
         size: const Size.square(10.0),
         activeSize: const Size(20.0, 10.0),

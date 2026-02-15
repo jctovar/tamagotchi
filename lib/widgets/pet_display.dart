@@ -9,11 +9,7 @@ class PetDisplay extends StatefulWidget {
   final Pet pet;
   final PetPreferences? preferences;
 
-  const PetDisplay({
-    super.key,
-    required this.pet,
-    this.preferences,
-  });
+  const PetDisplay({super.key, required this.pet, this.preferences});
 
   @override
   State<PetDisplay> createState() => _PetDisplayState();
@@ -35,12 +31,7 @@ class _PetDisplayState extends State<PetDisplay>
     _scaleAnimation = Tween<double>(
       begin: 1.0,
       end: 1.05,
-    ).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: Curves.easeInOut,
-      ),
-    );
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
 
   @override
@@ -60,10 +51,7 @@ class _PetDisplayState extends State<PetDisplay>
           children: [
             const PetNameDisplay(
               editable: true,
-              textStyle: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
+              textStyle: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             _buildLevelIndicator(),
@@ -95,10 +83,7 @@ class _PetDisplayState extends State<PetDisplay>
             decoration: BoxDecoration(
               color: petColor.withValues(alpha: 0.2),
               shape: BoxShape.circle,
-              border: Border.all(
-                color: petColor,
-                width: 3,
-              ),
+              border: Border.all(color: petColor, width: 3),
             ),
             child: Center(
               child: Text(
@@ -124,10 +109,7 @@ class _PetDisplayState extends State<PetDisplay>
                     ),
                   ],
                 ),
-                child: Text(
-                  accessory,
-                  style: const TextStyle(fontSize: 32),
-                ),
+                child: Text(accessory, style: const TextStyle(fontSize: 32)),
               ),
             ),
         ],
@@ -142,19 +124,12 @@ class _PetDisplayState extends State<PetDisplay>
       decoration: BoxDecoration(
         color: _getMoodColor().withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: _getMoodColor(),
-          width: 2,
-        ),
+        border: Border.all(color: _getMoodColor(), width: 2),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            _getMoodIcon(),
-            color: _getMoodColor(),
-            size: 20,
-          ),
+          Icon(_getMoodIcon(), color: _getMoodColor(), size: 20),
           const SizedBox(width: 8),
           Text(
             _getMoodText(),
@@ -252,18 +227,12 @@ class _PetDisplayState extends State<PetDisplay>
             const SizedBox(width: 4),
             Text(
               'Nivel ${widget.pet.level}',
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-              ),
+              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
             ),
             const SizedBox(width: 8),
             Text(
               '${widget.pet.experience} XP',
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey[600],
-              ),
+              style: TextStyle(fontSize: 12, color: Colors.grey[600]),
             ),
           ],
         ),

@@ -8,8 +8,9 @@ import '../models/life_stage.dart';
 /// de comportamiento y engagement en la aplicación Tamagotchi.
 class AnalyticsService {
   static final FirebaseAnalytics _analytics = FirebaseAnalytics.instance;
-  static final FirebaseAnalyticsObserver observer =
-      FirebaseAnalyticsObserver(analytics: _analytics);
+  static final FirebaseAnalyticsObserver observer = FirebaseAnalyticsObserver(
+    analytics: _analytics,
+  );
 
   // ==================== Eventos de Ciclo de Vida ====================
 
@@ -32,9 +33,7 @@ class AnalyticsService {
   static Future<void> logOnboardingCompleted() async {
     await _analytics.logEvent(
       name: 'onboarding_completed',
-      parameters: {
-        'timestamp': DateTime.now().toIso8601String(),
-      },
+      parameters: {'timestamp': DateTime.now().toIso8601String()},
     );
   }
 
@@ -117,10 +116,7 @@ class AnalyticsService {
   }) async {
     await _analytics.logEvent(
       name: 'pet_renamed',
-      parameters: {
-        'old_name': oldName,
-        'new_name': newName,
-      },
+      parameters: {'old_name': oldName, 'new_name': newName},
     );
   }
 
@@ -131,10 +127,7 @@ class AnalyticsService {
   }) async {
     await _analytics.logEvent(
       name: 'pet_color_changed',
-      parameters: {
-        'new_color': newColor,
-        'coins_spent': coinsSpent,
-      },
+      parameters: {'new_color': newColor, 'coins_spent': coinsSpent},
     );
   }
 
@@ -145,10 +138,7 @@ class AnalyticsService {
   }) async {
     await _analytics.logEvent(
       name: 'accessory_purchased',
-      parameters: {
-        'accessory_type': accessoryType,
-        'coins_spent': coinsSpent,
-      },
+      parameters: {'accessory_type': accessoryType, 'coins_spent': coinsSpent},
     );
   }
 
@@ -225,14 +215,10 @@ class AnalyticsService {
   // ==================== Eventos de Mini-Juegos ====================
 
   /// Registra cuando el usuario inicia un mini-juego
-  static Future<void> logMinigameStarted({
-    required String gameType,
-  }) async {
+  static Future<void> logMinigameStarted({required String gameType}) async {
     await _analytics.logEvent(
       name: 'minigame_started',
-      parameters: {
-        'game_type': gameType,
-      },
+      parameters: {'game_type': gameType},
     );
   }
 
@@ -296,9 +282,7 @@ class AnalyticsService {
   }) async {
     await _analytics.logEvent(
       name: 'notification_shown',
-      parameters: {
-        'notification_type': notificationType,
-      },
+      parameters: {'notification_type': notificationType},
     );
   }
 
@@ -308,9 +292,7 @@ class AnalyticsService {
   }) async {
     await _analytics.logEvent(
       name: 'notification_opened',
-      parameters: {
-        'notification_type': notificationType,
-      },
+      parameters: {'notification_type': notificationType},
     );
   }
 
@@ -368,10 +350,7 @@ class AnalyticsService {
   }) async {
     await _analytics.logEvent(
       name: 'coins_earned',
-      parameters: {
-        'amount': amount,
-        'source': source,
-      },
+      parameters: {'amount': amount, 'source': source},
     );
   }
 
@@ -435,10 +414,7 @@ class AnalyticsService {
   }) async {
     await _analytics.logEvent(
       name: 'ml_fallback',
-      parameters: {
-        'model_name': modelName,
-        'reason': reason,
-      },
+      parameters: {'model_name': modelName, 'reason': reason},
     );
   }
 

@@ -25,11 +25,11 @@ enum InteractionType {
 
 /// Contexto temporal de una interacción
 enum TimeOfDay {
-  earlyMorning(0, 6, 'Madrugada', '🌙'),     // 00:00 - 05:59
-  morning(6, 12, 'Mañana', '🌅'),            // 06:00 - 11:59
-  afternoon(12, 18, 'Tarde', '☀️'),          // 12:00 - 17:59
-  evening(18, 21, 'Noche', '🌆'),            // 18:00 - 20:59
-  night(21, 24, 'Noche tarde', '🌙');        // 21:00 - 23:59
+  earlyMorning(0, 6, 'Madrugada', '🌙'), // 00:00 - 05:59
+  morning(6, 12, 'Mañana', '🌅'), // 06:00 - 11:59
+  afternoon(12, 18, 'Tarde', '☀️'), // 12:00 - 17:59
+  evening(18, 21, 'Noche', '🌆'), // 18:00 - 20:59
+  night(21, 24, 'Noche tarde', '🌙'); // 21:00 - 23:59
 
   final int startHour;
   final int endHour;
@@ -75,8 +75,8 @@ class Interaction {
     required this.energyBefore,
     required this.healthBefore,
     this.metadata,
-  })  : timeOfDay = TimeOfDay.fromHour(timestamp.hour),
-        dayOfWeek = timestamp.weekday;
+  }) : timeOfDay = TimeOfDay.fromHour(timestamp.hour),
+       dayOfWeek = timestamp.weekday;
 
   /// Crea una interacción con el timestamp actual
   factory Interaction.now({
@@ -133,17 +133,17 @@ class Interaction {
   /// Verifica si la interacción fue reactiva (mascota en estado crítico)
   bool get wasReactive {
     return hungerBefore > 70 ||
-           happinessBefore < 30 ||
-           energyBefore < 30 ||
-           healthBefore < 40;
+        happinessBefore < 30 ||
+        energyBefore < 30 ||
+        healthBefore < 40;
   }
 
   /// Verifica si la interacción fue proactiva (mascota en buen estado)
   bool get wasProactive {
     return hungerBefore < 50 &&
-           happinessBefore > 50 &&
-           energyBefore > 50 &&
-           healthBefore > 60;
+        happinessBefore > 50 &&
+        energyBefore > 50 &&
+        healthBefore > 60;
   }
 }
 
@@ -160,21 +160,22 @@ class InteractionHistory {
   final Map<TimeOfDay, int> timeOfDayDistribution;
   final Map<int, int> dayOfWeekDistribution;
 
-  InteractionHistory({
-    List<Interaction>? interactions,
-  })  : interactions = interactions ?? [],
-        firstInteraction = interactions?.isNotEmpty == true
-            ? interactions!.first.timestamp
-            : null,
-        lastInteraction = interactions?.isNotEmpty == true
-            ? interactions!.last.timestamp
-            : null,
-        interactionCounts = _countByType(interactions ?? []),
-        timeOfDayDistribution = _countByTimeOfDay(interactions ?? []),
-        dayOfWeekDistribution = _countByDayOfWeek(interactions ?? []);
+  InteractionHistory({List<Interaction>? interactions})
+    : interactions = interactions ?? [],
+      firstInteraction = interactions?.isNotEmpty == true
+          ? interactions!.first.timestamp
+          : null,
+      lastInteraction = interactions?.isNotEmpty == true
+          ? interactions!.last.timestamp
+          : null,
+      interactionCounts = _countByType(interactions ?? []),
+      timeOfDayDistribution = _countByTimeOfDay(interactions ?? []),
+      dayOfWeekDistribution = _countByDayOfWeek(interactions ?? []);
 
   /// Cuenta interacciones por tipo
-  static Map<InteractionType, int> _countByType(List<Interaction> interactions) {
+  static Map<InteractionType, int> _countByType(
+    List<Interaction> interactions,
+  ) {
     final counts = <InteractionType, int>{};
     for (final type in InteractionType.values) {
       counts[type] = 0;
@@ -308,9 +309,7 @@ class InteractionHistory {
 
   /// Convierte a JSON para persistencia
   Map<String, dynamic> toJson() {
-    return {
-      'interactions': interactions.map((i) => i.toJson()).toList(),
-    };
+    return {'interactions': interactions.map((i) => i.toJson()).toList()};
   }
 
   /// Crea desde JSON

@@ -29,25 +29,15 @@ class PetNameDisplay extends ConsumerWidget {
     final petAsync = ref.watch(petStateProvider);
 
     return petAsync.when(
-      loading: () => Text(
-        'Cargando...',
-        style: textStyle,
-        textAlign: textAlign,
-      ),
-      error: (err, stack) => Text(
-        'Error',
-        style: textStyle,
-        textAlign: textAlign,
-      ),
+      loading: () =>
+          Text('Cargando...', style: textStyle, textAlign: textAlign),
+      error: (err, stack) =>
+          Text('Error', style: textStyle, textAlign: textAlign),
       data: (pet) {
         final petName = pet.name;
 
         if (!editable) {
-          return Text(
-            petName,
-            style: textStyle,
-            textAlign: textAlign,
-          );
+          return Text(petName, style: textStyle, textAlign: textAlign);
         }
 
         return InkWell(
@@ -71,7 +61,8 @@ class PetNameDisplay extends ConsumerWidget {
                 Icon(
                   Icons.edit,
                   size: (textStyle?.fontSize ?? 14) * 0.8,
-                  color: textStyle?.color?.withValues(alpha: 0.6) ??
+                  color:
+                      textStyle?.color?.withValues(alpha: 0.6) ??
                       Colors.grey[600],
                 ),
               ],
@@ -83,8 +74,7 @@ class PetNameDisplay extends ConsumerWidget {
   }
 
   /// Muestra el diálogo para renombrar la mascota
-  Future<void> _showRenameDialog(
-      BuildContext context, WidgetRef ref) async {
+  Future<void> _showRenameDialog(BuildContext context, WidgetRef ref) async {
     final pet = ref.read(petStateProvider).value;
     if (pet == null) return;
 

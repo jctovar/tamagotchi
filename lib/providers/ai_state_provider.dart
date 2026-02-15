@@ -1,5 +1,4 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/interaction_history.dart';
 import '../models/pet_personality.dart';
 import '../services/ai_service.dart';

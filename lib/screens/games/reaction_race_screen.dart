@@ -115,7 +115,9 @@ class _ReactionRaceScreenState extends ConsumerState<ReactionRaceScreen> {
       });
     } else if (_gameState == GameState.react) {
       // Calcular tiempo de reacción desde que cambió a verde
-      final reactionTime = DateTime.now().difference(_targetTime!).inMilliseconds;
+      final reactionTime = DateTime.now()
+          .difference(_targetTime!)
+          .inMilliseconds;
       _reactionTimes.add(reactionTime);
 
       FeedbackService.playHaptic(FeedbackType.success);
@@ -148,7 +150,8 @@ class _ReactionRaceScreenState extends ConsumerState<ReactionRaceScreen> {
     }
 
     final duration = DateTime.now().difference(_gameStartTime);
-    final avgReactionTime = _reactionTimes.reduce((a, b) => a + b) / _reactionTimes.length;
+    final avgReactionTime =
+        _reactionTimes.reduce((a, b) => a + b) / _reactionTimes.length;
 
     // Calcular puntuación: base menos penalización por tiempo promedio
     final baseScore = 1000;
@@ -239,7 +242,9 @@ class _ReactionRaceScreenState extends ConsumerState<ReactionRaceScreen> {
           FilledButton(
             onPressed: () async {
               // Actualizar estadísticas y recompensas automáticamente vía provider
-              await ref.read(miniGameStatsStateProvider.notifier).updateStats(result);
+              await ref
+                  .read(miniGameStatsStateProvider.notifier)
+                  .updateStats(result);
 
               // Navegar de vuelta y mostrar mensaje
               if (mounted) {
@@ -347,7 +352,9 @@ class _ReactionRaceScreenState extends ConsumerState<ReactionRaceScreen> {
                       LinearProgressIndicator(
                         value: _currentRound / _totalRounds,
                         backgroundColor: Colors.grey[300],
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.orange[700]!),
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          Colors.orange[700]!,
+                        ),
                       ),
                     ],
                   ),
@@ -356,11 +363,7 @@ class _ReactionRaceScreenState extends ConsumerState<ReactionRaceScreen> {
               const SizedBox(height: 32),
 
               // Área de juego
-              Expanded(
-                child: Center(
-                  child: _buildGameArea(),
-                ),
-              ),
+              Expanded(child: Center(child: _buildGameArea())),
 
               // Tiempos de reacción
               if (_reactionTimes.isNotEmpty) _buildReactionTimesList(),
@@ -472,8 +475,8 @@ class _ReactionRaceScreenState extends ConsumerState<ReactionRaceScreen> {
                 final color = time < 300
                     ? Colors.green
                     : time < 500
-                        ? Colors.orange
-                        : Colors.red;
+                    ? Colors.orange
+                    : Colors.red;
 
                 return Chip(
                   label: Text(

@@ -81,42 +81,48 @@ void main() {
       expect(description, contains('glotón'));
     });
 
-    test('updateFromInteraction incrementa bondPoints por interacción normal', () {
-      // Arrange
-      final personality = PetPersonality(bondPoints: 10);
-      final interaction = Interaction.now(
-        type: InteractionType.feed,
-        hungerBefore: 50,
-        happinessBefore: 70,
-        energyBefore: 60,
-        healthBefore: 80,
-      );
+    test(
+      'updateFromInteraction incrementa bondPoints por interacción normal',
+      () {
+        // Arrange
+        final personality = PetPersonality(bondPoints: 10);
+        final interaction = Interaction.now(
+          type: InteractionType.feed,
+          hungerBefore: 50,
+          happinessBefore: 70,
+          energyBefore: 60,
+          healthBefore: 80,
+        );
 
-      // Act
-      final updated = personality.updateFromInteraction(interaction);
+        // Act
+        final updated = personality.updateFromInteraction(interaction);
 
-      // Assert
-      expect(updated.bondPoints, 11); // +1 por interacción
-    });
+        // Assert
+        expect(updated.bondPoints, 11); // +1 por interacción
+      },
+    );
 
-    test('updateFromInteraction incrementa bondPoints extra por cuidado proactivo', () {
-      // Arrange
-      final personality = PetPersonality(bondPoints: 10);
-      final proactiveInteraction = Interaction.now(
-        type: InteractionType.feed,
-        hungerBefore: 30, // < 50
-        happinessBefore: 80, // > 50
-        energyBefore: 70, // > 50
-        healthBefore: 90, // > 60
-      );
+    test(
+      'updateFromInteraction incrementa bondPoints extra por cuidado proactivo',
+      () {
+        // Arrange
+        final personality = PetPersonality(bondPoints: 10);
+        final proactiveInteraction = Interaction.now(
+          type: InteractionType.feed,
+          hungerBefore: 30, // < 50
+          happinessBefore: 80, // > 50
+          energyBefore: 70, // > 50
+          healthBefore: 90, // > 60
+        );
 
-      // Act
-      final updated = personality.updateFromInteraction(proactiveInteraction);
+        // Act
+        final updated = personality.updateFromInteraction(proactiveInteraction);
 
-      // Assert
-      // Debe ser 10 + 1 (interacción) + 2 (proactivo) = 13
-      expect(updated.bondPoints, 13);
-    });
+        // Assert
+        // Debe ser 10 + 1 (interacción) + 2 (proactivo) = 13
+        expect(updated.bondPoints, 13);
+      },
+    );
 
     test('updateFromInteraction de tipo play aumenta trait playful', () {
       // Arrange
@@ -134,46 +140,54 @@ void main() {
       final updated = personality.updateFromInteraction(playInteraction);
 
       // Assert
-      expect(updated.getTraitIntensity(PersonalityTrait.playful),
-             greaterThan(initialPlayful));
-    });
-
-    test('updateFromInteraction de tipo minigame da puntos extra de vínculo', () {
-      // Arrange
-      final personality = PetPersonality(bondPoints: 10);
-      final minigameInteraction = Interaction.now(
-        type: InteractionType.minigame,
-        hungerBefore: 50,
-        happinessBefore: 70,
-        energyBefore: 60,
-        healthBefore: 80,
+      expect(
+        updated.getTraitIntensity(PersonalityTrait.playful),
+        greaterThan(initialPlayful),
       );
-
-      // Act
-      final updated = personality.updateFromInteraction(minigameInteraction);
-
-      // Assert
-      // 10 + 1 (interacción) + 3 (mini-juego) = 14
-      expect(updated.bondPoints, 14);
     });
 
-    test('updateFromInteraction no incrementa bondPoints para appOpen/appClose', () {
-      // Arrange
-      final personality = PetPersonality(bondPoints: 10);
-      final appOpenInteraction = Interaction.now(
-        type: InteractionType.appOpen,
-        hungerBefore: 50,
-        happinessBefore: 70,
-        energyBefore: 60,
-        healthBefore: 80,
-      );
+    test(
+      'updateFromInteraction de tipo minigame da puntos extra de vínculo',
+      () {
+        // Arrange
+        final personality = PetPersonality(bondPoints: 10);
+        final minigameInteraction = Interaction.now(
+          type: InteractionType.minigame,
+          hungerBefore: 50,
+          happinessBefore: 70,
+          energyBefore: 60,
+          healthBefore: 80,
+        );
 
-      // Act
-      final updated = personality.updateFromInteraction(appOpenInteraction);
+        // Act
+        final updated = personality.updateFromInteraction(minigameInteraction);
 
-      // Assert
-      expect(updated.bondPoints, 10); // No cambia
-    });
+        // Assert
+        // 10 + 1 (interacción) + 3 (mini-juego) = 14
+        expect(updated.bondPoints, 14);
+      },
+    );
+
+    test(
+      'updateFromInteraction no incrementa bondPoints para appOpen/appClose',
+      () {
+        // Arrange
+        final personality = PetPersonality(bondPoints: 10);
+        final appOpenInteraction = Interaction.now(
+          type: InteractionType.appOpen,
+          hungerBefore: 50,
+          happinessBefore: 70,
+          energyBefore: 60,
+          healthBefore: 80,
+        );
+
+        // Act
+        final updated = personality.updateFromInteraction(appOpenInteraction);
+
+        // Assert
+        expect(updated.bondPoints, 10); // No cambia
+      },
+    );
 
     test('updateEmotionalState calcula estado happy con métricas buenas', () {
       // Arrange
@@ -189,11 +203,14 @@ void main() {
       );
 
       // Assert
-      expect(updated.emotionalState, isIn([
-        EmotionalState.ecstatic,
-        EmotionalState.happy,
-        EmotionalState.content,
-      ]));
+      expect(
+        updated.emotionalState,
+        isIn([
+          EmotionalState.ecstatic,
+          EmotionalState.happy,
+          EmotionalState.content,
+        ]),
+      );
     });
 
     test('updateEmotionalState calcula estado negativo con métricas malas', () {
@@ -210,12 +227,15 @@ void main() {
       );
 
       // Assert
-      expect(updated.emotionalState, isIn([
-        EmotionalState.anxious,
-        EmotionalState.lonely,
-        EmotionalState.sad,
-        EmotionalState.bored,
-      ]));
+      expect(
+        updated.emotionalState,
+        isIn([
+          EmotionalState.anxious,
+          EmotionalState.lonely,
+          EmotionalState.sad,
+          EmotionalState.bored,
+        ]),
+      );
     });
 
     test('toJson serializa correctamente', () {
@@ -245,10 +265,7 @@ void main() {
     test('fromJson deserializa correctamente', () {
       // Arrange
       final json = <String, dynamic>{
-        'traits': {
-          'playful': 75.0,
-          'calm': 55.0,
-        },
+        'traits': {'playful': 75.0, 'calm': 55.0},
         'emotionalState': 'content',
         'bondLevel': 'acquaintance',
         'bondPoints': 80,
@@ -470,36 +487,39 @@ void main() {
       expect(history.timeOfDayDistribution.length, TimeOfDay.values.length);
     });
 
-    test('InteractionHistory con interacciones calcula timestamps correctamente', () {
-      // Arrange
-      final now = DateTime.now();
-      final interactions = [
-        Interaction(
-          type: InteractionType.feed,
-          timestamp: now.subtract(const Duration(hours: 2)),
-          hungerBefore: 60,
-          happinessBefore: 70,
-          energyBefore: 50,
-          healthBefore: 90,
-        ),
-        Interaction(
-          type: InteractionType.play,
-          timestamp: now,
-          hungerBefore: 50,
-          happinessBefore: 80,
-          energyBefore: 60,
-          healthBefore: 90,
-        ),
-      ];
+    test(
+      'InteractionHistory con interacciones calcula timestamps correctamente',
+      () {
+        // Arrange
+        final now = DateTime.now();
+        final interactions = [
+          Interaction(
+            type: InteractionType.feed,
+            timestamp: now.subtract(const Duration(hours: 2)),
+            hungerBefore: 60,
+            happinessBefore: 70,
+            energyBefore: 50,
+            healthBefore: 90,
+          ),
+          Interaction(
+            type: InteractionType.play,
+            timestamp: now,
+            hungerBefore: 50,
+            happinessBefore: 80,
+            energyBefore: 60,
+            healthBefore: 90,
+          ),
+        ];
 
-      // Act
-      final history = InteractionHistory(interactions: interactions);
+        // Act
+        final history = InteractionHistory(interactions: interactions);
 
-      // Assert
-      expect(history.interactions.length, 2);
-      expect(history.firstInteraction, interactions[0].timestamp);
-      expect(history.lastInteraction, interactions[1].timestamp);
-    });
+        // Assert
+        expect(history.interactions.length, 2);
+        expect(history.firstInteraction, interactions[0].timestamp);
+        expect(history.lastInteraction, interactions[1].timestamp);
+      },
+    );
 
     test('interactionCounts cuenta correctamente por tipo', () {
       // Arrange

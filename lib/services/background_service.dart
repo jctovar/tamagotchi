@@ -11,9 +11,7 @@ class BackgroundService {
 
   /// Inicializa WorkManager
   static Future<void> initialize() async {
-    await Workmanager().initialize(
-      callbackDispatcher,
-    );
+    await Workmanager().initialize(callbackDispatcher);
     debugPrint('🔧 WorkManager inicializado');
   }
 
@@ -34,7 +32,9 @@ class BackgroundService {
       backoffPolicy: BackoffPolicy.linear,
       backoffPolicyDelay: const Duration(minutes: 5),
     );
-    debugPrint('📅 Tarea periódica registrada: cada ${AppConstants.backgroundUpdateInterval} minutos');
+    debugPrint(
+      '📅 Tarea periódica registrada: cada ${AppConstants.backgroundUpdateInterval} minutos',
+    );
   }
 
   /// Cancela todas las tareas
@@ -67,12 +67,16 @@ void callbackDispatcher() {
         return Future.value(true);
       }
 
-      debugPrint('📊 Estado antes de actualizar - Hambre: ${savedPet.hunger}, Felicidad: ${savedPet.happiness}');
+      debugPrint(
+        '📊 Estado antes de actualizar - Hambre: ${savedPet.hunger}, Felicidad: ${savedPet.happiness}',
+      );
 
       // Actualizar métricas basado en tiempo transcurrido
       final updatedPet = storageService.updatePetMetrics(savedPet);
 
-      debugPrint('📊 Estado después de actualizar - Hambre: ${updatedPet.hunger}, Felicidad: ${updatedPet.happiness}');
+      debugPrint(
+        '📊 Estado después de actualizar - Hambre: ${updatedPet.hunger}, Felicidad: ${updatedPet.happiness}',
+      );
 
       // Guardar estado actualizado
       await storageService.saveState(updatedPet);

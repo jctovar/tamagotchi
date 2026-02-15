@@ -65,8 +65,9 @@ class PreferencesService {
   /// Actualiza estado de notificaciones
   static Future<void> updateNotificationsEnabled(bool enabled) async {
     final preferences = await loadPreferences();
-    final updatedPreferences =
-        preferences.copyWith(notificationsEnabled: enabled);
+    final updatedPreferences = preferences.copyWith(
+      notificationsEnabled: enabled,
+    );
     await savePreferences(updatedPreferences);
   }
 

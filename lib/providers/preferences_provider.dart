@@ -82,7 +82,8 @@ class PreferencesState extends _$PreferencesState {
     await PreferencesService.updateAccessory(defaultPrefs.accessory);
     await PreferencesService.updateSoundEnabled(defaultPrefs.soundEnabled);
     await PreferencesService.updateNotificationsEnabled(
-        defaultPrefs.notificationsEnabled);
+      defaultPrefs.notificationsEnabled,
+    );
 
     state = const AsyncValue.data(PetPreferences());
   }

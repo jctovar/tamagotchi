@@ -1,5 +1,4 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/minigame_stats.dart';
 import '../services/analytics_service.dart';
 import 'services_provider.dart';
@@ -39,10 +38,9 @@ class MiniGameStatsState extends _$MiniGameStatsState {
     state = AsyncValue.data(updatedStats);
 
     // 3. Otorgar recompensas al pet (XP y monedas)
-    await ref.read(petStateProvider.notifier).addRewards(
-          xp: result.xpEarned,
-          coins: result.coinsEarned,
-        );
+    await ref
+        .read(petStateProvider.notifier)
+        .addRewards(xp: result.xpEarned, coins: result.coinsEarned);
 
     // 4. Registrar eventos en Analytics
     await AnalyticsService.logMinigameCompleted(

@@ -8,10 +8,7 @@ class CoinsDisplay extends StatelessWidget {
   /// Cantidad de monedas a mostrar
   final int coins;
 
-  const CoinsDisplay({
-    super.key,
-    required this.coins,
-  });
+  const CoinsDisplay({super.key, required this.coins});
 
   @override
   Widget build(BuildContext context) {
@@ -28,10 +25,7 @@ class CoinsDisplay extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text(
-                '🪙',
-                style: TextStyle(fontSize: 18),
-              ),
+              const Text('🪙', style: TextStyle(fontSize: 18)),
               const SizedBox(width: 4),
               Text(
                 coins.toString(),

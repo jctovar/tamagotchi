@@ -13,10 +13,7 @@ void main() {
     group('Estructura de datos esperada', () {
       test('debería retornar una lista de CreditModel', () {
         // Este test valida que el tipo de retorno es correcto
-        expect(
-          Services.readJsonCredits(),
-          isA<Future<List<CreditModel>>>(),
-        );
+        expect(Services.readJsonCredits(), isA<Future<List<CreditModel>>>());
       });
     });
 
@@ -29,25 +26,28 @@ void main() {
               'credit_id': 1,
               'credit_name': 'Development',
               'credit_members': 'Developer Names',
-            }
-          ]
+            },
+          ],
         };
 
         expect(expectedStructure, contains('RECORDS'));
         expect(expectedStructure['RECORDS'], isA<List>());
       });
 
-      test('cada registro debe tener credit_id, credit_name, credit_members', () {
-        final record = {
-          'credit_id': 1,
-          'credit_name': 'Team Name',
-          'credit_members': 'Member Names',
-        };
+      test(
+        'cada registro debe tener credit_id, credit_name, credit_members',
+        () {
+          final record = {
+            'credit_id': 1,
+            'credit_name': 'Team Name',
+            'credit_members': 'Member Names',
+          };
 
-        expect(record, contains('credit_id'));
-        expect(record, contains('credit_name'));
-        expect(record, contains('credit_members'));
-      });
+          expect(record, contains('credit_id'));
+          expect(record, contains('credit_name'));
+          expect(record, contains('credit_members'));
+        },
+      );
     });
 
     group('Casos de uso del modelo', () {
@@ -82,11 +82,7 @@ void main() {
             creditName: 'Design',
             creditMembers: 'Designers',
           ),
-          CreditModel(
-            creditId: 3,
-            creditName: 'QA',
-            creditMembers: 'Testers',
-          ),
+          CreditModel(creditId: 3, creditName: 'QA', creditMembers: 'Testers'),
         ];
 
         expect(credits.length, 3);
@@ -225,7 +221,11 @@ void main() {
 
       test('puede buscar créditos por nombre', () {
         final credits = [
-          CreditModel(creditId: 1, creditName: 'Development', creditMembers: 'A'),
+          CreditModel(
+            creditId: 1,
+            creditName: 'Development',
+            creditMembers: 'A',
+          ),
           CreditModel(creditId: 2, creditName: 'Design', creditMembers: 'B'),
           CreditModel(creditId: 3, creditName: 'QA', creditMembers: 'C'),
         ];

@@ -45,7 +45,10 @@ void main() {
       expect(PersonalityTrait.playful.displayName, 'Juguetón');
       expect(PersonalityTrait.playful.emoji, '🎮');
       expect(PersonalityTrait.cuddly.displayName, 'Cariñoso');
-      expect(PersonalityTrait.anxious.description, 'Se preocupa cuando no recibe atención');
+      expect(
+        PersonalityTrait.anxious.description,
+        'Se preocupa cuando no recibe atención',
+      );
     });
   });
 
@@ -60,9 +63,18 @@ void main() {
     });
 
     test('valores están ordenados de mayor a menor felicidad', () {
-      expect(EmotionalState.ecstatic.value, greaterThan(EmotionalState.happy.value));
-      expect(EmotionalState.happy.value, greaterThan(EmotionalState.content.value));
-      expect(EmotionalState.content.value, greaterThan(EmotionalState.neutral.value));
+      expect(
+        EmotionalState.ecstatic.value,
+        greaterThan(EmotionalState.happy.value),
+      );
+      expect(
+        EmotionalState.happy.value,
+        greaterThan(EmotionalState.content.value),
+      );
+      expect(
+        EmotionalState.content.value,
+        greaterThan(EmotionalState.neutral.value),
+      );
     });
   });
 
@@ -194,9 +206,7 @@ void main() {
           consistencyScore: 50.0,
         );
 
-        final updated = original.copyWith(
-          preferredHour: 15,
-        );
+        final updated = original.copyWith(preferredHour: 15);
 
         expect(updated.preferredHour, 15);
         expect(updated.consistencyScore, 50.0); // No cambió
@@ -388,7 +398,9 @@ void main() {
         );
         expect(
           updated.getTraitIntensity(PersonalityTrait.energetic),
-          greaterThan(personality.getTraitIntensity(PersonalityTrait.energetic)),
+          greaterThan(
+            personality.getTraitIntensity(PersonalityTrait.energetic),
+          ),
         );
       });
 
@@ -502,7 +514,9 @@ void main() {
 
         expect(
           updated.getTraitIntensity(PersonalityTrait.earlyBird),
-          greaterThan(personality.getTraitIntensity(PersonalityTrait.earlyBird)),
+          greaterThan(
+            personality.getTraitIntensity(PersonalityTrait.earlyBird),
+          ),
         );
       });
 
@@ -521,7 +535,9 @@ void main() {
 
         expect(
           updated.getTraitIntensity(PersonalityTrait.nocturnal),
-          greaterThan(personality.getTraitIntensity(PersonalityTrait.nocturnal)),
+          greaterThan(
+            personality.getTraitIntensity(PersonalityTrait.nocturnal),
+          ),
         );
       });
 
@@ -606,9 +622,7 @@ void main() {
       });
 
       test('actualiza lastUpdated', () {
-        final personality = PetPersonality(
-          lastUpdated: DateTime(2024, 1, 1),
-        );
+        final personality = PetPersonality(lastUpdated: DateTime(2024, 1, 1));
         final interaction = Interaction.now(
           type: InteractionType.feed,
           hungerBefore: 50.0,
@@ -713,7 +727,10 @@ void main() {
           minutesSinceLastInteraction: 90,
         );
 
-        expect(withPenalty.emotionalState.value, lessThan(withoutPenalty.emotionalState.value));
+        expect(
+          withPenalty.emotionalState.value,
+          lessThan(withoutPenalty.emotionalState.value),
+        );
       });
 
       test('bondLevel más alto mejora el estado emocional', () {
@@ -736,7 +753,10 @@ void main() {
           minutesSinceLastInteraction: 30,
         );
 
-        expect(highBondState.emotionalState.value, greaterThanOrEqualTo(lowBondState.emotionalState.value));
+        expect(
+          highBondState.emotionalState.value,
+          greaterThanOrEqualTo(lowBondState.emotionalState.value),
+        );
       });
 
       test('trait anxious alto reduce el estado emocional', () {
@@ -810,16 +830,11 @@ void main() {
 
       test('fromJson deserializa correctamente', () {
         final json = {
-          'traits': {
-            'playful': 75.0,
-            'calm': 60.0,
-          },
+          'traits': {'playful': 75.0, 'calm': 60.0},
           'emotionalState': 'content',
           'bondLevel': 'acquaintance',
           'bondPoints': 100,
-          'userPreferences': {
-            'consistencyScore': 80.0,
-          },
+          'userPreferences': {'consistencyScore': 80.0},
           'lastUpdated': DateTime(2024, 1, 15).toIso8601String(),
         };
 
@@ -836,9 +851,7 @@ void main() {
 
       test('fromJson usa valores por defecto para traits faltantes', () {
         final json = {
-          'traits': {
-            'playful': 75.0,
-          },
+          'traits': {'playful': 75.0},
           'emotionalState': 'neutral',
           'bondLevel': 'stranger',
           'bondPoints': 0,
@@ -847,7 +860,10 @@ void main() {
         final personality = PetPersonality.fromJson(json);
 
         expect(personality.getTraitIntensity(PersonalityTrait.playful), 75.0);
-        expect(personality.getTraitIntensity(PersonalityTrait.calm), 50.0); // Default
+        expect(
+          personality.getTraitIntensity(PersonalityTrait.calm),
+          50.0,
+        ); // Default
       });
 
       test('fromJson maneja json vacío con valores por defecto', () {
@@ -882,9 +898,7 @@ void main() {
           bondPoints: 100,
         );
 
-        final updated = original.copyWith(
-          emotionalState: EmotionalState.happy,
-        );
+        final updated = original.copyWith(emotionalState: EmotionalState.happy);
 
         expect(updated.emotionalState, EmotionalState.happy);
         expect(updated.bondPoints, 100); // No cambió

@@ -58,26 +58,35 @@ void main() {
   });
 
   group('Interaction', () {
-    test('constructor inicializa correctamente con timestamp proporcionado', () {
-      final timestamp = DateTime(2024, 1, 15, 14, 30); // Lunes 15 de enero, 14:30
-      final interaction = Interaction(
-        type: InteractionType.feed,
-        timestamp: timestamp,
-        hungerBefore: 70.0,
-        happinessBefore: 50.0,
-        energyBefore: 60.0,
-        healthBefore: 80.0,
-      );
+    test(
+      'constructor inicializa correctamente con timestamp proporcionado',
+      () {
+        final timestamp = DateTime(
+          2024,
+          1,
+          15,
+          14,
+          30,
+        ); // Lunes 15 de enero, 14:30
+        final interaction = Interaction(
+          type: InteractionType.feed,
+          timestamp: timestamp,
+          hungerBefore: 70.0,
+          happinessBefore: 50.0,
+          energyBefore: 60.0,
+          healthBefore: 80.0,
+        );
 
-      expect(interaction.type, InteractionType.feed);
-      expect(interaction.timestamp, timestamp);
-      expect(interaction.hungerBefore, 70.0);
-      expect(interaction.happinessBefore, 50.0);
-      expect(interaction.energyBefore, 60.0);
-      expect(interaction.healthBefore, 80.0);
-      expect(interaction.timeOfDay, TimeOfDay.afternoon);
-      expect(interaction.dayOfWeek, DateTime.monday);
-    });
+        expect(interaction.type, InteractionType.feed);
+        expect(interaction.timestamp, timestamp);
+        expect(interaction.hungerBefore, 70.0);
+        expect(interaction.happinessBefore, 50.0);
+        expect(interaction.energyBefore, 60.0);
+        expect(interaction.healthBefore, 80.0);
+        expect(interaction.timeOfDay, TimeOfDay.afternoon);
+        expect(interaction.dayOfWeek, DateTime.monday);
+      },
+    );
 
     test('factory now() crea interacción con timestamp actual', () {
       final before = DateTime.now();
@@ -91,8 +100,16 @@ void main() {
       final after = DateTime.now();
 
       expect(interaction.type, InteractionType.play);
-      expect(interaction.timestamp.isAfter(before) || interaction.timestamp.isAtSameMomentAs(before), true);
-      expect(interaction.timestamp.isBefore(after) || interaction.timestamp.isAtSameMomentAs(after), true);
+      expect(
+        interaction.timestamp.isAfter(before) ||
+            interaction.timestamp.isAtSameMomentAs(before),
+        true,
+      );
+      expect(
+        interaction.timestamp.isBefore(after) ||
+            interaction.timestamp.isAtSameMomentAs(after),
+        true,
+      );
     });
 
     test('metadata se guarda correctamente', () {
@@ -762,10 +779,13 @@ void main() {
       expect(last5.length, 2);
     });
 
-    test('getLastInteractions devuelve lista vacía cuando no hay interacciones', () {
-      final history = InteractionHistory();
-      expect(history.getLastInteractions(5), isEmpty);
-    });
+    test(
+      'getLastInteractions devuelve lista vacía cuando no hay interacciones',
+      () {
+        final history = InteractionHistory();
+        expect(history.getLastInteractions(5), isEmpty);
+      },
+    );
 
     test('getInteractionsLastHours devuelve interacciones recientes', () {
       final now = DateTime.now();

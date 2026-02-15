@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter/widgets.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../utils/constants.dart';
 import '../utils/logger.dart';
@@ -40,7 +39,8 @@ class MetricsUpdateNotifier extends _$MetricsUpdateNotifier {
     );
 
     appLogger.d(
-        'Timer iniciado - actualizando cada ${AppConstants.foregroundUpdateInterval}s');
+      'Timer iniciado - actualizando cada ${AppConstants.foregroundUpdateInterval}s',
+    );
   }
 
   /// Actualiza las métricas de la mascota
@@ -66,45 +66,5 @@ class MetricsUpdateNotifier extends _$MetricsUpdateNotifier {
   void resume() {
     appLogger.d('Timer resumido');
     _startTimer();
-  }
-}
-
-/// Provider para el estado del lifecycle de la aplicación
-///
-/// Observa cambios en el lifecycle de la app (paused, resumed, etc.)
-/// y pausa/reanuda el timer de métricas según corresponda.
-@riverpod
-class AppLifecycleNotifier extends _$AppLifecycleNotifier
-    with WidgetsBindingObserver {
-  @override
-  AppLifecycleState build() {
-    // Registrar observer
-    WidgetsBinding.instance.addObserver(this);
-
-    // Auto-cleanup: remover observer cuando el provider se destruye
-    ref.onDispose(() {
-      WidgetsBinding.instance.removeObserver(this);
-      appLogger.d('AppLifecycleNotifier disposed - observer removido');
-    });
-
-    // Estado inicial
-    return AppLifecycleState.resumed;
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    appLogger.d('Lifecycle cambió a: $state');
-
-    // Actualizar estado
-    this.state = state;
-
-    // Manejar cambios de lifecycle
-    if (state == AppLifecycleState.paused) {
-      appLogger.d('App pausada - guardando estado y pausando timer');
-      ref.read(metricsUpdateNotifierProvider.notifier).pause();
-    } else if (state == AppLifecycleState.resumed) {
-      appLogger.d('App resumida - reiniciando timer');
-      ref.read(metricsUpdateNotifierProvider.notifier).resume();
-    }
   }
 }

@@ -1,9 +1,5 @@
 /// Tipos de mini-juegos disponibles
-enum MiniGameType {
-  memory,
-  slidingPuzzle,
-  reactionRace,
-}
+enum MiniGameType { memory, slidingPuzzle, reactionRace }
 
 /// Extensión para obtener información de cada mini-juego
 extension MiniGameTypeExtension on MiniGameType {
@@ -154,22 +150,24 @@ class MiniGameStats {
   final Map<MiniGameType, GameStats> stats;
 
   MiniGameStats({Map<MiniGameType, GameStats>? stats})
-      : stats = stats ??
-            {
-              MiniGameType.memory: GameStats(gameType: MiniGameType.memory),
-              MiniGameType.slidingPuzzle:
-                  GameStats(gameType: MiniGameType.slidingPuzzle),
-              MiniGameType.reactionRace:
-                  GameStats(gameType: MiniGameType.reactionRace),
-            };
+    : stats =
+          stats ??
+          {
+            MiniGameType.memory: GameStats(gameType: MiniGameType.memory),
+            MiniGameType.slidingPuzzle: GameStats(
+              gameType: MiniGameType.slidingPuzzle,
+            ),
+            MiniGameType.reactionRace: GameStats(
+              gameType: MiniGameType.reactionRace,
+            ),
+          };
 
   /// Total de partidas jugadas
   int get totalGamesPlayed =>
       stats.values.fold(0, (sum, stat) => sum + stat.timesPlayed);
 
   /// Total de victorias
-  int get totalWins =>
-      stats.values.fold(0, (sum, stat) => sum + stat.timesWon);
+  int get totalWins => stats.values.fold(0, (sum, stat) => sum + stat.timesWon);
 
   /// Total de XP ganado en mini-juegos
   int get totalXpEarned =>
@@ -204,7 +202,9 @@ class MiniGameStats {
   /// el índice del enum como clave en formato string.
   Map<String, dynamic> toJson() {
     return {
-      'stats': stats.map((key, value) => MapEntry(key.index.toString(), value.toJson())),
+      'stats': stats.map(
+        (key, value) => MapEntry(key.index.toString(), value.toJson()),
+      ),
     };
   }
 

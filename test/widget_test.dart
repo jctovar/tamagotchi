@@ -18,21 +18,19 @@ void main() {
       expect(result, isFalse);
     });
 
-    test('hasSeenOnboarding returns false explicitly when set to false',
-        () async {
-      SharedPreferences.setMockInitialValues({
-        'has_seen_onboarding': false,
-      });
+    test(
+      'hasSeenOnboarding returns false explicitly when set to false',
+      () async {
+        SharedPreferences.setMockInitialValues({'has_seen_onboarding': false});
 
-      final result = await OnboardingScreen.hasSeenOnboarding();
+        final result = await OnboardingScreen.hasSeenOnboarding();
 
-      expect(result, isFalse);
-    });
+        expect(result, isFalse);
+      },
+    );
 
     test('hasSeenOnboarding returns true when set to true', () async {
-      SharedPreferences.setMockInitialValues({
-        'has_seen_onboarding': true,
-      });
+      SharedPreferences.setMockInitialValues({'has_seen_onboarding': true});
 
       final result = await OnboardingScreen.hasSeenOnboarding();
 
@@ -55,9 +53,7 @@ void main() {
     });
 
     test('setOnboardingComplete overwrites existing false value', () async {
-      SharedPreferences.setMockInitialValues({
-        'has_seen_onboarding': false,
-      });
+      SharedPreferences.setMockInitialValues({'has_seen_onboarding': false});
 
       await OnboardingScreen.setOnboardingComplete();
 
@@ -96,9 +92,7 @@ void main() {
     });
 
     test('returning user sees onboarding as completed', () async {
-      SharedPreferences.setMockInitialValues({
-        'has_seen_onboarding': true,
-      });
+      SharedPreferences.setMockInitialValues({'has_seen_onboarding': true});
 
       final hasSeenOnboarding = await OnboardingScreen.hasSeenOnboarding();
       expect(hasSeenOnboarding, isTrue);
@@ -118,9 +112,7 @@ void main() {
     });
 
     test('hasSeenOnboarding handles null value gracefully', () async {
-      SharedPreferences.setMockInitialValues({
-        'some_other_key': 'value',
-      });
+      SharedPreferences.setMockInitialValues({'some_other_key': 'value'});
 
       // Key doesn't exist, should return false
       final result = await OnboardingScreen.hasSeenOnboarding();
@@ -143,27 +135,25 @@ void main() {
       expect(prefs.getBool('has_seen_onboarding'), isTrue);
     });
 
-    test('hasSeenOnboarding called multiple times returns consistent result',
-        () async {
-      SharedPreferences.setMockInitialValues({
-        'has_seen_onboarding': true,
-      });
+    test(
+      'hasSeenOnboarding called multiple times returns consistent result',
+      () async {
+        SharedPreferences.setMockInitialValues({'has_seen_onboarding': true});
 
-      final results = await Future.wait([
-        OnboardingScreen.hasSeenOnboarding(),
-        OnboardingScreen.hasSeenOnboarding(),
-        OnboardingScreen.hasSeenOnboarding(),
-      ]);
+        final results = await Future.wait([
+          OnboardingScreen.hasSeenOnboarding(),
+          OnboardingScreen.hasSeenOnboarding(),
+          OnboardingScreen.hasSeenOnboarding(),
+        ]);
 
-      expect(results, everyElement(isTrue));
-    });
+        expect(results, everyElement(isTrue));
+      },
+    );
   });
 
   group('Performance Tests', () {
     test('hasSeenOnboarding completes quickly', () async {
-      SharedPreferences.setMockInitialValues({
-        'has_seen_onboarding': true,
-      });
+      SharedPreferences.setMockInitialValues({'has_seen_onboarding': true});
 
       final stopwatch = Stopwatch()..start();
       await OnboardingScreen.hasSeenOnboarding();
@@ -221,9 +211,7 @@ void main() {
     });
 
     test('true value returns true', () async {
-      SharedPreferences.setMockInitialValues({
-        'has_seen_onboarding': true,
-      });
+      SharedPreferences.setMockInitialValues({'has_seen_onboarding': true});
 
       final result = await OnboardingScreen.hasSeenOnboarding();
       expect(result, isTrue);
@@ -231,9 +219,7 @@ void main() {
     });
 
     test('false value returns false', () async {
-      SharedPreferences.setMockInitialValues({
-        'has_seen_onboarding': false,
-      });
+      SharedPreferences.setMockInitialValues({'has_seen_onboarding': false});
 
       final result = await OnboardingScreen.hasSeenOnboarding();
       expect(result, isFalse);
@@ -243,9 +229,7 @@ void main() {
 
   group('Async Behavior', () {
     test('hasSeenOnboarding is properly async', () {
-      SharedPreferences.setMockInitialValues({
-        'has_seen_onboarding': true,
-      });
+      SharedPreferences.setMockInitialValues({'has_seen_onboarding': true});
 
       final future = OnboardingScreen.hasSeenOnboarding();
       expect(future, isA<Future<bool>>());

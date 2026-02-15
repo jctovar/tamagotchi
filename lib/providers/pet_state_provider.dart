@@ -33,12 +33,14 @@ class PetState extends _$PetState {
 
     if (savedPet != null) {
       appLogger.d(
-          'Estado cargado - Hambre: ${savedPet.hunger.toStringAsFixed(1)}, Felicidad: ${savedPet.happiness.toStringAsFixed(1)}');
+        'Estado cargado - Hambre: ${savedPet.hunger.toStringAsFixed(1)}, Felicidad: ${savedPet.happiness.toStringAsFixed(1)}',
+      );
 
       // Actualizar métricas basado en tiempo transcurrido
       final updatedPet = storage.updatePetMetrics(savedPet);
       appLogger.d(
-          'Estado actualizado - Hambre: ${updatedPet.hunger.toStringAsFixed(1)}, Felicidad: ${updatedPet.happiness.toStringAsFixed(1)}');
+        'Estado actualizado - Hambre: ${updatedPet.hunger.toStringAsFixed(1)}, Felicidad: ${updatedPet.happiness.toStringAsFixed(1)}',
+      );
 
       // Actualizar propiedades de usuario en Analytics
       await AnalyticsService.updateUserProperties(updatedPet);
@@ -513,15 +515,17 @@ int petLevel(Ref ref) {
 /// Provider que solo emite cuando el estado crítico cambia
 @riverpod
 bool petIsCritical(Ref ref) {
-  return ref
-      .watch(petStateProvider.select((s) => s.value?.isCritical ?? false));
+  return ref.watch(
+    petStateProvider.select((s) => s.value?.isCritical ?? false),
+  );
 }
 
 /// Provider que solo emite cuando el nombre cambia
 @riverpod
 String petName(Ref ref) {
-  return ref
-      .watch(petStateProvider.select((s) => s.value?.name ?? 'Tamagotchi'));
+  return ref.watch(
+    petStateProvider.select((s) => s.value?.name ?? 'Tamagotchi'),
+  );
 }
 
 /// Provider para controlar si se debe mostrar el diálogo de evolución

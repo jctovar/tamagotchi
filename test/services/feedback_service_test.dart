@@ -69,10 +69,7 @@ void main() {
       });
 
       test('tipos de resultado incluyen success y error', () {
-        const resultTypes = [
-          FeedbackType.success,
-          FeedbackType.error,
-        ];
+        const resultTypes = [FeedbackType.success, FeedbackType.error];
 
         expect(resultTypes.length, 2);
         expect(resultTypes, contains(FeedbackType.success));

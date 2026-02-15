@@ -19,9 +19,7 @@ class MiniGamesMenuScreen extends ConsumerWidget {
     final statsAsync = ref.watch(miniGameStatsStateProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Mini-Juegos'),
-      ),
+      appBar: AppBar(title: const Text('Mini-Juegos')),
       body: statsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, stack) => Center(child: Text('Error: $err')),
@@ -30,7 +28,11 @@ class MiniGamesMenuScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildContent(BuildContext context, WidgetRef ref, MiniGameStats stats) {
+  Widget _buildContent(
+    BuildContext context,
+    WidgetRef ref,
+    MiniGameStats stats,
+  ) {
     return SafeArea(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -44,10 +46,7 @@ class MiniGamesMenuScreen extends ConsumerWidget {
             // Título
             const Text(
               'Elige un juego',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
 
@@ -77,10 +76,7 @@ class MiniGamesMenuScreen extends ConsumerWidget {
                 const SizedBox(width: 8),
                 const Text(
                   'Estadísticas Generales',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
               ],
             ),
@@ -123,23 +119,19 @@ class MiniGamesMenuScreen extends ConsumerWidget {
         const SizedBox(height: 4),
         Text(
           value,
-          style: const TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
+          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.grey[600],
-          ),
-        ),
+        Text(label, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
       ],
     );
   }
 
-  Widget _buildGameCard(BuildContext context, WidgetRef ref, MiniGameType gameType, MiniGameStats stats) {
+  Widget _buildGameCard(
+    BuildContext context,
+    WidgetRef ref,
+    MiniGameType gameType,
+    MiniGameStats stats,
+  ) {
     final gameStats = stats.getStats(gameType);
     final winRate = gameStats.winRate;
 
@@ -184,10 +176,7 @@ class MiniGamesMenuScreen extends ConsumerWidget {
                     const SizedBox(height: 4),
                     Text(
                       gameType.description,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey[600],
-                      ),
+                      style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                     ),
                     const SizedBox(height: 12),
                     // Estadísticas del juego
@@ -199,18 +188,12 @@ class MiniGamesMenuScreen extends ConsumerWidget {
                           '🎮 ${gameStats.timesPlayed}',
                           'jugadas',
                         ),
-                        _buildGameStat(
-                          '⭐ ${gameStats.timesWon}',
-                          'victorias',
-                        ),
+                        _buildGameStat('⭐ ${gameStats.timesWon}', 'victorias'),
                         _buildGameStat(
                           '📊 ${winRate.toStringAsFixed(0)}%',
                           'win rate',
                         ),
-                        _buildGameStat(
-                          '🏆 ${gameStats.bestScore}',
-                          'récord',
-                        ),
+                        _buildGameStat('🏆 ${gameStats.bestScore}', 'récord'),
                       ],
                     ),
                   ],
@@ -236,24 +219,19 @@ class MiniGamesMenuScreen extends ConsumerWidget {
       children: [
         Text(
           value,
-          style: const TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w600,
-          ),
+          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
         ),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 10,
-            color: Colors.grey[600],
-          ),
-        ),
+        Text(label, style: TextStyle(fontSize: 10, color: Colors.grey[600])),
       ],
     );
   }
 
   /// Navega a la pantalla del juego seleccionado
-  void _navigateToGame(BuildContext context, WidgetRef ref, MiniGameType gameType) async {
+  void _navigateToGame(
+    BuildContext context,
+    WidgetRef ref,
+    MiniGameType gameType,
+  ) async {
     Widget gameScreen;
 
     switch (gameType) {
@@ -269,9 +247,7 @@ class MiniGamesMenuScreen extends ConsumerWidget {
     }
 
     // Registrar evento de inicio de juego en Analytics
-    await AnalyticsService.logMinigameStarted(
-      gameType: gameType.name,
-    );
+    await AnalyticsService.logMinigameStarted(gameType: gameType.name);
 
     if (context.mounted) {
       Navigator.push(

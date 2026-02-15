@@ -92,23 +92,53 @@ void main() {
       expect(Pet(name: 'Test', experience: 50).level, 1);
       expect(Pet(name: 'Test', experience: 100).level, 2);
       expect(Pet(name: 'Test', experience: 250).level, 3);
-      expect(Pet(name: 'Test', experience: 500).level, 6); // (500/100).floor() + 1 = 5 + 1 = 6
-      expect(Pet(name: 'Test', experience: 1000).level, 11); // (1000/100).floor() + 1 = 10 + 1 = 11
+      expect(
+        Pet(name: 'Test', experience: 500).level,
+        6,
+      ); // (500/100).floor() + 1 = 5 + 1 = 6
+      expect(
+        Pet(name: 'Test', experience: 1000).level,
+        11,
+      ); // (1000/100).floor() + 1 = 10 + 1 = 11
     });
 
     test('isCritical detecta estado crítico correctamente', () {
       // Arrange & Assert
       // mood es critical cuando: health < 30 || hunger > 80 || energy < 20
-      final critical1 = Pet(name: 'Test', hunger: 85, happiness: 100, energy: 100, health: 100);
+      final critical1 = Pet(
+        name: 'Test',
+        hunger: 85,
+        happiness: 100,
+        energy: 100,
+        health: 100,
+      );
       expect(critical1.isCritical, true); // Hambre > 80
 
-      final critical2 = Pet(name: 'Test', hunger: 0, happiness: 100, energy: 100, health: 25);
+      final critical2 = Pet(
+        name: 'Test',
+        hunger: 0,
+        happiness: 100,
+        energy: 100,
+        health: 25,
+      );
       expect(critical2.isCritical, true); // Salud < 30
 
-      final critical3 = Pet(name: 'Test', hunger: 0, happiness: 100, energy: 15, health: 100);
+      final critical3 = Pet(
+        name: 'Test',
+        hunger: 0,
+        happiness: 100,
+        energy: 15,
+        health: 100,
+      );
       expect(critical3.isCritical, true); // Energía < 20
 
-      final healthy = Pet(name: 'Test', hunger: 50, happiness: 50, energy: 50, health: 100);
+      final healthy = Pet(
+        name: 'Test',
+        hunger: 50,
+        happiness: 50,
+        energy: 50,
+        health: 100,
+      );
       expect(healthy.isCritical, false); // Todo bien
     });
 
@@ -135,7 +165,10 @@ void main() {
       expect(updated, isNotNull);
       expect(updated.variant, isNotNull);
       // El variant es un enum PetVariant, verificar que sea uno de los valores válidos
-      expect(updated.variant, isIn([PetVariant.normal, PetVariant.excellent, PetVariant.neglected]));
+      expect(
+        updated.variant,
+        isIn([PetVariant.normal, PetVariant.excellent, PetVariant.neglected]),
+      );
     });
 
     test('toJson serializa correctamente', () {
@@ -192,7 +225,13 @@ void main() {
 
     test('combinación de acciones funciona correctamente', () {
       // Arrange
-      var pet = Pet(name: 'Test', hunger: 70, happiness: 40, energy: 60, health: 80);
+      var pet = Pet(
+        name: 'Test',
+        hunger: 70,
+        happiness: 40,
+        energy: 60,
+        health: 80,
+      );
 
       // Act - Alimentar
       pet = pet.copyWith(hunger: (pet.hunger - 30).clamp(0, 100));

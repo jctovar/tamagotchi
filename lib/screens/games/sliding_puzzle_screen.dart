@@ -23,7 +23,7 @@ class SlidingPuzzleScreen extends ConsumerStatefulWidget {
 
 class _SlidingPuzzleScreenState extends ConsumerState<SlidingPuzzleScreen> {
   late List<int> _tiles;
-  int _emptyIndex = 8; // Índice del espacio vacío
+  int _emptyIndex = 0; // Índice del espacio vacío
   int _moves = 0;
   late DateTime _startTime;
   Timer? _gameTimer;
@@ -68,7 +68,9 @@ class _SlidingPuzzleScreenState extends ConsumerState<SlidingPuzzleScreen> {
 
     setState(() {
       // Crear puzzle en estado resuelto (0-8)
+      // El 0 representa el espacio vacío y comienza en la posición 0
       _tiles = List.generate(9, (index) => index);
+      _emptyIndex = 0;
 
       // Mezclar haciendo movimientos aleatorios válidos (garantiza que sea resoluble)
       final random = Random();
@@ -116,11 +118,14 @@ class _SlidingPuzzleScreenState extends ConsumerState<SlidingPuzzleScreen> {
     return validMoves;
   }
 
-  void _swapTiles(int index1, int index2) {
-    final temp = _tiles[index1];
-    _tiles[index1] = _tiles[index2];
-    _tiles[index2] = temp;
-    _emptyIndex = index1;
+  /// Intercambia el espacio vacío con una ficha adyacente
+  ///
+  /// [emptyIdx] Índice actual del espacio vacío
+  /// [tileIdx] Índice de la ficha a mover al espacio vacío
+  void _swapTiles(int emptyIdx, int tileIdx) {
+    _tiles[emptyIdx] = _tiles[tileIdx];
+    _tiles[tileIdx] = 0;
+    _emptyIndex = tileIdx;
   }
 
   /// Maneja el evento de tocar una ficha
@@ -138,7 +143,7 @@ class _SlidingPuzzleScreenState extends ConsumerState<SlidingPuzzleScreen> {
     });
 
     setState(() {
-      _swapTiles(index, _emptyIndex);
+      _swapTiles(_emptyIndex, index);
       _moves++;
     });
 

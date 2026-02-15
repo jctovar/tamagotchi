@@ -20,7 +20,9 @@ class StorageService {
       final prefs = await SharedPreferences.getInstance();
       final petJson = jsonEncode(pet.toJson());
       await prefs.setString(_petStateKey, petJson);
-      appLogger.d('Estado guardado - Nombre: ${pet.name}, Salud: ${pet.health.toStringAsFixed(1)}');
+      appLogger.d(
+        'Estado guardado - Nombre: ${pet.name}, Salud: ${pet.health.toStringAsFixed(1)}',
+      );
     } catch (e, stackTrace) {
       appLogger.e('Error guardando estado', error: e, stackTrace: stackTrace);
     }
@@ -39,7 +41,9 @@ class StorageService {
 
       final petMap = jsonDecode(petJson) as Map<String, dynamic>;
       final pet = Pet.fromJson(petMap);
-      appLogger.d('Estado cargado - Nombre: ${pet.name}, Salud: ${pet.health.toStringAsFixed(1)}');
+      appLogger.d(
+        'Estado cargado - Nombre: ${pet.name}, Salud: ${pet.health.toStringAsFixed(1)}',
+      );
       return pet;
     } catch (e, stackTrace) {
       appLogger.e('Error cargando estado', error: e, stackTrace: stackTrace);
@@ -57,14 +61,15 @@ class StorageService {
     final secondsSinceLastRested = now.difference(pet.lastRested).inSeconds;
 
     // Actualizar métricas con decaimiento
-    double newHunger = pet.hunger +
-        (secondsSinceLastFed * AppConstants.hungerDecayRate);
+    double newHunger =
+        pet.hunger + (secondsSinceLastFed * AppConstants.hungerDecayRate);
 
-    double newHappiness = pet.happiness -
+    double newHappiness =
+        pet.happiness -
         (secondsSinceLastPlayed * AppConstants.happinessDecayRate);
 
-    double newEnergy = pet.energy -
-        (secondsSinceLastRested * AppConstants.energyDecayRate);
+    double newEnergy =
+        pet.energy - (secondsSinceLastRested * AppConstants.energyDecayRate);
 
     // Calcular salud basada en el estado general
     double newHealth = pet.health;
@@ -118,7 +123,11 @@ class StorageService {
       await prefs.setString(_miniGameStatsKey, statsJson);
       appLogger.d('Estadísticas de mini-juegos guardadas');
     } catch (e, stackTrace) {
-      appLogger.e('Error guardando estadísticas de mini-juegos', error: e, stackTrace: stackTrace);
+      appLogger.e(
+        'Error guardando estadísticas de mini-juegos',
+        error: e,
+        stackTrace: stackTrace,
+      );
     }
   }
 
@@ -140,7 +149,11 @@ class StorageService {
       final statsMap = jsonDecode(statsJson) as Map<String, dynamic>;
       return MiniGameStats.fromJson(statsMap);
     } catch (e, stackTrace) {
-      appLogger.e('Error cargando estadísticas de mini-juegos', error: e, stackTrace: stackTrace);
+      appLogger.e(
+        'Error cargando estadísticas de mini-juegos',
+        error: e,
+        stackTrace: stackTrace,
+      );
       return MiniGameStats(); // Retorna estadísticas vacías en caso de error
     }
   }
@@ -164,7 +177,10 @@ class StorageService {
       totalCoinsEarned: gameStats.totalCoinsEarned + result.coinsEarned,
     );
 
-    final updatedStats = stats.updateGameStats(result.gameType, updatedGameStats);
+    final updatedStats = stats.updateGameStats(
+      result.gameType,
+      updatedGameStats,
+    );
     await saveMiniGameStats(updatedStats);
   }
 
@@ -176,9 +192,15 @@ class StorageService {
       final prefs = await SharedPreferences.getInstance();
       final historyJson = jsonEncode(history.toJson());
       await prefs.setString(_interactionHistoryKey, historyJson);
-      appLogger.d('Historial de interacciones guardado (${history.totalInteractions} interacciones)');
+      appLogger.d(
+        'Historial de interacciones guardado (${history.totalInteractions} interacciones)',
+      );
     } catch (e, stackTrace) {
-      appLogger.e('Error guardando historial de interacciones', error: e, stackTrace: stackTrace);
+      appLogger.e(
+        'Error guardando historial de interacciones',
+        error: e,
+        stackTrace: stackTrace,
+      );
     }
   }
 
@@ -197,7 +219,11 @@ class StorageService {
       final historyMap = jsonDecode(historyJson) as Map<String, dynamic>;
       return InteractionHistory.fromJson(historyMap);
     } catch (e, stackTrace) {
-      appLogger.e('Error cargando historial de interacciones', error: e, stackTrace: stackTrace);
+      appLogger.e(
+        'Error cargando historial de interacciones',
+        error: e,
+        stackTrace: stackTrace,
+      );
       return InteractionHistory();
     }
   }
@@ -216,9 +242,15 @@ class StorageService {
       final prefs = await SharedPreferences.getInstance();
       final personalityJson = jsonEncode(personality.toJson());
       await prefs.setString(_petPersonalityKey, personalityJson);
-      appLogger.d('Personalidad guardada (Vínculo: ${personality.bondLevel.displayName})');
+      appLogger.d(
+        'Personalidad guardada (Vínculo: ${personality.bondLevel.displayName})',
+      );
     } catch (e, stackTrace) {
-      appLogger.e('Error guardando personalidad', error: e, stackTrace: stackTrace);
+      appLogger.e(
+        'Error guardando personalidad',
+        error: e,
+        stackTrace: stackTrace,
+      );
     }
   }
 
@@ -234,10 +266,15 @@ class StorageService {
       }
 
       appLogger.d('Personalidad cargada');
-      final personalityMap = jsonDecode(personalityJson) as Map<String, dynamic>;
+      final personalityMap =
+          jsonDecode(personalityJson) as Map<String, dynamic>;
       return PetPersonality.fromJson(personalityMap);
     } catch (e, stackTrace) {
-      appLogger.e('Error cargando personalidad', error: e, stackTrace: stackTrace);
+      appLogger.e(
+        'Error cargando personalidad',
+        error: e,
+        stackTrace: stackTrace,
+      );
       return PetPersonality();
     }
   }
@@ -246,7 +283,8 @@ class StorageService {
   ///
   /// Método conveniente que combina el guardado de interacción
   /// con la actualización de personalidad en una sola llamada.
-  Future<({InteractionHistory history, PetPersonality personality})> recordInteraction({
+  Future<({InteractionHistory history, PetPersonality personality})>
+  recordInteraction({
     required InteractionType type,
     required double hungerBefore,
     required double happinessBefore,
@@ -285,7 +323,11 @@ class StorageService {
       await prefs.remove(_petPersonalityKey);
       appLogger.i('Datos de IA eliminados');
     } catch (e, stackTrace) {
-      appLogger.e('Error eliminando datos de IA', error: e, stackTrace: stackTrace);
+      appLogger.e(
+        'Error eliminando datos de IA',
+        error: e,
+        stackTrace: stackTrace,
+      );
     }
   }
 
@@ -296,7 +338,11 @@ class StorageService {
       await prefs.remove(_miniGameStatsKey);
       appLogger.i('Estadísticas de mini-juegos eliminadas');
     } catch (e, stackTrace) {
-      appLogger.e('Error eliminando estadísticas de mini-juegos', error: e, stackTrace: stackTrace);
+      appLogger.e(
+        'Error eliminando estadísticas de mini-juegos',
+        error: e,
+        stackTrace: stackTrace,
+      );
     }
   }
 

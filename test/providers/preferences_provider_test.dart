@@ -47,10 +47,7 @@ void main() {
       );
 
       // Act
-      final updated = original.copyWith(
-        petColor: Colors.red,
-        accessory: 'bow',
-      );
+      final updated = original.copyWith(petColor: Colors.red, accessory: 'bow');
 
       // Assert
       expect(updated.petColor, Colors.red); // Cambió
@@ -162,7 +159,10 @@ void main() {
       expect(const PetPreferences(accessory: 'none').accessoryName, 'Ninguno');
       expect(const PetPreferences(accessory: 'bow').accessoryName, 'Moño');
       expect(const PetPreferences(accessory: 'hat').accessoryName, 'Sombrero');
-      expect(const PetPreferences(accessory: 'glasses').accessoryName, 'Lentes');
+      expect(
+        const PetPreferences(accessory: 'glasses').accessoryName,
+        'Lentes',
+      );
       expect(const PetPreferences(accessory: 'scarf').accessoryName, 'Bufanda');
     });
 
@@ -222,7 +222,10 @@ void main() {
     test('accessory por defecto está en availableAccessories', () {
       const prefs = PetPreferences();
 
-      expect(PetPreferences.availableAccessories.contains(prefs.accessory), true);
+      expect(
+        PetPreferences.availableAccessories.contains(prefs.accessory),
+        true,
+      );
     });
 
     test('todos los availableAccessories tienen emoji y nombre', () {

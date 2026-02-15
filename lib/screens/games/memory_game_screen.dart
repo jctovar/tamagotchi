@@ -22,7 +22,14 @@ class MemoryGameScreen extends ConsumerStatefulWidget {
 
 class _MemoryGameScreenState extends ConsumerState<MemoryGameScreen> {
   static const List<String> _emojis = [
-    '🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼',
+    '🐶',
+    '🐱',
+    '🐭',
+    '🐹',
+    '🐰',
+    '🦊',
+    '🐻',
+    '🐼',
   ];
 
   late List<String> _cards;
@@ -251,7 +258,9 @@ class _MemoryGameScreenState extends ConsumerState<MemoryGameScreen> {
           FilledButton(
             onPressed: () async {
               // Actualizar estadísticas y recompensas automáticamente vía provider
-              await ref.read(miniGameStatsStateProvider.notifier).updateStats(result);
+              await ref
+                  .read(miniGameStatsStateProvider.notifier)
+                  .updateStats(result);
 
               // Navegar de vuelta y mostrar mensaje
               if (mounted) {
@@ -360,19 +369,10 @@ class _MemoryGameScreenState extends ConsumerState<MemoryGameScreen> {
       children: [
         Text(
           value,
-          style: const TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
+          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 4),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.grey[600],
-          ),
-        ),
+        Text(label, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
       ],
     );
   }
@@ -388,15 +388,15 @@ class _MemoryGameScreenState extends ConsumerState<MemoryGameScreen> {
           color: _matched[index]
               ? Colors.green[100]
               : isRevealed
-                  ? Colors.white
-                  : Colors.purple[400],
+              ? Colors.white
+              : Colors.purple[400],
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: _matched[index]
                 ? Colors.green
                 : isRevealed
-                    ? Colors.purple
-                    : Colors.purple[700]!,
+                ? Colors.purple
+                : Colors.purple[700]!,
             width: 2,
           ),
           boxShadow: [
@@ -409,15 +409,8 @@ class _MemoryGameScreenState extends ConsumerState<MemoryGameScreen> {
         ),
         child: Center(
           child: isRevealed
-              ? Text(
-                  _cards[index],
-                  style: const TextStyle(fontSize: 36),
-                )
-              : const Icon(
-                  Icons.help_outline,
-                  size: 36,
-                  color: Colors.white,
-                ),
+              ? Text(_cards[index], style: const TextStyle(fontSize: 36))
+              : const Icon(Icons.help_outline, size: 36, color: Colors.white),
         ),
       ),
     );

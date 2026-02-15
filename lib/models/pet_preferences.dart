@@ -44,7 +44,9 @@ class PetPreferences {
   /// Crea desde JSON
   factory PetPreferences.fromJson(Map<String, dynamic> json) {
     return PetPreferences(
-      petColor: Color(json['petColorValue'] as int? ?? Colors.purple.toARGB32()),
+      petColor: Color(
+        json['petColorValue'] as int? ?? Colors.purple.toARGB32(),
+      ),
       accessory: json['accessory'] as String? ?? 'none',
       soundEnabled: json['soundEnabled'] as bool? ?? true,
       notificationsEnabled: json['notificationsEnabled'] as bool? ?? true,

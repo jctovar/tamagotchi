@@ -15,7 +15,9 @@ class NotificationService {
   /// Inicializa el servicio de notificaciones
   static Future<void> initialize() async {
     // Configuración para Android
-    const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const androidSettings = AndroidInitializationSettings(
+      '@mipmap/ic_launcher',
+    );
 
     // Configuración para iOS (opcional)
     const iosSettings = DarwinInitializationSettings(
@@ -30,7 +32,7 @@ class NotificationService {
     );
 
     await _notifications.initialize(
-      initSettings,
+      settings: initSettings,
       onDidReceiveNotificationResponse: _onNotificationTapped,
     );
 
@@ -53,7 +55,8 @@ class NotificationService {
 
     await _notifications
         .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
+          AndroidFlutterLocalNotificationsPlugin
+        >()
         ?.createNotificationChannel(androidChannel);
   }
 
@@ -67,11 +70,15 @@ class NotificationService {
   static Future<bool> requestPermissions() async {
     final androidImplementation = _notifications
         .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>();
+          AndroidFlutterLocalNotificationsPlugin
+        >();
 
     if (androidImplementation != null) {
-      final granted = await androidImplementation.requestNotificationsPermission();
-      debugPrint('🔔 Permisos de notificación: ${granted == true ? "Concedidos" : "Denegados"}');
+      final granted = await androidImplementation
+          .requestNotificationsPermission();
+      debugPrint(
+        '🔔 Permisos de notificación: ${granted == true ? "Concedidos" : "Denegados"}',
+      );
       return granted ?? false;
     }
 
@@ -86,12 +93,7 @@ class NotificationService {
     String body = _getCriticalMessage(pet);
     String payload = 'critical_state';
 
-    await _showNotification(
-      id: 1,
-      title: title,
-      body: body,
-      payload: payload,
-    );
+    await _showNotification(id: 1, title: title, body: body, payload: payload);
 
     debugPrint('🔔 Notificación crítica enviada: $body');
   }
@@ -152,10 +154,10 @@ class NotificationService {
     );
 
     await _notifications.show(
-      id,
-      title,
-      body,
-      details,
+      id: id,
+      title: title,
+      body: body,
+      notificationDetails: details,
       payload: payload,
     );
   }
@@ -168,7 +170,7 @@ class NotificationService {
 
   /// Cancela una notificación específica
   static Future<void> cancel(int id) async {
-    await _notifications.cancel(id);
+    await _notifications.cancel(id: id);
     debugPrint('🔕 Notificación $id cancelada');
   }
 }

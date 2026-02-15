@@ -309,70 +309,70 @@ void main() {
 
     group('Status Getters', () {
       test('isCritical returns true when mood is critical', () {
-        final pet = Pet(
-          name: 'CriticalPet',
-          health: 20,
-        );
+        final pet = Pet(name: 'CriticalPet', health: 20);
 
         expect(pet.isCritical, isTrue);
       });
 
       test('isCritical returns false when mood is not critical', () {
-        final pet = Pet(
-          name: 'HealthyPet',
-          health: 100,
-        );
+        final pet = Pet(name: 'HealthyPet', health: 100);
 
         expect(pet.isCritical, isFalse);
       });
 
       test('isAlive returns true when health > 0', () {
-        final pet = Pet(
-          name: 'AlivePet',
-          health: 1,
-        );
+        final pet = Pet(name: 'AlivePet', health: 1);
 
         expect(pet.isAlive, isTrue);
       });
 
       test('isAlive returns false when health is 0', () {
-        final pet = Pet(
-          name: 'DeadPet',
-          health: 0,
-        );
+        final pet = Pet(name: 'DeadPet', health: 0);
 
         expect(pet.isAlive, isFalse);
       });
     });
 
     group('Evolution System', () {
-      test('gainExperience increases experience by correct amount for feed', () {
-        final pet = Pet(name: 'TestPet', experience: 100);
-        final updatedPet = pet.gainExperience('feed');
+      test(
+        'gainExperience increases experience by correct amount for feed',
+        () {
+          final pet = Pet(name: 'TestPet', experience: 100);
+          final updatedPet = pet.gainExperience('feed');
 
-        expect(updatedPet.experience, 110); // 100 + 10
-      });
+          expect(updatedPet.experience, 110); // 100 + 10
+        },
+      );
 
-      test('gainExperience increases experience by correct amount for play', () {
-        final pet = Pet(name: 'TestPet', experience: 100);
-        final updatedPet = pet.gainExperience('play');
+      test(
+        'gainExperience increases experience by correct amount for play',
+        () {
+          final pet = Pet(name: 'TestPet', experience: 100);
+          final updatedPet = pet.gainExperience('play');
 
-        expect(updatedPet.experience, 115); // 100 + 15
-      });
+          expect(updatedPet.experience, 115); // 100 + 15
+        },
+      );
 
-      test('gainExperience increases experience by correct amount for clean', () {
-        final pet = Pet(name: 'TestPet', experience: 100);
-        final updatedPet = pet.gainExperience('clean');
+      test(
+        'gainExperience increases experience by correct amount for clean',
+        () {
+          final pet = Pet(name: 'TestPet', experience: 100);
+          final updatedPet = pet.gainExperience('clean');
 
-        expect(updatedPet.experience, 110); // 100 + 10
-      });
+          expect(updatedPet.experience, 110); // 100 + 10
+        },
+      );
 
-      test('gainExperience increases experience by correct amount for rest', () {
-        final pet = Pet(name: 'TestPet', experience: 100);
-        final updatedPet = pet.gainExperience('rest');
+      test(
+        'gainExperience increases experience by correct amount for rest',
+        () {
+          final pet = Pet(name: 'TestPet', experience: 100);
+          final updatedPet = pet.gainExperience('rest');
 
-        expect(updatedPet.experience, 105); // 100 + 5
-      });
+          expect(updatedPet.experience, 105); // 100 + 5
+        },
+      );
 
       test('gainExperience returns 0 for unknown action', () {
         final pet = Pet(name: 'TestPet', experience: 100);

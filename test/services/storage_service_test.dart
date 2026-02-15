@@ -134,11 +134,7 @@ void main() {
       final now = DateTime.now();
       final oneMinuteAgo = now.subtract(const Duration(minutes: 1));
 
-      final pet = Pet(
-        name: 'HungerTest',
-        hunger: 10,
-        lastFed: oneMinuteAgo,
-      );
+      final pet = Pet(name: 'HungerTest', hunger: 10, lastFed: oneMinuteAgo);
 
       final updatedPet = service.updatePetMetrics(pet);
 
@@ -168,11 +164,7 @@ void main() {
       final now = DateTime.now();
       final oneMinuteAgo = now.subtract(const Duration(minutes: 1));
 
-      final pet = Pet(
-        name: 'EnergyTest',
-        energy: 70,
-        lastRested: oneMinuteAgo,
-      );
+      final pet = Pet(name: 'EnergyTest', energy: 70, lastRested: oneMinuteAgo);
 
       final updatedPet = service.updatePetMetrics(pet);
 
@@ -265,11 +257,7 @@ void main() {
       final now = DateTime.now();
       final longTimeAgo = now.subtract(const Duration(hours: 10));
 
-      final pet = Pet(
-        name: 'MaxHungerTest',
-        hunger: 50,
-        lastFed: longTimeAgo,
-      );
+      final pet = Pet(name: 'MaxHungerTest', hunger: 50, lastFed: longTimeAgo);
 
       final updatedPet = service.updatePetMetrics(pet);
 
@@ -393,10 +381,13 @@ void main() {
       // Verify rates match constants
       expect(updatedPet.hunger, closeTo(AppConstants.hungerDecayRate, 0.01));
       expect(
-          updatedPet.happiness,
-          closeTo(100 - AppConstants.happinessDecayRate, 0.01));
-      expect(updatedPet.energy,
-          closeTo(100 - AppConstants.energyDecayRate, 0.01));
+        updatedPet.happiness,
+        closeTo(100 - AppConstants.happinessDecayRate, 0.01),
+      );
+      expect(
+        updatedPet.energy,
+        closeTo(100 - AppConstants.energyDecayRate, 0.01),
+      );
     });
 
     test('multiple critical conditions reduce health multiple times', () {
@@ -468,7 +459,10 @@ void main() {
       // Last save should win
       final loadedPet = await service.loadPetState();
       expect(loadedPet, isNotNull);
-      expect(loadedPet!.name, anyOf('Concurrent1', 'Concurrent2', 'Concurrent3'));
+      expect(
+        loadedPet!.name,
+        anyOf('Concurrent1', 'Concurrent2', 'Concurrent3'),
+      );
     });
 
     test('clearState on empty storage does not crash', () async {
@@ -481,9 +475,7 @@ void main() {
 
     test('saveState with special characters in name', () async {
       final service = StorageService();
-      final pet = Pet(
-        name: 'Test™ 🐱 "Special" \'Chars\'',
-      );
+      final pet = Pet(name: 'Test™ 🐱 "Special" \'Chars\'');
 
       await service.saveState(pet);
       final loadedPet = await service.loadPetState();
@@ -621,7 +613,10 @@ void main() {
         totalXpEarned: 350,
         totalCoinsEarned: 70,
       );
-      final updatedStats = originalStats.updateGameStats(MiniGameType.memory, memoryStats);
+      final updatedStats = originalStats.updateGameStats(
+        MiniGameType.memory,
+        memoryStats,
+      );
 
       await service.saveMiniGameStats(updatedStats);
       final loadedStats = await service.loadMiniGameStats();
@@ -660,24 +655,28 @@ void main() {
       final service = StorageService();
 
       // First game
-      await service.updateGameStats(GameResult(
-        gameType: MiniGameType.reactionRace,
-        won: true,
-        score: 1000,
-        xpEarned: 30,
-        coinsEarned: 5,
-        duration: const Duration(seconds: 30),
-      ));
+      await service.updateGameStats(
+        GameResult(
+          gameType: MiniGameType.reactionRace,
+          won: true,
+          score: 1000,
+          xpEarned: 30,
+          coinsEarned: 5,
+          duration: const Duration(seconds: 30),
+        ),
+      );
 
       // Second game with higher score
-      await service.updateGameStats(GameResult(
-        gameType: MiniGameType.reactionRace,
-        won: true,
-        score: 1500,
-        xpEarned: 40,
-        coinsEarned: 8,
-        duration: const Duration(seconds: 25),
-      ));
+      await service.updateGameStats(
+        GameResult(
+          gameType: MiniGameType.reactionRace,
+          won: true,
+          score: 1500,
+          xpEarned: 40,
+          coinsEarned: 8,
+          duration: const Duration(seconds: 25),
+        ),
+      );
 
       final stats = await service.loadMiniGameStats();
       final raceStats = stats.getStats(MiniGameType.reactionRace);
@@ -722,14 +721,17 @@ void main() {
   });
 
   group('StorageService - InteractionHistory', () {
-    test('loadInteractionHistory returns empty history when no data exists', () async {
-      final service = StorageService();
+    test(
+      'loadInteractionHistory returns empty history when no data exists',
+      () async {
+        final service = StorageService();
 
-      final history = await service.loadInteractionHistory();
+        final history = await service.loadInteractionHistory();
 
-      expect(history, isNotNull);
-      expect(history.totalInteractions, 0);
-    });
+        expect(history, isNotNull);
+        expect(history.totalInteractions, 0);
+      },
+    );
 
     test('saveInteractionHistory stores data correctly', () async {
       final service = StorageService();
@@ -742,22 +744,25 @@ void main() {
       expect(savedData, isNotNull);
     });
 
-    test('saveInteractionHistory and loadInteractionHistory preserve data', () async {
-      final service = StorageService();
-      final interaction = Interaction.now(
-        type: InteractionType.feed,
-        hungerBefore: 50,
-        happinessBefore: 70,
-        energyBefore: 60,
-        healthBefore: 80,
-      );
-      final history = InteractionHistory().addInteraction(interaction);
+    test(
+      'saveInteractionHistory and loadInteractionHistory preserve data',
+      () async {
+        final service = StorageService();
+        final interaction = Interaction.now(
+          type: InteractionType.feed,
+          hungerBefore: 50,
+          happinessBefore: 70,
+          energyBefore: 60,
+          healthBefore: 80,
+        );
+        final history = InteractionHistory().addInteraction(interaction);
 
-      await service.saveInteractionHistory(history);
-      final loadedHistory = await service.loadInteractionHistory();
+        await service.saveInteractionHistory(history);
+        final loadedHistory = await service.loadInteractionHistory();
 
-      expect(loadedHistory.totalInteractions, 1);
-    });
+        expect(loadedHistory.totalInteractions, 1);
+      },
+    );
 
     test('addInteraction saves and returns updated history', () async {
       final service = StorageService();
@@ -781,21 +786,25 @@ void main() {
     test('multiple addInteraction calls accumulate interactions', () async {
       final service = StorageService();
 
-      await service.addInteraction(Interaction.now(
-        type: InteractionType.feed,
-        hungerBefore: 50,
-        happinessBefore: 70,
-        energyBefore: 60,
-        healthBefore: 80,
-      ));
+      await service.addInteraction(
+        Interaction.now(
+          type: InteractionType.feed,
+          hungerBefore: 50,
+          happinessBefore: 70,
+          energyBefore: 60,
+          healthBefore: 80,
+        ),
+      );
 
-      await service.addInteraction(Interaction.now(
-        type: InteractionType.play,
-        hungerBefore: 40,
-        happinessBefore: 75,
-        energyBefore: 55,
-        healthBefore: 80,
-      ));
+      await service.addInteraction(
+        Interaction.now(
+          type: InteractionType.play,
+          hungerBefore: 40,
+          happinessBefore: 75,
+          energyBefore: 55,
+          healthBefore: 80,
+        ),
+      );
 
       final history = await service.loadInteractionHistory();
       expect(history.totalInteractions, 2);
@@ -815,13 +824,16 @@ void main() {
   });
 
   group('StorageService - PetPersonality', () {
-    test('loadPetPersonality returns default personality when no data exists', () async {
-      final service = StorageService();
+    test(
+      'loadPetPersonality returns default personality when no data exists',
+      () async {
+        final service = StorageService();
 
-      final personality = await service.loadPetPersonality();
+        final personality = await service.loadPetPersonality();
 
-      expect(personality, isNotNull);
-    });
+        expect(personality, isNotNull);
+      },
+    );
 
     test('savePetPersonality stores data correctly', () async {
       final service = StorageService();
@@ -921,10 +933,7 @@ void main() {
         happinessBefore: 80,
         energyBefore: 65,
         healthBefore: 85,
-        metadata: {
-          'gameType': 'memory',
-          'score': 1500,
-        },
+        metadata: {'gameType': 'memory', 'score': 1500},
       );
 
       final history = await service.loadInteractionHistory();

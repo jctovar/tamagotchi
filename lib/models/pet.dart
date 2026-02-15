@@ -39,11 +39,11 @@ class Pet {
     this.lifeStage = LifeStage.egg,
     this.variant = PetVariant.normal,
     this.coins = 0,
-  })  : lastFed = lastFed ?? DateTime.now(),
-        lastPlayed = lastPlayed ?? DateTime.now(),
-        lastCleaned = lastCleaned ?? DateTime.now(),
-        lastRested = lastRested ?? DateTime.now(),
-        birthDate = birthDate ?? DateTime.now();
+  }) : lastFed = lastFed ?? DateTime.now(),
+       lastPlayed = lastPlayed ?? DateTime.now(),
+       lastCleaned = lastCleaned ?? DateTime.now(),
+       lastRested = lastRested ?? DateTime.now(),
+       birthDate = birthDate ?? DateTime.now();
 
   /// Estado de ánimo basado en las métricas
   PetMood get mood {
@@ -74,7 +74,8 @@ class Pet {
   double get levelProgress => EvolutionUtils.levelProgress(experience, level);
 
   /// Experiencia necesaria para siguiente nivel
-  int get experienceForNextLevel => EvolutionUtils.experienceForNextLevel(level);
+  int get experienceForNextLevel =>
+      EvolutionUtils.experienceForNextLevel(level);
 
   /// Actualiza tiempo vivo
   void updateTimeAlive() {
@@ -194,11 +195,4 @@ class Pet {
 }
 
 /// Estados de ánimo de la mascota
-enum PetMood {
-  happy,
-  neutral,
-  sad,
-  hungry,
-  tired,
-  critical,
-}
+enum PetMood { happy, neutral, sad, hungry, tired, critical }

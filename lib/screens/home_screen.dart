@@ -36,10 +36,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     // Inicializar providers de timer y lifecycle
     Future.microtask(() {
       // Inicializar el timer de actualización automática
-      ref.read(metricsUpdateNotifierProvider);
-
-      // Inicializar el observer de lifecycle
-      ref.read(appLifecycleNotifierProvider);
+      ref.read(metricsUpdateProvider);
     });
   }
 
@@ -384,9 +381,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   void _navigateToMiniGames() {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => const MiniGamesMenuScreen(),
-      ),
+      MaterialPageRoute(builder: (context) => const MiniGamesMenuScreen()),
     );
   }
 
@@ -411,10 +406,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),
-            Text(
-              pet.lifeStage.baseEmoji,
-              style: const TextStyle(fontSize: 80),
-            ),
+            Text(pet.lifeStage.baseEmoji, style: const TextStyle(fontSize: 80)),
             const SizedBox(height: 8),
             Text(
               'Ahora es un ${pet.lifeStage.displayName}',

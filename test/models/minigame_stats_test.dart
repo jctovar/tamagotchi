@@ -19,9 +19,18 @@ void main() {
     });
 
     test('description devuelve descripciones correctas', () {
-      expect(MiniGameType.memory.description, 'Encuentra las parejas de emojis');
-      expect(MiniGameType.slidingPuzzle.description, 'Ordena los números del 1 al 8');
-      expect(MiniGameType.reactionRace.description, 'Presiona cuando cambie el color');
+      expect(
+        MiniGameType.memory.description,
+        'Encuentra las parejas de emojis',
+      );
+      expect(
+        MiniGameType.slidingPuzzle.description,
+        'Ordena los números del 1 al 8',
+      );
+      expect(
+        MiniGameType.reactionRace.description,
+        'Presiona cuando cambie el color',
+      );
     });
 
     test('icon devuelve emojis correctos', () {
@@ -156,9 +165,7 @@ void main() {
       });
 
       test('fromJson usa valores por defecto para campos faltantes', () {
-        final json = {
-          'gameType': MiniGameType.reactionRace.index,
-        };
+        final json = {'gameType': MiniGameType.reactionRace.index};
 
         final stats = GameStats.fromJson(json);
 
@@ -200,10 +207,7 @@ void main() {
           bestScore: 500,
         );
 
-        final updated = original.copyWith(
-          timesPlayed: 11,
-          timesWon: 5,
-        );
+        final updated = original.copyWith(timesPlayed: 11, timesWon: 5);
 
         expect(updated.gameType, MiniGameType.memory);
         expect(updated.timesPlayed, 11);
@@ -268,20 +272,22 @@ void main() {
 
     group('getters agregados', () {
       test('totalGamesPlayed suma todas las partidas', () {
-        final stats = MiniGameStats(stats: {
-          MiniGameType.memory: GameStats(
-            gameType: MiniGameType.memory,
-            timesPlayed: 10,
-          ),
-          MiniGameType.slidingPuzzle: GameStats(
-            gameType: MiniGameType.slidingPuzzle,
-            timesPlayed: 15,
-          ),
-          MiniGameType.reactionRace: GameStats(
-            gameType: MiniGameType.reactionRace,
-            timesPlayed: 5,
-          ),
-        });
+        final stats = MiniGameStats(
+          stats: {
+            MiniGameType.memory: GameStats(
+              gameType: MiniGameType.memory,
+              timesPlayed: 10,
+            ),
+            MiniGameType.slidingPuzzle: GameStats(
+              gameType: MiniGameType.slidingPuzzle,
+              timesPlayed: 15,
+            ),
+            MiniGameType.reactionRace: GameStats(
+              gameType: MiniGameType.reactionRace,
+              timesPlayed: 5,
+            ),
+          },
+        );
 
         expect(stats.totalGamesPlayed, 30);
       });
@@ -292,20 +298,22 @@ void main() {
       });
 
       test('totalWins suma todas las victorias', () {
-        final stats = MiniGameStats(stats: {
-          MiniGameType.memory: GameStats(
-            gameType: MiniGameType.memory,
-            timesWon: 7,
-          ),
-          MiniGameType.slidingPuzzle: GameStats(
-            gameType: MiniGameType.slidingPuzzle,
-            timesWon: 10,
-          ),
-          MiniGameType.reactionRace: GameStats(
-            gameType: MiniGameType.reactionRace,
-            timesWon: 3,
-          ),
-        });
+        final stats = MiniGameStats(
+          stats: {
+            MiniGameType.memory: GameStats(
+              gameType: MiniGameType.memory,
+              timesWon: 7,
+            ),
+            MiniGameType.slidingPuzzle: GameStats(
+              gameType: MiniGameType.slidingPuzzle,
+              timesWon: 10,
+            ),
+            MiniGameType.reactionRace: GameStats(
+              gameType: MiniGameType.reactionRace,
+              timesWon: 3,
+            ),
+          },
+        );
 
         expect(stats.totalWins, 20);
       });
@@ -316,20 +324,22 @@ void main() {
       });
 
       test('totalXpEarned suma toda la experiencia', () {
-        final stats = MiniGameStats(stats: {
-          MiniGameType.memory: GameStats(
-            gameType: MiniGameType.memory,
-            totalXpEarned: 100,
-          ),
-          MiniGameType.slidingPuzzle: GameStats(
-            gameType: MiniGameType.slidingPuzzle,
-            totalXpEarned: 200,
-          ),
-          MiniGameType.reactionRace: GameStats(
-            gameType: MiniGameType.reactionRace,
-            totalXpEarned: 150,
-          ),
-        });
+        final stats = MiniGameStats(
+          stats: {
+            MiniGameType.memory: GameStats(
+              gameType: MiniGameType.memory,
+              totalXpEarned: 100,
+            ),
+            MiniGameType.slidingPuzzle: GameStats(
+              gameType: MiniGameType.slidingPuzzle,
+              totalXpEarned: 200,
+            ),
+            MiniGameType.reactionRace: GameStats(
+              gameType: MiniGameType.reactionRace,
+              totalXpEarned: 150,
+            ),
+          },
+        );
 
         expect(stats.totalXpEarned, 450);
       });
@@ -340,20 +350,22 @@ void main() {
       });
 
       test('totalCoinsEarned suma todas las monedas', () {
-        final stats = MiniGameStats(stats: {
-          MiniGameType.memory: GameStats(
-            gameType: MiniGameType.memory,
-            totalCoinsEarned: 50,
-          ),
-          MiniGameType.slidingPuzzle: GameStats(
-            gameType: MiniGameType.slidingPuzzle,
-            totalCoinsEarned: 75,
-          ),
-          MiniGameType.reactionRace: GameStats(
-            gameType: MiniGameType.reactionRace,
-            totalCoinsEarned: 25,
-          ),
-        });
+        final stats = MiniGameStats(
+          stats: {
+            MiniGameType.memory: GameStats(
+              gameType: MiniGameType.memory,
+              totalCoinsEarned: 50,
+            ),
+            MiniGameType.slidingPuzzle: GameStats(
+              gameType: MiniGameType.slidingPuzzle,
+              totalCoinsEarned: 75,
+            ),
+            MiniGameType.reactionRace: GameStats(
+              gameType: MiniGameType.reactionRace,
+              totalCoinsEarned: 25,
+            ),
+          },
+        );
 
         expect(stats.totalCoinsEarned, 150);
       });
@@ -370,9 +382,7 @@ void main() {
           gameType: MiniGameType.memory,
           timesPlayed: 10,
         );
-        final stats = MiniGameStats(stats: {
-          MiniGameType.memory: memoryStats,
-        });
+        final stats = MiniGameStats(stats: {MiniGameType.memory: memoryStats});
 
         final retrieved = stats.getStats(MiniGameType.memory);
 
@@ -401,38 +411,52 @@ void main() {
           timesWon: 3,
         );
 
-        final updated = stats.updateGameStats(MiniGameType.memory, newMemoryStats);
+        final updated = stats.updateGameStats(
+          MiniGameType.memory,
+          newMemoryStats,
+        );
 
         expect(updated.stats[MiniGameType.memory]!.timesPlayed, 5);
         expect(updated.stats[MiniGameType.memory]!.timesWon, 3);
       });
 
       test('no modifica las otras estadísticas', () {
-        final stats = MiniGameStats(stats: {
-          MiniGameType.memory: GameStats(
-            gameType: MiniGameType.memory,
-            timesPlayed: 10,
-          ),
-          MiniGameType.slidingPuzzle: GameStats(
-            gameType: MiniGameType.slidingPuzzle,
-            timesPlayed: 15,
-          ),
-        });
+        final stats = MiniGameStats(
+          stats: {
+            MiniGameType.memory: GameStats(
+              gameType: MiniGameType.memory,
+              timesPlayed: 10,
+            ),
+            MiniGameType.slidingPuzzle: GameStats(
+              gameType: MiniGameType.slidingPuzzle,
+              timesPlayed: 15,
+            ),
+          },
+        );
 
         final newMemoryStats = GameStats(
           gameType: MiniGameType.memory,
           timesPlayed: 20,
         );
 
-        final updated = stats.updateGameStats(MiniGameType.memory, newMemoryStats);
+        final updated = stats.updateGameStats(
+          MiniGameType.memory,
+          newMemoryStats,
+        );
 
         expect(updated.stats[MiniGameType.memory]!.timesPlayed, 20);
-        expect(updated.stats[MiniGameType.slidingPuzzle]!.timesPlayed, 15); // No cambió
+        expect(
+          updated.stats[MiniGameType.slidingPuzzle]!.timesPlayed,
+          15,
+        ); // No cambió
       });
 
       test('devuelve nueva instancia de MiniGameStats', () {
         final stats = MiniGameStats();
-        final newStats = GameStats(gameType: MiniGameType.memory, timesPlayed: 5);
+        final newStats = GameStats(
+          gameType: MiniGameType.memory,
+          timesPlayed: 5,
+        );
 
         final updated = stats.updateGameStats(MiniGameType.memory, newStats);
 
@@ -442,23 +466,25 @@ void main() {
 
     group('serialización', () {
       test('toJson serializa correctamente', () {
-        final stats = MiniGameStats(stats: {
-          MiniGameType.memory: GameStats(
-            gameType: MiniGameType.memory,
-            timesPlayed: 10,
-            timesWon: 7,
-          ),
-          MiniGameType.slidingPuzzle: GameStats(
-            gameType: MiniGameType.slidingPuzzle,
-            timesPlayed: 5,
-            timesWon: 3,
-          ),
-          MiniGameType.reactionRace: GameStats(
-            gameType: MiniGameType.reactionRace,
-            timesPlayed: 8,
-            timesWon: 6,
-          ),
-        });
+        final stats = MiniGameStats(
+          stats: {
+            MiniGameType.memory: GameStats(
+              gameType: MiniGameType.memory,
+              timesPlayed: 10,
+              timesWon: 7,
+            ),
+            MiniGameType.slidingPuzzle: GameStats(
+              gameType: MiniGameType.slidingPuzzle,
+              timesPlayed: 5,
+              timesWon: 3,
+            ),
+            MiniGameType.reactionRace: GameStats(
+              gameType: MiniGameType.reactionRace,
+              timesPlayed: 8,
+              timesWon: 6,
+            ),
+          },
+        );
 
         final json = stats.toJson();
 
@@ -501,10 +527,7 @@ void main() {
       test('fromJson asegura que todos los juegos tengan estadísticas', () {
         final json = {
           'stats': {
-            '0': {
-              'gameType': 0,
-              'timesPlayed': 10,
-            },
+            '0': {'gameType': 0, 'timesPlayed': 10},
           },
         };
 
@@ -542,32 +565,34 @@ void main() {
       });
 
       test('roundtrip toJson -> fromJson preserva datos', () {
-        final original = MiniGameStats(stats: {
-          MiniGameType.memory: GameStats(
-            gameType: MiniGameType.memory,
-            timesPlayed: 25,
-            timesWon: 20,
-            bestScore: 1500,
-            totalXpEarned: 1000,
-            totalCoinsEarned: 300,
-          ),
-          MiniGameType.slidingPuzzle: GameStats(
-            gameType: MiniGameType.slidingPuzzle,
-            timesPlayed: 15,
-            timesWon: 10,
-            bestScore: 800,
-            totalXpEarned: 500,
-            totalCoinsEarned: 150,
-          ),
-          MiniGameType.reactionRace: GameStats(
-            gameType: MiniGameType.reactionRace,
-            timesPlayed: 30,
-            timesWon: 25,
-            bestScore: 2000,
-            totalXpEarned: 1500,
-            totalCoinsEarned: 450,
-          ),
-        });
+        final original = MiniGameStats(
+          stats: {
+            MiniGameType.memory: GameStats(
+              gameType: MiniGameType.memory,
+              timesPlayed: 25,
+              timesWon: 20,
+              bestScore: 1500,
+              totalXpEarned: 1000,
+              totalCoinsEarned: 300,
+            ),
+            MiniGameType.slidingPuzzle: GameStats(
+              gameType: MiniGameType.slidingPuzzle,
+              timesPlayed: 15,
+              timesWon: 10,
+              bestScore: 800,
+              totalXpEarned: 500,
+              totalCoinsEarned: 150,
+            ),
+            MiniGameType.reactionRace: GameStats(
+              gameType: MiniGameType.reactionRace,
+              timesPlayed: 30,
+              timesWon: 25,
+              bestScore: 2000,
+              totalXpEarned: 1500,
+              totalCoinsEarned: 450,
+            ),
+          },
+        );
 
         final json = original.toJson();
         final restored = MiniGameStats.fromJson(json);

@@ -16,9 +16,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Inicializar Firebase
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   // Configurar Crashlytics para capturar errores de Flutter
   FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
@@ -43,9 +41,7 @@ void main() async {
   // Ejecutar app (los errores ya se capturan via FlutterError.onError y PlatformDispatcher.instance.onError)
   runApp(
     // ProviderScope para Riverpod (migración en progreso)
-    const ProviderScope(
-      child: TamagotchiApp(),
-    ),
+    const ProviderScope(child: TamagotchiApp()),
   );
 }
 
@@ -58,13 +54,9 @@ class TamagotchiApp extends StatelessWidget {
       title: 'Tamagotchi',
       theme: AppTheme.lightTheme,
       debugShowCheckedModeBanner: false,
-      navigatorObservers: [
-        AnalyticsService.observer,
-      ],
+      navigatorObservers: [AnalyticsService.observer],
       home: const AppInitializer(),
-      routes: {
-        '/home': (context) => const MainNavigation(),
-      },
+      routes: {'/home': (context) => const MainNavigation()},
     );
   }
 }

@@ -3,11 +3,11 @@ library;
 
 /// Etapa de vida de la mascota
 enum LifeStage {
-  egg,      // Huevo (0-5 min)
-  baby,     // Bebé (5-30 min)
-  child,    // Niño (30 min - 2 horas)
-  teen,     // Adolescente (2-6 horas)
-  adult,    // Adulto (6+ horas)
+  egg, // Huevo (0-5 min)
+  baby, // Bebé (5-30 min)
+  child, // Niño (30 min - 2 horas)
+  teen, // Adolescente (2-6 horas)
+  adult, // Adulto (6+ horas)
 }
 
 /// Extensión para obtener propiedades de cada etapa
@@ -111,9 +111,9 @@ extension LifeStageExtension on LifeStage {
 
 /// Variante de la mascota según calidad de cuidado
 enum PetVariant {
-  neglected,  // Descuidado (mal cuidado)
-  normal,     // Normal (cuidado promedio)
-  excellent,  // Excelente (muy buen cuidado)
+  neglected, // Descuidado (mal cuidado)
+  normal, // Normal (cuidado promedio)
+  excellent, // Excelente (muy buen cuidado)
 }
 
 extension PetVariantExtension on PetVariant {

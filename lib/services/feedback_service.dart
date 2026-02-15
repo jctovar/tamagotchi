@@ -6,18 +6,9 @@ import 'package:vibration/vibration.dart';
 import '../services/preferences_service.dart';
 
 /// Tipo de feedback
-enum FeedbackType {
-  feed,
-  play,
-  clean,
-  rest,
-  tap,
-  success,
-  error,
-}
+enum FeedbackType { feed, play, clean, rest, tap, success, error }
 
 class FeedbackService {
-
   /// Reproduce haptic feedback según el tipo
   static Future<void> playHaptic(FeedbackType type) async {
     // Cargar preferencias para verificar si el sonido está habilitado

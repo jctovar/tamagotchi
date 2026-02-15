@@ -296,14 +296,17 @@ void main() {
         expect(loaded.notificationsEnabled, false);
       });
 
-      test('retorna valores por defecto cuando no hay preferencias guardadas', () async {
-        final loaded = await PreferencesService.loadPreferences();
+      test(
+        'retorna valores por defecto cuando no hay preferencias guardadas',
+        () async {
+          final loaded = await PreferencesService.loadPreferences();
 
-        expect(loaded.petColor.toARGB32(), Colors.purple.toARGB32());
-        expect(loaded.accessory, 'none');
-        expect(loaded.soundEnabled, true);
-        expect(loaded.notificationsEnabled, true);
-      });
+          expect(loaded.petColor.toARGB32(), Colors.purple.toARGB32());
+          expect(loaded.accessory, 'none');
+          expect(loaded.soundEnabled, true);
+          expect(loaded.notificationsEnabled, true);
+        },
+      );
 
       test('retorna valores por defecto cuando JSON está corrupto', () async {
         final sp = await SharedPreferences.getInstance();
@@ -418,7 +421,10 @@ void main() {
 
         final loaded = await PreferencesService.loadPreferences();
         expect(loaded.accessory, 'scarf');
-        expect(loaded.petColor.toARGB32(), Colors.purple.toARGB32()); // Defaults
+        expect(
+          loaded.petColor.toARGB32(),
+          Colors.purple.toARGB32(),
+        ); // Defaults
       });
 
       test('puede cambiar de un accesorio a otro', () async {
@@ -462,7 +468,10 @@ void main() {
         await PreferencesService.updateSoundEnabled(false);
 
         final loaded = await PreferencesService.loadPreferences();
-        expect(loaded.petColor.toARGB32(), Colors.orange.toARGB32()); // No cambió
+        expect(
+          loaded.petColor.toARGB32(),
+          Colors.orange.toARGB32(),
+        ); // No cambió
         expect(loaded.accessory, 'bow'); // No cambió
         expect(loaded.soundEnabled, false);
         expect(loaded.notificationsEnabled, false); // No cambió
@@ -473,7 +482,10 @@ void main() {
 
         final loaded = await PreferencesService.loadPreferences();
         expect(loaded.soundEnabled, false);
-        expect(loaded.petColor.toARGB32(), Colors.purple.toARGB32()); // Defaults
+        expect(
+          loaded.petColor.toARGB32(),
+          Colors.purple.toARGB32(),
+        ); // Defaults
       });
 
       test('puede alternar entre true y false', () async {
@@ -497,30 +509,39 @@ void main() {
         expect(loaded.notificationsEnabled, false);
       });
 
-      test('mantiene otras preferencias al actualizar notificaciones', () async {
-        const initial = PetPreferences(
-          petColor: Colors.amber,
-          accessory: 'scarf',
-          soundEnabled: false,
-          notificationsEnabled: true,
-        );
-        await PreferencesService.savePreferences(initial);
+      test(
+        'mantiene otras preferencias al actualizar notificaciones',
+        () async {
+          const initial = PetPreferences(
+            petColor: Colors.amber,
+            accessory: 'scarf',
+            soundEnabled: false,
+            notificationsEnabled: true,
+          );
+          await PreferencesService.savePreferences(initial);
 
-        await PreferencesService.updateNotificationsEnabled(false);
+          await PreferencesService.updateNotificationsEnabled(false);
 
-        final loaded = await PreferencesService.loadPreferences();
-        expect(loaded.petColor.toARGB32(), Colors.amber.toARGB32()); // No cambió
-        expect(loaded.accessory, 'scarf'); // No cambió
-        expect(loaded.soundEnabled, false); // No cambió
-        expect(loaded.notificationsEnabled, false);
-      });
+          final loaded = await PreferencesService.loadPreferences();
+          expect(
+            loaded.petColor.toARGB32(),
+            Colors.amber.toARGB32(),
+          ); // No cambió
+          expect(loaded.accessory, 'scarf'); // No cambió
+          expect(loaded.soundEnabled, false); // No cambió
+          expect(loaded.notificationsEnabled, false);
+        },
+      );
 
       test('funciona cuando no hay preferencias previas', () async {
         await PreferencesService.updateNotificationsEnabled(false);
 
         final loaded = await PreferencesService.loadPreferences();
         expect(loaded.notificationsEnabled, false);
-        expect(loaded.petColor.toARGB32(), Colors.purple.toARGB32()); // Defaults
+        expect(
+          loaded.petColor.toARGB32(),
+          Colors.purple.toARGB32(),
+        ); // Defaults
       });
 
       test('puede alternar entre true y false', () async {
@@ -574,33 +595,45 @@ void main() {
         }
       });
 
-      test('persiste datos después de múltiples ciclos load-update-save', () async {
-        // Ciclo 1
-        await PreferencesService.updatePetColor(Colors.red.toARGB32());
-        var loaded = await PreferencesService.loadPreferences();
-        expect(loaded.petColor.toARGB32(), Colors.red.toARGB32());
+      test(
+        'persiste datos después de múltiples ciclos load-update-save',
+        () async {
+          // Ciclo 1
+          await PreferencesService.updatePetColor(Colors.red.toARGB32());
+          var loaded = await PreferencesService.loadPreferences();
+          expect(loaded.petColor.toARGB32(), Colors.red.toARGB32());
 
-        // Ciclo 2
-        await PreferencesService.updateAccessory('glasses');
-        loaded = await PreferencesService.loadPreferences();
-        expect(loaded.petColor.toARGB32(), Colors.red.toARGB32()); // Se mantuvo
-        expect(loaded.accessory, 'glasses');
+          // Ciclo 2
+          await PreferencesService.updateAccessory('glasses');
+          loaded = await PreferencesService.loadPreferences();
+          expect(
+            loaded.petColor.toARGB32(),
+            Colors.red.toARGB32(),
+          ); // Se mantuvo
+          expect(loaded.accessory, 'glasses');
 
-        // Ciclo 3
-        await PreferencesService.updateSoundEnabled(false);
-        loaded = await PreferencesService.loadPreferences();
-        expect(loaded.petColor.toARGB32(), Colors.red.toARGB32()); // Se mantuvo
-        expect(loaded.accessory, 'glasses'); // Se mantuvo
-        expect(loaded.soundEnabled, false);
+          // Ciclo 3
+          await PreferencesService.updateSoundEnabled(false);
+          loaded = await PreferencesService.loadPreferences();
+          expect(
+            loaded.petColor.toARGB32(),
+            Colors.red.toARGB32(),
+          ); // Se mantuvo
+          expect(loaded.accessory, 'glasses'); // Se mantuvo
+          expect(loaded.soundEnabled, false);
 
-        // Ciclo 4
-        await PreferencesService.updateNotificationsEnabled(false);
-        loaded = await PreferencesService.loadPreferences();
-        expect(loaded.petColor.toARGB32(), Colors.red.toARGB32()); // Se mantuvo
-        expect(loaded.accessory, 'glasses'); // Se mantuvo
-        expect(loaded.soundEnabled, false); // Se mantuvo
-        expect(loaded.notificationsEnabled, false);
-      });
+          // Ciclo 4
+          await PreferencesService.updateNotificationsEnabled(false);
+          loaded = await PreferencesService.loadPreferences();
+          expect(
+            loaded.petColor.toARGB32(),
+            Colors.red.toARGB32(),
+          ); // Se mantuvo
+          expect(loaded.accessory, 'glasses'); // Se mantuvo
+          expect(loaded.soundEnabled, false); // Se mantuvo
+          expect(loaded.notificationsEnabled, false);
+        },
+      );
     });
   });
 }

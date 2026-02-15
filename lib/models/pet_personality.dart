@@ -64,7 +64,11 @@ enum BondLevel {
   final int requiredInteractions;
   final String description;
 
-  const BondLevel(this.displayName, this.requiredInteractions, this.description);
+  const BondLevel(
+    this.displayName,
+    this.requiredInteractions,
+    this.description,
+  );
 
   /// Obtiene el nivel de vínculo basado en interacciones
   static BondLevel fromInteractions(int count) {
@@ -103,15 +107,13 @@ class PetPersonality {
     this.bondPoints = 0,
     UserPreferences? userPreferences,
     DateTime? lastUpdated,
-  })  : traits = traits ?? _defaultTraits(),
-        userPreferences = userPreferences ?? UserPreferences(),
-        lastUpdated = lastUpdated ?? DateTime.now();
+  }) : traits = traits ?? _defaultTraits(),
+       userPreferences = userPreferences ?? UserPreferences(),
+       lastUpdated = lastUpdated ?? DateTime.now();
 
   /// Traits por defecto
   static Map<PersonalityTrait, double> _defaultTraits() {
-    return {
-      for (final trait in PersonalityTrait.values) trait: 50.0,
-    };
+    return {for (final trait in PersonalityTrait.values) trait: 50.0};
   }
 
   /// Obtiene los 3 traits más dominantes
@@ -129,9 +131,12 @@ class PetPersonality {
   /// Descripción textual de la personalidad
   String get personalityDescription {
     final dominant = dominantTraits;
-    if (dominant.isEmpty) return 'Tu mascota aún está desarrollando su personalidad.';
+    if (dominant.isEmpty)
+      return 'Tu mascota aún está desarrollando su personalidad.';
 
-    final traitNames = dominant.map((t) => t.displayName.toLowerCase()).toList();
+    final traitNames = dominant
+        .map((t) => t.displayName.toLowerCase())
+        .toList();
 
     if (traitNames.length == 1) {
       return 'Tu mascota es muy ${traitNames[0]}.';
@@ -336,7 +341,9 @@ class PetPersonality {
       ),
       bondPoints: json['bondPoints'] as int? ?? 0,
       userPreferences: json['userPreferences'] != null
-          ? UserPreferences.fromJson(json['userPreferences'] as Map<String, dynamic>)
+          ? UserPreferences.fromJson(
+              json['userPreferences'] as Map<String, dynamic>,
+            )
           : null,
       lastUpdated: json['lastUpdated'] != null
           ? DateTime.parse(json['lastUpdated'] as String)
@@ -452,7 +459,8 @@ class UserPreferences {
       preferredDayOfWeek: preferredDayOfWeek ?? this.preferredDayOfWeek,
       favoriteInteraction: favoriteInteraction ?? this.favoriteInteraction,
       averageSessionGap: averageSessionGap ?? this.averageSessionGap,
-      averageSessionDuration: averageSessionDuration ?? this.averageSessionDuration,
+      averageSessionDuration:
+          averageSessionDuration ?? this.averageSessionDuration,
       consistencyScore: consistencyScore ?? this.consistencyScore,
     );
   }

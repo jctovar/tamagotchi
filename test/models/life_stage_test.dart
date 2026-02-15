@@ -92,7 +92,9 @@ void main() {
     });
 
     test('time requirements are in ascending order', () {
-      final times = LifeStage.values.map((stage) => stage.minTimeSeconds).toList();
+      final times = LifeStage.values
+          .map((stage) => stage.minTimeSeconds)
+          .toList();
       final sortedTimes = List<int>.from(times)..sort();
       expect(times, equals(sortedTimes));
     });
@@ -120,7 +122,9 @@ void main() {
     });
 
     test('experience requirements are in ascending order', () {
-      final xpRequirements = LifeStage.values.map((stage) => stage.requiredExperience).toList();
+      final xpRequirements = LifeStage.values
+          .map((stage) => stage.requiredExperience)
+          .toList();
       final sortedXp = List<int>.from(xpRequirements)..sort();
       expect(xpRequirements, equals(sortedXp));
     });
@@ -452,9 +456,12 @@ void main() {
     });
 
     test('play gives most XP among actions', () {
-      final xpValues = ['feed', 'play', 'clean', 'rest']
-          .map((action) => EvolutionUtils.getExperienceForAction(action))
-          .toList();
+      final xpValues = [
+        'feed',
+        'play',
+        'clean',
+        'rest',
+      ].map((action) => EvolutionUtils.getExperienceForAction(action)).toList();
       expect(xpValues.reduce((a, b) => a > b ? a : b), 15);
     });
   });
@@ -584,7 +591,10 @@ void main() {
       // Level 3 = 200 XP, Next level (4) = 1600 XP
       // Range: 400 - 900 XP (500 XP range)
       final level = 5;
-      final progress1 = EvolutionUtils.levelProgress(1600, level); // Start of level 5
+      final progress1 = EvolutionUtils.levelProgress(
+        1600,
+        level,
+      ); // Start of level 5
       final progress2 = EvolutionUtils.levelProgress(1800, level); // Middle
       final progress3 = EvolutionUtils.levelProgress(2000, level); // Further in
 
@@ -595,9 +605,14 @@ void main() {
 
   group('EvolutionUtils - Integration Tests', () {
     test('progression from egg to adult through experience', () {
-      final stages = [0, 100, 500, 1500, 3000].map((xp) =>
-        EvolutionUtils.calculateLifeStage(totalTimeAlive: 0, experience: xp)
-      ).toList();
+      final stages = [0, 100, 500, 1500, 3000]
+          .map(
+            (xp) => EvolutionUtils.calculateLifeStage(
+              totalTimeAlive: 0,
+              experience: xp,
+            ),
+          )
+          .toList();
 
       expect(stages, [
         LifeStage.egg,
@@ -609,9 +624,14 @@ void main() {
     });
 
     test('progression from egg to adult through time', () {
-      final stages = [0, 300, 1800, 7200, 21600].map((time) =>
-        EvolutionUtils.calculateLifeStage(totalTimeAlive: time, experience: 0)
-      ).toList();
+      final stages = [0, 300, 1800, 7200, 21600]
+          .map(
+            (time) => EvolutionUtils.calculateLifeStage(
+              totalTimeAlive: time,
+              experience: 0,
+            ),
+          )
+          .toList();
 
       expect(stages, [
         LifeStage.egg,
@@ -623,15 +643,20 @@ void main() {
     });
 
     test('variant changes with care quality', () {
-      final variants = [
-        [30, 25, 20], // Neglected
-        [50, 55, 60], // Normal
-        [90, 85, 95], // Excellent
-      ].map((metrics) => EvolutionUtils.calculateVariant(
-        avgHealth: metrics[0].toDouble(),
-        avgHappiness: metrics[1].toDouble(),
-        avgEnergy: metrics[2].toDouble(),
-      )).toList();
+      final variants =
+          [
+                [30, 25, 20], // Neglected
+                [50, 55, 60], // Normal
+                [90, 85, 95], // Excellent
+              ]
+              .map(
+                (metrics) => EvolutionUtils.calculateVariant(
+                  avgHealth: metrics[0].toDouble(),
+                  avgHappiness: metrics[1].toDouble(),
+                  avgEnergy: metrics[2].toDouble(),
+                ),
+              )
+              .toList();
 
       expect(variants, [
         PetVariant.neglected,
