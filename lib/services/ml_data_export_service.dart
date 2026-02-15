@@ -1,311 +1,14 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:math';
-
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
-
+import 'package:intl/intl.dart';
 import '../models/pet.dart';
 import '../models/pet_personality.dart';
 import '../models/interaction_history.dart';
-import '../utils/ml_feature_extractor.dart';
+import '../utils/logger.dart';
 
-/// Servicio para exportar datos de entrenamiento ML
-///
-/// Permite exportar historial de interacciones en formato JSON
-/// para entrenar modelos TensorFlow Lite externamente.
-class MLDataExportService {
-  static final MLDataExportService _instance = MLDataExportService._internal();
-  factory MLDataExportService() => _instance;
-  MLDataExportService._internal();
-
-  static const String _exportVersion = '1.0';
-
-  /// Exporta datos reales del historial de interacciones
-  Future<ExportResult> exportTrainingData({
-    required Pet pet,
-    required PetPersonality personality,
-    required InteractionHistory history,
-  }) async {
-    if (history.interactions.isEmpty) {
-      return ExportResult(
-        success: false,
-        recordCount: 0,
-        error: 'No hay interacciones para exportar',
-      );
-    }
-
-    try {
-      final records = <Map<String, dynamic>>[];
-
-      // Procesar cada interacción para generar registros de entrenamiento
-      for (int i = 0; i < history.interactions.length; i++) {
-        final interaction = history.interactions[i];
-
-        // Saltar interacciones de apertura/cierre de app
-        if (interaction.type == InteractionType.appOpen ||
-            interaction.type == InteractionType.appClose) {
-          continue;
-        }
-
-        // Crear un Pet simulado con las métricas antes de la interacción
-        final petSnapshot = Pet(
-          name: pet.name,
-          hunger: interaction.hungerBefore,
-          happiness: interaction.happinessBefore,
-          energy: interaction.energyBefore,
-          health: interaction.healthBefore,
-        );
-
-        // Crear historial hasta este punto
-        final historySnapshot = InteractionHistory(
-          interactions: history.interactions.sublist(0, i),
-        );
-
-        // Extraer features
-        final features = MLFeatureExtractor.extractActionPredictorFeatures(
-          pet: petSnapshot,
-          personality: personality,
-          history: historySnapshot,
-        );
-
-        // Calcular tiempo hasta estado crítico (aproximado)
-        final timeToCritical = _estimateTimeToCritical(petSnapshot);
-
-        records.add(MLTrainingRecord(
-          features: features,
-          actionTaken: interaction.type,
-          timeToCritical: timeToCritical,
-          resultingEmotion: personality.emotionalState,
-          timestamp: interaction.timestamp,
-          metricsBefore: {
-            'hunger': interaction.hungerBefore,
-            'happiness': interaction.happinessBefore,
-            'energy': interaction.energyBefore,
-            'health': interaction.healthBefore,
-          },
-        ).toJson());
-      }
-
-      if (records.isEmpty) {
-        return ExportResult(
-          success: false,
-          recordCount: 0,
-          error: 'No se pudieron generar registros de entrenamiento',
-        );
-      }
-
-      // Crear JSON de exportación
-      final exportData = {
-        'version': _exportVersion,
-        'export_date': DateTime.now().toIso8601String(),
-        'pet_name': pet.name,
-        'total_interactions': history.totalInteractions,
-        'days_active': history.daysActive,
-        'record_count': records.length,
-        'records': records,
-      };
-
-      // Guardar archivo
-      final filePath = await _saveToFile(exportData);
-
-      return ExportResult(
-        success: true,
-        recordCount: records.length,
-        filePath: filePath,
-      );
-    } catch (e) {
-      return ExportResult(
-        success: false,
-        recordCount: 0,
-        error: 'Error al exportar: $e',
-      );
-    }
-  }
-
-  /// Genera datos sintéticos para entrenamiento inicial
-  Future<ExportResult> generateSyntheticData({
-    int recordCount = 500,
-  }) async {
-    try {
-      final random = Random();
-      final records = <Map<String, dynamic>>[];
-
-      for (int i = 0; i < recordCount; i++) {
-        // Generar métricas aleatorias
-        final hunger = random.nextDouble() * 100;
-        final happiness = random.nextDouble() * 100;
-        final energy = random.nextDouble() * 100;
-        final health = random.nextDouble() * 100;
-
-        // Determinar acción "correcta" basada en reglas heurísticas
-        final action = _determineOptimalAction(
-          hunger: hunger,
-          happiness: happiness,
-          energy: energy,
-          health: health,
-        );
-
-        // Generar features
-        final features = _generateSyntheticFeatures(
-          hunger: hunger,
-          happiness: happiness,
-          energy: energy,
-          health: health,
-          random: random,
-        );
-
-        // Calcular tiempo hasta estado crítico
-        final timeToCritical = [
-          (70 - hunger) / 0.12, // ~8.3 minutos por punto
-          (happiness - 30) / 0.06, // ~16.6 minutos por punto
-          (energy - 20) / 0.06, // ~16.6 minutos por punto
-          (health - 30) / 0.04, // ~25 minutos por punto
-        ].map((t) => t.clamp(0.0, 180.0)).toList();
-
-        records.add({
-          'features': features,
-          'action_taken': action.id,
-          'time_to_critical': timeToCritical,
-          'resulting_emotion': random.nextInt(8),
-          'timestamp': DateTime.now()
-              .subtract(Duration(minutes: random.nextInt(10000)))
-              .toIso8601String(),
-          'metrics_before': {
-            'hunger': hunger,
-            'happiness': happiness,
-            'energy': energy,
-            'health': health,
-          },
-          'is_synthetic': true,
-        });
-      }
-
-      // Crear JSON de exportación
-      final exportData = {
-        'version': _exportVersion,
-        'export_date': DateTime.now().toIso8601String(),
-        'data_type': 'synthetic',
-        'record_count': records.length,
-        'records': records,
-      };
-
-      // Guardar archivo
-      final filePath = await _saveToFile(
-        exportData,
-        filename: 'ml_synthetic_data',
-      );
-
-      return ExportResult(
-        success: true,
-        recordCount: records.length,
-        filePath: filePath,
-      );
-    } catch (e) {
-      return ExportResult(
-        success: false,
-        recordCount: 0,
-        error: 'Error al generar datos sintéticos: $e',
-      );
-    }
-  }
-
-  /// Comparte el archivo de datos exportados
-  Future<void> shareExportedData(String filePath) async {
-    final file = XFile(filePath);
-    await Share.shareXFiles(
-      [file],
-      subject: 'Datos de entrenamiento ML - Tamagotchi',
-      text: 'Datos exportados para entrenamiento de modelos ML',
-    );
-  }
-
-  /// Guarda datos en archivo JSON
-  Future<String> _saveToFile(
-    Map<String, dynamic> data, {
-    String filename = 'ml_training_data',
-  }) async {
-    final directory = await getTemporaryDirectory();
-    final timestamp = DateTime.now().millisecondsSinceEpoch;
-    final file = File('${directory.path}/${filename}_$timestamp.json');
-
-    final jsonString = const JsonEncoder.withIndent('  ').convert(data);
-    await file.writeAsString(jsonString);
-
-    return file.path;
-  }
-
-  /// Estima tiempo hasta estado crítico basado en métricas actuales
-  List<double> _estimateTimeToCritical(Pet pet) {
-    // Tasas de decaimiento aproximadas (por minuto)
-    const hungerRate = 0.12; // Hambre aumenta
-    const happinessRate = 0.06; // Felicidad disminuye
-    const energyRate = 0.06; // Energía disminuye
-    const healthRate = 0.04; // Salud disminuye (más lento)
-
-    return [
-      ((70 - pet.hunger) / hungerRate).clamp(0.0, 180.0),
-      ((pet.happiness - 30) / happinessRate).clamp(0.0, 180.0),
-      ((pet.energy - 20) / energyRate).clamp(0.0, 180.0),
-      ((pet.health - 30) / healthRate).clamp(0.0, 180.0),
-    ];
-  }
-
-  /// Determina la acción óptima basada en métricas
-  InteractionType _determineOptimalAction({
-    required double hunger,
-    required double happiness,
-    required double energy,
-    required double health,
-  }) {
-    // Priorizar por urgencia
-    if (hunger > 70) return InteractionType.feed;
-    if (health < 40) return InteractionType.clean;
-    if (happiness < 40) return InteractionType.play;
-    if (energy < 30) return InteractionType.rest;
-
-    // Si todo está bien, elegir basado en qué está más bajo
-    final metrics = {
-      InteractionType.feed: 100 - hunger, // Invertir para que menor = más urgente
-      InteractionType.play: happiness,
-      InteractionType.rest: energy,
-      InteractionType.clean: health,
-    };
-
-    return metrics.entries
-        .reduce((a, b) => a.value < b.value ? a : b)
-        .key;
-  }
-
-  /// Genera features sintéticos
-  List<double> _generateSyntheticFeatures({
-    required double hunger,
-    required double happiness,
-    required double energy,
-    required double health,
-    required Random random,
-  }) {
-    return [
-      hunger / 100,
-      happiness / 100,
-      energy / 100,
-      health / 100,
-      random.nextDouble(), // emotional_state
-      random.nextDouble(), // bond_level
-      random.nextDouble(), // proactive_ratio
-      random.nextDouble(), // time_of_day
-      random.nextDouble(), // day_of_week
-      random.nextDouble(), // minutes_since_last
-      random.nextDouble() > 0.8 ? 1.0 : 0.0, // last_action_feed
-      random.nextDouble() > 0.8 ? 1.0 : 0.0, // last_action_play
-      random.nextDouble() > 0.8 ? 1.0 : 0.0, // last_action_clean
-      random.nextDouble() > 0.8 ? 1.0 : 0.0, // last_action_rest
-      random.nextDouble() > 0.8 ? 1.0 : 0.0, // last_action_minigame
-    ];
-  }
-}
-
-/// Resultado de una exportación de datos
+/// Resultado de una operación de exportación de datos ML
 class ExportResult {
   final bool success;
   final int recordCount;
@@ -318,4 +21,315 @@ class ExportResult {
     this.filePath,
     this.error,
   });
+
+  @override
+  String toString() {
+    if (success) {
+      return 'ExportResult: success=true, recordCount=$recordCount, filePath=$filePath';
+    }
+    return 'ExportResult: success=false, error=$error';
+  }
+}
+
+/// Servicio para exportar datos de entrenamiento de Machine Learning
+///
+/// Este servicio permite exportar los datos reales de la mascota
+/// (historial de interacciones, personalidad, métricas) para entrenar
+/// modelos ML, así como generar datos sintéticos para pruebas.
+class MLDataExportService {
+  static MLDataExportService? _instance;
+
+  factory MLDataExportService() {
+    _instance ??= MLDataExportService._internal();
+    return _instance!;
+  }
+
+  MLDataExportService._internal();
+
+  /// Exporta los datos reales de entrenamiento de la mascota
+  ///
+  /// Exporta información estructurada incluyendo:
+  /// - Datos demográficos de la mascota
+  /// - Métricas de personalidad
+  /// - Historial completo de interacciones con features
+  ///
+  /// Retorna un [ExportResult] con la ruta del archivo exportado
+  Future<ExportResult> exportTrainingData({
+    required Pet pet,
+    required PetPersonality personality,
+    required InteractionHistory history,
+  }) async {
+    try {
+      appLogger.i('Iniciando exportación de datos ML');
+
+      final trainingData = <String, dynamic>{
+        'metadata': {
+          'exportDate': DateTime.now().toIso8601String(),
+          'version': '1.0',
+          'format': 'training_data',
+        },
+        'pet': {
+          'name': pet.name,
+          'lifeStage': pet.lifeStage.name,
+          'variant': pet.variant.name,
+          'level': pet.level,
+          'experience': pet.experience,
+          'birthDate': pet.birthDate.toIso8601String(),
+          'currentMetrics': {
+            'hunger': pet.hunger,
+            'happiness': pet.happiness,
+            'energy': pet.energy,
+            'health': pet.health,
+          },
+        },
+        'personality': {
+          'bondPoints': personality.bondPoints,
+          'bondLevel': personality.bondLevel.name,
+          'emotionalState': personality.emotionalState.name,
+          'traits': {
+            for (var trait in PersonalityTrait.values)
+              trait.name: personality.getTraitIntensity(trait),
+          },
+          'dominantTraits': personality.dominantTraits
+              .map((t) => t.name)
+              .toList(),
+        },
+        'interactions': history.interactions.asMap().entries.map((entry) {
+          final interaction = entry.value;
+          return {
+            'index': entry.key,
+            'type': interaction.type.id,
+            'timestamp': interaction.timestamp.toIso8601String(),
+            'timeOfDay': interaction.timeOfDay.name,
+            'dayOfWeek': interaction.dayOfWeek,
+            'metricsBefore': {
+              'hunger': interaction.hungerBefore,
+              'happiness': interaction.happinessBefore,
+              'energy': interaction.energyBefore,
+              'health': interaction.healthBefore,
+            },
+            'metadata': interaction.metadata,
+          };
+        }).toList(),
+        'statistics': {
+          'totalInteractions': history.totalInteractions,
+          'interactionCounts': {
+            for (var entry in history.interactionCounts.entries)
+              entry.key.id: entry.value,
+          },
+          'timeOfDayDistribution': {
+            for (var entry in history.timeOfDayDistribution.entries)
+              entry.key.name: entry.value,
+          },
+          'dayOfWeekDistribution': {
+            for (var entry in history.dayOfWeekDistribution.entries)
+              _getDayName(entry.key): entry.value,
+          },
+          'averageInteractionsPerDay': history.averageInteractionsPerDay
+              .toStringAsFixed(2),
+          'mostActiveTimeOfDay': history.mostActiveTimeOfDay?.name,
+        },
+      };
+
+      final fileName = 'tamagotchi_ml_data_${_getTimestamp()}.json';
+      final filePath = await _saveJsonFile(fileName, trainingData);
+
+      appLogger.i(
+        'Datos exportados exitosamente: ${history.interactions.length} registros',
+      );
+
+      return ExportResult(
+        success: true,
+        recordCount: history.interactions.length,
+        filePath: filePath,
+      );
+    } catch (e, stackTrace) {
+      appLogger.e(
+        'Error exportando datos ML',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      return ExportResult(
+        success: false,
+        recordCount: 0,
+        error: 'Error: ${e.toString()}',
+      );
+    }
+  }
+
+  /// Genera datos sintéticos para entrenamiento de modelos ML
+  ///
+  /// Crea un conjunto de datos sintéticos realistas que simulan
+  /// interacciones con mascotas virtuales. Útil para:
+  /// - Entrenar modelos iniciales
+  /// - Aumentar el dataset de entrenamiento
+  /// - Probar pipelines de ML
+  ///
+  /// [recordCount] Cantidad de registros sintéticos a generar (default: 500)
+  ///
+  /// Retorna un [ExportResult] con la ruta del archivo generado
+  Future<ExportResult> generateSyntheticData({int recordCount = 500}) async {
+    try {
+      appLogger.i('Generando $recordCount registros sintéticos');
+
+      final syntheticData = <String, dynamic>{
+        'metadata': {
+          'exportDate': DateTime.now().toIso8601String(),
+          'version': '1.0',
+          'format': 'synthetic_training_data',
+          'recordCount': recordCount,
+        },
+        'synthetic_interactions': List.generate(recordCount, (index) {
+          final randomDayOffset = (index * 3) % 30;
+          final timestamp = DateTime.now().subtract(
+            Duration(days: randomDayOffset, hours: (index % 24)),
+          );
+
+          final type = _getRandomInteractionType(index);
+          final timeOfDay = TimeOfDay.fromHour(timestamp.hour);
+          final dayOfWeek = timestamp.weekday;
+
+          final hunger = _generateRandomMetric(10, 90, index);
+          final happiness = _generateRandomMetric(10, 90, index + 1);
+          final energy = _generateRandomMetric(10, 90, index + 2);
+          final health = _generateRandomMetric(50, 100, index + 3);
+
+          return {
+            'id': 'synthetic_${index.toString().padLeft(5, '0')}',
+            'type': type.id,
+            'timestamp': timestamp.toIso8601String(),
+            'timeOfDay': timeOfDay.name,
+            'dayOfWeek': dayOfWeek,
+            'metricsBefore': {
+              'hunger': hunger,
+              'happiness': happiness,
+              'energy': energy,
+              'health': health,
+            },
+            'synthetic': true,
+            'metadata': {
+              'petLifeStage': _getRandomLifeStage(index),
+              'petLevel': _generateRandomInt(1, 20, index),
+              'bondLevel': _getRandomBondLevel(index).name,
+            },
+          };
+        }),
+        'statistics': {
+          'totalRecords': recordCount,
+          'types': InteractionType.values.map((t) => t.id).toList(),
+          'timePeriods': TimeOfDay.values.map((t) => t.name).toList(),
+          'generatedBy': 'MLDataExportService',
+          'purpose': 'training_augmentation',
+        },
+      };
+
+      final fileName = 'tamagotchi_synthetic_data_${_getTimestamp()}.json';
+      final filePath = await _saveJsonFile(fileName, syntheticData);
+
+      appLogger.i(
+        'Datos sintéticos generados exitosamente: $recordCount registros',
+      );
+
+      return ExportResult(
+        success: true,
+        recordCount: recordCount,
+        filePath: filePath,
+      );
+    } catch (e, stackTrace) {
+      appLogger.e(
+        'Error generando datos sintéticos',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      return ExportResult(
+        success: false,
+        recordCount: 0,
+        error: 'Error: ${e.toString()}',
+      );
+    }
+  }
+
+  /// Comparte un archivo exportado mediante el sistema nativo
+  ///
+  /// Abre la hoja de compartir del sistema para enviar el archivo
+  /// a través de diferentes medios (email, drive, mensajes, etc.)
+  ///
+  /// [filePath] Ruta del archivo a compartir
+  Future<void> shareExportedData(String filePath) async {
+    try {
+      final file = File(filePath);
+      if (!await file.exists()) {
+        throw Exception('El archivo no existe: $filePath');
+      }
+
+      final xFile = XFile(filePath);
+      await Share.shareXFiles(
+        [xFile],
+        subject: 'Datos de entrenamiento Tamagotchi',
+        text: 'Archivo exportado desde Iztatamagotchi',
+      );
+
+      appLogger.i('Archivo compartido exitosamente: $filePath');
+    } catch (e, stackTrace) {
+      appLogger.e(
+        'Error compartiendo archivo',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
+  }
+
+  Future<String> _saveJsonFile(
+    String fileName,
+    Map<String, dynamic> data,
+  ) async {
+    final directory = await getTemporaryDirectory();
+    final file = File('${directory.path}/$fileName');
+    await file.writeAsString(jsonEncode(data));
+    return file.path;
+  }
+
+  String _getTimestamp() {
+    final now = DateTime.now();
+    final formatter = DateFormat('yyyyMMdd_HHmmss');
+    return formatter.format(now);
+  }
+
+  InteractionType _getRandomInteractionType(int seed) {
+    final types = InteractionType.values;
+    return types[seed % types.length];
+  }
+
+  double _generateRandomMetric(double min, double max, int seed) {
+    final value = ((min + (max - min) * (seed % 100) / 100) * 10).round() / 10;
+    return value.clamp(min, max);
+  }
+
+  int _generateRandomInt(int min, int max, int seed) {
+    return min + (seed % (max - min + 1));
+  }
+
+  String _getRandomLifeStage(int seed) {
+    final stages = ['egg', 'baby', 'child', 'teen', 'adult'];
+    return stages[seed % stages.length];
+  }
+
+  BondLevel _getRandomBondLevel(int seed) {
+    final levels = BondLevel.values;
+    return levels[seed % levels.length];
+  }
+
+  String _getDayName(int dayOfWeek) {
+    const days = {
+      1: 'Monday',
+      2: 'Tuesday',
+      3: 'Wednesday',
+      4: 'Thursday',
+      5: 'Friday',
+      6: 'Saturday',
+      7: 'Sunday',
+    };
+    return days[dayOfWeek] ?? 'Unknown';
+  }
 }

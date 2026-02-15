@@ -123,15 +123,24 @@ class SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   Future<void> _updateAccessory(BuildContext context, String accessory) async {
-    await ref.read(preferencesStateProvider.notifier).updateAccessory(accessory);
+    await ref
+        .read(preferencesStateProvider.notifier)
+        .updateAccessory(accessory);
   }
 
   Future<void> _updateSoundEnabled(BuildContext context, bool enabled) async {
-    await ref.read(preferencesStateProvider.notifier).updateSoundEnabled(enabled);
+    await ref
+        .read(preferencesStateProvider.notifier)
+        .updateSoundEnabled(enabled);
   }
 
-  Future<void> _updateNotificationsEnabled(BuildContext context, bool enabled) async {
-    await ref.read(preferencesStateProvider.notifier).updateNotificationsEnabled(enabled);
+  Future<void> _updateNotificationsEnabled(
+    BuildContext context,
+    bool enabled,
+  ) async {
+    await ref
+        .read(preferencesStateProvider.notifier)
+        .updateNotificationsEnabled(enabled);
   }
 
   Future<void> _exportMLData(BuildContext context) async {
@@ -209,7 +218,9 @@ class SettingsScreenState extends ConsumerState<SettingsScreen> {
 
         scaffoldMessenger.showSnackBar(
           SnackBar(
-            content: Text('Generados ${result.recordCount} registros sintéticos'),
+            content: Text(
+              'Generados ${result.recordCount} registros sintéticos',
+            ),
             backgroundColor: Colors.green,
           ),
         );
@@ -235,28 +246,21 @@ class SettingsScreenState extends ConsumerState<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     final petAsync = ref.watch(petStateProvider);
     final prefsAsync = ref.watch(preferencesStateProvider);
 
     return petAsync.when(
-      loading: () => const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      ),
-      error: (err, stack) => Scaffold(
-        body: Center(child: Text('Error: $err')),
-      ),
+      loading: () =>
+          const Scaffold(body: Center(child: CircularProgressIndicator())),
+      error: (err, stack) => Scaffold(body: Center(child: Text('Error: $err'))),
       data: (pet) => prefsAsync.when(
-        loading: () => const Scaffold(
-          body: Center(child: CircularProgressIndicator()),
-        ),
-        error: (err, stack) => Scaffold(
-          body: Center(child: Text('Error: $err')),
-        ),
+        loading: () =>
+            const Scaffold(body: Center(child: CircularProgressIndicator())),
+        error: (err, stack) =>
+            Scaffold(body: Center(child: Text('Error: $err'))),
         data: (preferences) {
           return _buildContent(context, pet, preferences);
         },
@@ -264,22 +268,21 @@ class SettingsScreenState extends ConsumerState<SettingsScreen> {
     );
   }
 
-  Widget _buildContent(BuildContext context, Pet pet, PetPreferences preferences) {
+  Widget _buildContent(
+    BuildContext context,
+    Pet pet,
+    PetPreferences preferences,
+  ) {
     return Scaffold(
-          appBar: AppBar(
-            title: const Text('Configuración'),
-          ),
-          body: ListView(
-            children: [
+      appBar: AppBar(title: const Text('Configuración')),
+      body: ListView(
+        children: [
           // Sección: Personalización
           const Padding(
             padding: EdgeInsets.all(16.0),
             child: Text(
               'Personalización',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),
 
@@ -352,7 +355,9 @@ class SettingsScreenState extends ConsumerState<SettingsScreen> {
           // Accesorios
           ListTile(
             leading: Text(
-              preferences.accessoryEmoji.isEmpty ? '👕' : preferences.accessoryEmoji,
+              preferences.accessoryEmoji.isEmpty
+                  ? '👕'
+                  : preferences.accessoryEmoji,
               style: const TextStyle(fontSize: 24),
             ),
             title: const Text('Accesorio'),
@@ -378,7 +383,9 @@ class SettingsScreenState extends ConsumerState<SettingsScreen> {
                       decoration: BoxDecoration(
                         color: isSelected
                             ? Theme.of(context).colorScheme.primaryContainer
-                            : Theme.of(context).colorScheme.surfaceContainerHighest,
+                            : Theme.of(
+                                context,
+                              ).colorScheme.surfaceContainerHighest,
                         borderRadius: BorderRadius.circular(12),
                         border: isSelected
                             ? Border.all(
@@ -391,7 +398,9 @@ class SettingsScreenState extends ConsumerState<SettingsScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            tempPrefs.accessoryEmoji.isEmpty ? '🚫' : tempPrefs.accessoryEmoji,
+                            tempPrefs.accessoryEmoji.isEmpty
+                                ? '🚫'
+                                : tempPrefs.accessoryEmoji,
                             style: const TextStyle(fontSize: 32),
                           ),
                           const SizedBox(height: 4),
@@ -420,10 +429,7 @@ class SettingsScreenState extends ConsumerState<SettingsScreen> {
             padding: EdgeInsets.all(16.0),
             child: Text(
               'Preferencias',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),
 
@@ -452,10 +458,7 @@ class SettingsScreenState extends ConsumerState<SettingsScreen> {
             padding: EdgeInsets.all(16.0),
             child: Text(
               'Información',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),
 
@@ -470,12 +473,12 @@ class SettingsScreenState extends ConsumerState<SettingsScreen> {
           ),
 
           ListTile(
-              leading: const Icon(Icons.cake),
-              title: const Text('Creado el'),
-              subtitle: Text(
-                '${pet.birthDate.day}/${pet.birthDate.month}/${pet.birthDate.year}',
-              ),
+            leading: const Icon(Icons.cake),
+            title: const Text('Creado el'),
+            subtitle: Text(
+              '${pet.birthDate.day}/${pet.birthDate.month}/${pet.birthDate.year}',
             ),
+          ),
 
           const Divider(),
 
@@ -484,10 +487,7 @@ class SettingsScreenState extends ConsumerState<SettingsScreen> {
             padding: EdgeInsets.all(16.0),
             child: Text(
               'Datos ML (Desarrollador)',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),
 
@@ -560,7 +560,10 @@ class SettingsScreenState extends ConsumerState<SettingsScreen> {
                   subtitle: const Text(
                     'Elimina todos los datos y comienza de nuevo',
                   ),
-                  trailing: Icon(Icons.chevron_right, color: Colors.red.shade700),
+                  trailing: Icon(
+                    Icons.chevron_right,
+                    color: Colors.red.shade700,
+                  ),
                   onTap: _showResetConfirmationDialog,
                 ),
               ],
@@ -568,9 +571,9 @@ class SettingsScreenState extends ConsumerState<SettingsScreen> {
           ),
 
           const SizedBox(height: 32),
-            ],
-          ),
-        );
+        ],
+      ),
+    );
   }
 
   Future<void> _showResetConfirmationDialog() async {
@@ -632,9 +635,7 @@ class SettingsScreenState extends ConsumerState<SettingsScreen> {
             ),
             FilledButton(
               onPressed: () => Navigator.pop(context, true),
-              style: FilledButton.styleFrom(
-                backgroundColor: Colors.red,
-              ),
+              style: FilledButton.styleFrom(backgroundColor: Colors.red),
               child: const Text('Sí, reiniciar'),
             ),
           ],
@@ -665,9 +666,7 @@ class SettingsScreenState extends ConsumerState<SettingsScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => const Center(
-        child: CircularProgressIndicator(),
-      ),
+      builder: (context) => const Center(child: CircularProgressIndicator()),
     );
 
     try {
